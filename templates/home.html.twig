@@ -4,6 +4,13 @@
 
 {% block body %}
 <div class="row no-gutters cover" style="background-image:url('{{ asset('images/cover.jpg') }}')">
-    <a href="{{ path('home_page') }}" title="Voir les figures"><span class="arrow-home"><i class="fas fa-chevron-circle-down fa-5x"></i></span></a>
+    <span class="text-home  d-none d-sm-none d-md-block">Bienvenue sur SnowTricks, LE site communautaire 100% snowboard !</span>
+    <span class="text-homeMobile  d-block d-md-none">SnowTricks, LE site communautaire 100% snowboard !</span>
+    <a href="{{ path('home_page') }}" title="Voir les figures">
+        <span class="arrow-home">
+            <i class="fas fa-chevron-circle-down fa-5x  d-none d-sm-none d-md-block"></i>
+            <i class="fas fa-chevron-circle-down fa-3x  d-block d-md-none"></i>
+        </span>
+    </a>
 </div>
 {% endblock %}

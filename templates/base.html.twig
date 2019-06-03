@@ -12,19 +12,19 @@
         {% endblock %}
     </head>
     <body>
-    <header>
-        <nav class="navbar navbar-expand-lg justify-content-center fixed-top text-white">
+    <header class="d-none d-sm-none d-md-block">
+        <nav class="navbar navbar-expand-md justify-content-center fixed-top text-white">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse justify-content-around" id="navbarTogglerDemo01">
-                <div class="text-center"><a class="navbar-brand" href=""><img src="{{ asset('images/logo.png') }}" width="130" height="70" alt="SnowTricks"/>Votre site communautaire 100% snowboard !</a></div>
+                <div class="text-center d-inline-flex"><a class="navbar-brand" href=""><img src="{{ asset('images/logo.png') }}" width="130" height="70" alt="SnowTricks"/></a></div>
                 <ul class="navbar-nav text-center">
                     <li class="nav-item"><a class="nav-link" href="{{ path('home_page') }}">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="">Figures</a></li>
-                    <li class="nav-item"><a class="nav-link" href="">Se connecter</a></li>
-                    <li class="nav-item"><a class="nav-link" href="">S'inscrire</a></li>
+                    <li class="nav-item"><a class="nav-link" href="">Connexion</a></li>
+                    <li class="nav-item"><a class="nav-link" href="">Inscription</a></li>
                 </ul>
             </div>
         </nav>
@@ -35,8 +35,13 @@
         {% endblock %}
 
         <footer class="footer text-center">
-            <div class="row align-items-center justify-content-center no-gutters">
+            <div class="row align-items-center justify-content-center no-gutters d-none d-sm-none d-md-block">
                 <span> Quentin Boinet | SnowTricks | Copyright 2019</span>
+            </div>
+            <div class="row d-flex align-items-center justify-content-around no-gutters d-block d-md-none">
+                <span><a href="{{ path('home_page') }}" title="Accueil"><i class="fas fa-home fa-2x"></i></a></span>
+                <span><i class="fas fa-user-plus fa-2x"></i></span>
+                <span><i class="fas fa-sign-in-alt fa-2x"></i></span>
             </div>
         </footer>
 
