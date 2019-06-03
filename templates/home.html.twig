@@ -3,4 +3,7 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
+<div class="row no-gutters cover" style="background-image:url('{{ asset('images/cover.jpg') }}')">
+    <a href="{{ path('home_page') }}" title="Voir les figures"><span class="arrow-home"><i class="fas fa-chevron-circle-down fa-5x"></i></span></a>
+</div>
 {% endblock %}

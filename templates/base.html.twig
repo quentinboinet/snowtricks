@@ -8,6 +8,7 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/base.css') }}"/>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
         {% endblock %}
     </head>
     <body>
@@ -29,14 +30,13 @@
         </nav>
     </header>
 
-        <div class="container">
+
         {% block body %}
         {% endblock %}
-        </div>
 
         <footer class="footer text-center">
             <div class="row align-items-center justify-content-center no-gutters">
-                <p> Quentin Boinet | SnowTricks | Copyright 2019</p>
+                <span> Quentin Boinet | SnowTricks | Copyright 2019</span>
             </div>
         </footer>
 
