@@ -1,3 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil {% endblock %}
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    <div class="row no-gutters cover" style="background-image:url('{{ asset('images/cover.jpg') }}')">
+        <span class="text-home  d-none d-sm-none d-md-block">Bienvenue sur SnowTricks, LE site communautaire 100% snowboard !</span>
+        <span class="text-homeMobile  d-block d-md-none">SnowTricks, LE site communautaire 100% snowboard !</span>
+        <a href="{{ path('home_page') }}#tricksList" class="arrowHome" title="Voir les figures">
+            <span class="arrow-home">
+                <i class="fas fa-chevron-circle-down fa-5x  d-none d-sm-none d-md-block"></i>
+            </span>
+            <span class="arrow-homeMobile">
+                <i class="fas fa-chevron-circle-down fa-3x  d-block d-md-none"></i>
+            </span>
+        </a>
+    </div>
+
+    <div id="tricksList">
+
+        <div class="row card-deck">
+            <div class="card rounded">
+                <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top border-bottom border-dark" alt="...">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col col-md-8">Trick name</div>
+                        <div class="col col-md-4"><i class="fas fa-pen-fancy"></i> | <i class="fas fa-trash-alt"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+
+            <!-- Flèche qui permet de remonter vers le haut de la section "figures" s'il y a plus de 15 figures affichées -->
+            <a href="{{ path('home_page') }}#tricksList" class="arrowHome" title="Remonter en haut">
+                <span class="arrow-homeUp">
+                    <i class="fas fa-chevron-circle-up fa-3x  d-none d-sm-none d-md-block"></i>
+                </span>
+                <span class="arrow-homeMobileUp">
+                    <i class="fas fa-chevron-circle-up fa-2x  d-block d-md-none"></i>
+                </span>
+            </a>
+    </div>
+{% endblock %}
