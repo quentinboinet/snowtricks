@@ -11,8 +11,9 @@
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
         {% endblock %}
 
+        {%  block javascriptHead %}
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-        <script>
+        <script type="text/javascript">
             $(function (keyframes, options) {
                 $('nav>div>ul>li>a').on('click', function(e) {
                     e.preventDefault();
@@ -46,6 +47,7 @@
                 });
             });
         </script>
+        {% endblock %}
 
     </head>
     <body data-spy="scroll" data-target=".navbar">

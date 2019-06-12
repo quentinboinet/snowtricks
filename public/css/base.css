@@ -78,14 +78,14 @@ body {
 
 .arrow-homeUp {
     position:absolute;
-    left: 93%;
+    left: 90%;
     color: black;
     animation: arrowHomeUP 1.5s ease-in-out -1s infinite running;
 }
 
 .arrow-homeMobileUp {
     position: absolute;
-    left:93%;
+    left:90%;
     color:black;
     animation: arrowHomeUP 1.5s ease-in-out -1s infinite running;
 }
@@ -111,11 +111,16 @@ body {
 #tricksList {
     min-height:92vh;
     padding-top: 30px;
-    padding-bottom:15vh;
     margin-left: 5%;
     margin-right: 5%;
 }
 
 .card {
     background-color: #5FC0C7 !important;
+    margin-bottom: 20px;
+    padding:0 !important;
+}
+
+#divArrowUp {
+    padding-bottom: 50px;
 }
