@@ -1,0 +1,31 @@
+body {
+    background-color : #5FC0C7 !important;
+}
+
+#errorBlock {
+    height:50%;
+    width:50%;
+    position:absolute;
+    top:25%;
+    left:25%;
+    text-align:center;
+}
+
+#errorBlock img {
+    height:30vh;
+}
+
+#errorBlock a {
+    color:black;
+}
+#errorBlock p {
+    font-size: 1.2em;
+    color:white;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+#imageError {
+    position: relative;
+    margin:0;
+}

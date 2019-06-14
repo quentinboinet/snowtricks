@@ -2,54 +2,6 @@
 
 {% block title %}Accueil{% endblock %}
 
-{% block javascriptHead %}
-    {{ parent() }}
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("#showMoreOffset").val(15); //on initialise au chargement de la page le compteur à 15 tricks affichés pour gérer les clics sur "Voir plus"
-            $('#showMore').click(function () {
-                var offset = $('#showMoreOffset').val();
-                $.ajax({
-                    method: "POST",
-                    url: "{{ path('get_more_tricks') }}",
-                    data: {offset: offset},
-                    success: function(data) {
-                        var nbreTricks = data.length;
-                        //si on a moins de 15 figures (donc on arrive à la fin), on cache le bouton "voir plus"
-                        if (nbreTricks < 15) { $("#divShowMore").css('display', 'none'); }
-
-                        var html = "";
-                        var i = 0;
-                        $.each(data, function(key, val){
-                            if ((i % 5) == 0) { html = html + " <div class=\"row justify-content-around\">"; }
-
-                                html = html + "            <div class=\"col-lg-2 card h-100 rounded\">\n" +
-                                "                <img src=\"{{ asset('images/default_cover.jpg') }}\" class=\"card-img-top border-bottom border-dark\" alt=\"...\">\n" +
-                                "                <div class=\"card-body\">\n" +
-                                "                    <div class=\"row\">\n" +
-                                "                        <div class=\"col col-xs-8 col-sm-12 col-md-7\">" + val.name + "</div>\n" +
-                                "                        <div class=\"col col-xs-4 col-sm-12 col-md-5 text-right\"><i class=\"fas fa-pen-fancy\"></i> <i class=\"fas fa-trash-alt\"></i></div>\n" +
-                                "                    </div>\n" +
-                                "                </div>\n" +
-                                "            </div>";
-                            if (((i+1) % 5) == 0) { html = html + "</div>"; }
-                            if ((i+1) == nbreTricks) { html = html + "</div>"; }
-                                i = i+1;
-
-                            });
-                        $("#tricksList").append(html);
-                        var newOffset = parseInt(offset) + parseInt(nbreTricks);
-                        $("#showMoreOffset").val(newOffset);
-
-                        //on affiche la flèche pour remonter en haut des figures si le nombre de figures affichées est supérieure à 15
-                        if ($('.card').length > 15) { $('#divArrowUp').css('display', 'flex'); }
-                    }
-                });
-            });
-        });
-    </script>
-{%  endblock %}
-
 {% block body %}
     <div class="row no-gutters cover" style="background-image:url('{{ asset('images/cover.jpg') }}')">
         <span class="text-home  d-none d-sm-none d-md-block">Bienvenue sur SnowTricks, LE site communautaire 100% snowboard !</span>
@@ -64,18 +16,35 @@
         </a>
     </div>
 
-    <div id="tricksList">
+    <div id="tricksList" data-defaultcover="{{ asset('images/default_cover.jpg') }}">
+    {% if tricks == "" %}
+        <div class="row justify-content-center align-items-center col-md-4 offset-md-4 card text-center text-white rounded">
+            <p><br /><i class="far fa-meh-rolling-eyes fa-5x"></i></p>
+            <div class="card-body">
+                <div class="row">
+                    <p><b>Aucune figure n'a pour le moment été ajoutée !<br /> Qu'attendez-vous pour contribuer ?</b></p>
+                </div>
+            </div>
+        </div>
+    {% else %}
         {% for trick in tricks %}
 
              {% if (loop.index0 % 5) == 0 %}
              <div class="row justify-content-around">
             {% endif %}
             <div class="col-lg-2 card h-100 rounded">
-                <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top border-bottom border-dark" alt="...">
+
+                <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
+                <img src="
+                {% if ((trick.pictures | length) == 0) %} {{ asset('images/default_cover.jpg') }}
+                {% else %} {%  for picture in trick.pictures %} {% if loop.first %}{{ asset(picture.path) }}{%  endif %} {% endfor %}
+                {% endif %}
+                " class="card-img-top border-bottom border-dark" alt="{{ trick.name }}">
+
                 <div class="card-body">
                     <div class="row">
                         <div class="col col-xs-8 col-sm-12 col-md-7">{{ trick.name }}</div>
-                        <div class="col col-xs-4 col-sm-12 col-md-5 text-right"><i class="fas fa-pen-fancy"></i> <i class="fas fa-trash-alt"></i></div>
+                        <div class="col col-xs-4 col-sm-12 col-md-5 text-right"><a href="" title="Modifier la figure"><i class="fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="fas fa-trash-alt"></i></a></div>
                     </div>
                 </div>
             </div>
@@ -87,13 +56,17 @@
                 </div>
             {% endif %}
         {% endfor %}
-    </div>
-    {% if tricks|length == 15 %}
-        <div class="row justify-content-center" id="divShowMore">
-            <button class="btn btn-info" id="showMore">Voir plus</button>
-            <input type="text" id="showMoreOffset" value="15" style="display: none;"/>
-        </div>
+
+        {% if tricks|length == 15 %}
+            <div class="row justify-content-center" id="divShowMore">
+                <button class="btn btn-info" id="showMore" data-path="{{ path('get_more_tricks') }}">Voir plus</button>
+                <button class="btn btn-info" id="showMoreGif" style="display:none;"><i class="fas fa-stroopwafel fa-spin fa-2x"></i></button>
+                <input type="text" id="showMoreOffset" value="15" style="display: none;"/>
+            </div>
+        {% endif %}
+
     {% endif %}
+    </div>
 
     <div class="row" id="divArrowUp" style="display:none;">
             <!-- Flèche qui permet de remonter vers le haut de la section "figures" s'il y a plus de 15 figures affichées -->
@@ -107,3 +80,8 @@
             </a>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/showMoreHome.js') }}"></script>
+{%  endblock %}

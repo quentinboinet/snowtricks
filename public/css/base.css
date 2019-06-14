@@ -87,6 +87,7 @@ body {
     position: absolute;
     left:90%;
     color:black;
+    padding-bottom: 25%;
     animation: arrowHomeUP 1.5s ease-in-out -1s infinite running;
 }
 
@@ -117,10 +118,21 @@ body {
 
 .card {
     background-color: #5FC0C7 !important;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     padding:0 !important;
 }
+.card a {
+    color:black;
+}
 
-#divArrowUp {
+#divArrowUp, #divShowMore {
     padding-bottom: 50px;
+    margin:0;
+}
+
+#errorPageBlock {
+    min-height:82vh;
+    padding-top: 30px;
+    margin-left: 5%;
+    margin-right: 5%;
 }

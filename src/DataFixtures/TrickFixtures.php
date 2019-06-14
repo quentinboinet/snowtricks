@@ -2,16 +2,18 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Picture;
 use App\Entity\Trick;
+use App\Entity\Video;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class TrickFixtures extends Fixture
+class TrickFixtures extends BaseFixture implements DependentFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function loadData(ObjectManager $manager)
     {
-        for ($i=0; $i<=50; $i++)
-        {
+        $this->createMany(50, Trick::class, function($i) use ($manager){
             $trick = new Trick();
             $trick->setAuthorName('Quentin Boinet')
                 ->setName('Backflip-' . $i)
@@ -37,8 +39,27 @@ class TrickFixtures extends Fixture
                 ->setPublishedAt(new \DateTime(sprintf('-%d days', rand(1, 100))))
                 ->setUpdatedAt(new \DateTime(sprintf('-%d days', rand(1, 100))));
 
-            $manager->persist($trick);
-        }
+            $pictures = $this->getRandomReferences(Picture::class, $this->faker->numberBetween(0, 5));
+            foreach ($pictures as $picture) {
+                $trick->addPicture($picture);
+            }
+
+            $videos = $this->getRandomReferences(Video::class, $this->faker->numberBetween(0, 5));
+            foreach ($videos as $video) {
+                $trick->addVideo($video);
+            }
+
+            return $trick;
+        });
+
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        //on s'assure que les images soient bien chargées et crées avant de les associer à des tricks
+        return [
+            PictureFixtures::class, VideoFixtures::class
+        ];
     }
 }
