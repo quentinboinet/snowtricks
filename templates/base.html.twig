@@ -23,15 +23,25 @@
             <div class="collapse navbar-collapse justify-content-around" id="navbarTogglerDemo01">
                 <div class="text-center d-inline-flex"><a class="navbar-brand" href=""><img src="{{ asset('images/logo.png') }}" width="130" height="70" alt="SnowTricks"/></a></div>
                 <ul class="navbar-nav text-center">
-                    <li class="nav-item"><a class="nav-link" href="{{ path('home_page') }}">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page') }}#tricksList">Figures</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Connexion</a></li>
-                    <li class="nav-item"><a class="nav-link" href="">Inscription</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('home_page') }}" title="Accueil">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page') }}#tricksList" title="Accéder à la liste des figures">Figures</a></li>
+
+                    {% if is_granted('ROLE_USER') %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}" title="Se déconnecter">Déconnexion</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}" title="Se connecter">Connexion</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" title="S'inscrire">Inscription</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
     </header>
 
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-info">
+            {{ message }}
+        </div>
+    {% endfor %}
 
         {% block body %}
         {% endblock %}
@@ -42,8 +52,12 @@
             </div>
             <div class="row d-flex align-items-center justify-content-around no-gutters d-block d-md-none fixed-bottom footerMobile">
                 <span><a href="{{ path('home_page') }}" title="Accueil"><i class="fas fa-home fa-2x"></i></a></span>
-                <span><i class="fas fa-user-plus fa-2x"></i></span>
-                <span><i class="fas fa-sign-in-alt fa-2x"></i></span>
+                {% if is_granted('ROLE_USER') %}
+                    <span><a href="{{ path('app_logout') }}" title="Déconnexion"><i class="fas fa-sign-out-alt fa-2x"></i></a></span>
+                {% else %}
+                    <span><a href="" title="S'inscrire"><i class="fas fa-user-plus fa-2x"></i></a></span>
+                    <span><a href="{{ path('app_login') }}" title="Se connecter"><i class="fas fa-sign-in-alt fa-2x"></i></a></span>
+                {% endif %}
             </div>
         </footer>
 
@@ -52,6 +66,7 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
             <script src="{{ asset('js/scrollsHome.js') }}"></script>
+            <script src="{{ asset('js/base.js') }}"></script>
         {% endblock %}
 
     </body>
