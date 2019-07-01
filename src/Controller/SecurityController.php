@@ -2,13 +2,26 @@
 
 namespace App\Controller;
 
+use App\Entity\RegistrationToken;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    private $mailer;
+
+    public function __construct(MailerInterface $mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
     /**
      * @Route("/login", name="app_login")
      */
@@ -39,5 +52,45 @@ class SecurityController extends AbstractController
     {
         $this->addFlash('success', 'Vous êtes maintenant déconnecté !');
         return $this->redirectToRoute('home_page');
+    }
+
+    /**
+     * @Route ("/register", name="app_register")
+     */
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        if ($request->isMethod('POST')) {
+
+            //on insère l'user en BDD
+            $user = new User();
+            $user->setUsername($request->request->get('username'));
+            $user->setEmail($request->request->get('email'));
+            $user->setPassword($passwordEncoder->encodePassword(
+                $user,
+                $request->request->get('password')
+            ));
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            //on crée le token qui servira à valider son compte
+            $token = new RegistrationToken($user);
+            $em->persist($token);
+            $em->flush();
+
+            //on envoi l'e-mail de confirmation d'inscription
+            $email = (new Email())
+            ->from('quentinboinet@live.fr')
+                ->to($request->request->get('email'))
+                ->subject('SnowTricks - Confirmation d\'inscription')
+                ->html('<h3>SnowTricks</h3><p>Merci pour votre inscription sur le site communautaire SnowTricks ! <br/>Cependant, votre compte est pour le moment inactif. Afin
+                de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant :</p>');
+
+            $this->mailer->send($email);
+
+            $this->addFlash('success', 'Inscription prise en compte ! Un e-mail contenant un lien d\'activation vous a été envoyé.');
+            return $this->redirectToRoute('home_page');
+        }
+        return $this->render('security/register.html.twig');
     }
 }

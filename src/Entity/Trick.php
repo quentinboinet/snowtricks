@@ -18,10 +18,6 @@ class Trick
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $authorName;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -63,6 +59,12 @@ class Trick
      */
     private $videos;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tricks")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $authorName;
+
     public function __construct()
     {
         $this->pictures = new ArrayCollection();
@@ -72,18 +74,6 @@ class Trick
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAuthorName(): ?string
-    {
-        return $this->authorName;
-    }
-
-    public function setAuthorName(string $authorName): self
-    {
-        $this->authorName = $authorName;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -206,6 +196,18 @@ class Trick
         if ($this->videos->contains($video)) {
             $this->videos->removeElement($video);
         }
+
+        return $this;
+    }
+
+    public function getAuthorName(): ?User
+    {
+        return $this->authorName;
+    }
+
+    public function setAuthorName(?User $authorName): self
+    {
+        $this->authorName = $authorName;
 
         return $this;
     }

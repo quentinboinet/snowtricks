@@ -30,7 +30,7 @@
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}" title="Se déconnecter">Déconnexion</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}" title="Se connecter">Connexion</a></li>
-                        <li class="nav-item"><a class="nav-link" href="" title="S'inscrire">Inscription</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_register') }}" title="S'inscrire">Inscription</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -55,7 +55,7 @@
                 {% if is_granted('ROLE_USER') %}
                     <span><a href="{{ path('app_logout') }}" title="Déconnexion"><i class="fas fa-sign-out-alt fa-2x"></i></a></span>
                 {% else %}
-                    <span><a href="" title="S'inscrire"><i class="fas fa-user-plus fa-2x"></i></a></span>
+                    <span><a href="{{ path('app_register') }}" title="S'inscrire"><i class="fas fa-user-plus fa-2x"></i></a></span>
                     <span><a href="{{ path('app_login') }}" title="Se connecter"><i class="fas fa-sign-in-alt fa-2x"></i></a></span>
                 {% endif %}
             </div>

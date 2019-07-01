@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -46,6 +48,22 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Trick", mappedBy="authorName")
+     */
+    private $tricks;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\RegistrationToken", mappedBy="user", orphanRemoval=true)
+     */
+    private $registrationTokens;
+
+    public function __construct()
+    {
+        $this->tricks = new ArrayCollection();
+        $this->registrationTokens = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -152,6 +170,68 @@ class User implements UserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Trick[]
+     */
+    public function getTricks(): Collection
+    {
+        return $this->tricks;
+    }
+
+    public function addTrick(Trick $trick): self
+    {
+        if (!$this->tricks->contains($trick)) {
+            $this->tricks[] = $trick;
+            $trick->setAuthorName($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrick(Trick $trick): self
+    {
+        if ($this->tricks->contains($trick)) {
+            $this->tricks->removeElement($trick);
+            // set the owning side to null (unless already changed)
+            if ($trick->getAuthorName() === $this) {
+                $trick->setAuthorName(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|RegistrationToken[]
+     */
+    public function getRegistrationTokens(): Collection
+    {
+        return $this->registrationTokens;
+    }
+
+    public function addRegistrationToken(RegistrationToken $registrationToken): self
+    {
+        if (!$this->registrationTokens->contains($registrationToken)) {
+            $this->registrationTokens[] = $registrationToken;
+            $registrationToken->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistrationToken(RegistrationToken $registrationToken): self
+    {
+        if ($this->registrationTokens->contains($registrationToken)) {
+            $this->registrationTokens->removeElement($registrationToken);
+            // set the owning side to null (unless already changed)
+            if ($registrationToken->getUser() === $this) {
+                $registrationToken->setUser(null);
+            }
+        }
 
         return $this;
     }
