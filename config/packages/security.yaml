@@ -16,7 +16,8 @@ security:
                 authenticators:
                     - App\Security\LoginFormAuthenticator
             logout:
-                path: app_logout
+                path: /logout
+                target: /app_logout_message
 
     encoders:
         App\Entity\User:

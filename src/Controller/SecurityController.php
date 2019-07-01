@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -29,6 +30,14 @@ class SecurityController extends AbstractController
      */
     public function logout()
     {
+    }
 
+    /**
+     * @Route("/app_logout_message", name="app_logout_message")
+     */
+    public function logout_message()
+    {
+        $this->addFlash('success', 'Vous êtes maintenant déconnecté !');
+        return $this->redirectToRoute('home_page');
     }
 }
