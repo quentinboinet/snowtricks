@@ -69,6 +69,7 @@ class SecurityController extends AbstractController
                 $user,
                 $request->request->get('password')
             ));
+            $user->setStatus(0);
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
@@ -84,7 +85,8 @@ class SecurityController extends AbstractController
                 ->to($request->request->get('email'))
                 ->subject('SnowTricks - Confirmation d\'inscription')
                 ->html('<h3>SnowTricks</h3><p>Merci pour votre inscription sur le site communautaire SnowTricks ! <br/>Cependant, votre compte est pour le moment inactif. Afin
-                de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant :</p>');
+                de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $user->getId() . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
+                <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
 
             $this->mailer->send($email);
 

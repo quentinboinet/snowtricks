@@ -30,6 +30,7 @@ class UserFixtures extends BaseFixture
                 $user,
                 'password'
             ));
+            $user->setStatus(1);
             return $user;
         });
 
@@ -44,6 +45,7 @@ class UserFixtures extends BaseFixture
                 $user,
                 'password'
             ));
+            $user->setStatus(1);
             return $user;
         });
         $manager->flush();
