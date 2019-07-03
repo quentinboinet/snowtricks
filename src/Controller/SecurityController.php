@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\RegistrationToken;
 use App\Entity\User;
+use App\Form\UserRegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,15 +60,15 @@ class SecurityController extends AbstractController
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
-        if ($request->isMethod('POST')) {
+        $form = $this->createForm(UserRegistrationFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
 
             //on insère l'user en BDD
-            $user = new User();
-            $user->setUsername($request->request->get('username'));
-            $user->setEmail($request->request->get('email'));
+            $user = $form->getData();
             $user->setPassword($passwordEncoder->encodePassword(
                 $user,
-                $request->request->get('password')
+                $form['plainPassword']->getData()
             ));
             $user->setStatus(0);
             $em = $this->getDoctrine()->getManager();
@@ -82,7 +83,7 @@ class SecurityController extends AbstractController
             //on envoi l'e-mail de confirmation d'inscription
             $email = (new Email())
             ->from('quentinboinet@live.fr')
-                ->to($request->request->get('email'))
+                ->to($form['email']->getData())
                 ->subject('SnowTricks - Confirmation d\'inscription')
                 ->html('<h3>SnowTricks</h3><p>Merci pour votre inscription sur le site communautaire SnowTricks ! <br/>Cependant, votre compte est pour le moment inactif. Afin
                 de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $user->getId() . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
@@ -93,6 +94,6 @@ class SecurityController extends AbstractController
             $this->addFlash('success', 'Inscription prise en compte ! Un e-mail contenant un lien d\'activation vous a été envoyé.');
             return $this->redirectToRoute('home_page');
         }
-        return $this->render('security/register.html.twig');
+        return $this->render('security/register.html.twig', ['registrationForm' => $form->createView()]);
     }
 }

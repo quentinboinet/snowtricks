@@ -11,6 +11,7 @@
         "symfony/console": "4.3.*",
         "symfony/dotenv": "4.3.*",
         "symfony/flex": "^1.1",
+        "symfony/form": "4.3.*",
         "symfony/framework-bundle": "4.3.*",
         "symfony/google-mailer": "4.3.*",
         "symfony/mailer": "4.3.*",
@@ -18,6 +19,7 @@
         "symfony/security-bundle": "4.3.*",
         "symfony/translation": "4.3.*",
         "symfony/twig-bundle": "4.3.*",
+        "symfony/validator": "4.3.*",
         "symfony/web-server-bundle": "4.3.*",
         "symfony/yaml": "4.3.*"
     },
