@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -80,12 +82,22 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             throw new InvalidCsrfTokenException();
         }
 
-        return $this->userRepository->findOneBy(['username' => $credentials['username']]);
+        $user = $this->userRepository->findOneBy(['username' => $credentials['username']]);
+        return $user;
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+        $user2 = $this->userRepository->findOneBy(['username' => $credentials['username']]);
+        if ($user2->getStatus() === 0)
+        {
+            $this->flash->add('fail', 'Votre compte inactif ! Veuillez l\'activer via le lien reçu par e-mail, ou <a href="/api/resendRegistrationToken/' . $user2->getId() . '">me renvoyer un lien</a>');
+            throw new DisabledException();
+            return new RedirectResponse($this->router->generate('home_page'));
+        }
+        else {
+            return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+        }
     }
 
 

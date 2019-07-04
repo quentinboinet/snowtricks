@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\RegistrationToken;
-use App\Entity\User;
 use App\Form\UserRegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;

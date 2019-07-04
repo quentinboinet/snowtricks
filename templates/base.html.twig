@@ -39,13 +39,13 @@
 
     {% for message in app.flashes('success') %}
         <div class="alert alert-info">
-            {{ message }}
+            {{ message|raw }}
         </div>
     {% endfor %}
 
     {% for message in app.flashes('fail') %}
         <div class="alert alert-danger">
-            {{ message }}
+            {{ message|raw }}
         </div>
     {% endfor %}
 

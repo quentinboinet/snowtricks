@@ -15,6 +15,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     fields={"email"},
  *     message="Cette adresse e-mail est déjà associée à un compte existant !"
  * )
+ * @UniqueEntity(
+ *     fields={"username"},
+ *     message="Ce nom d'utilisateur est déjà associée à un compte existant !"
+ * )
  */
 class User implements UserInterface
 {
