@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Entity\Trick;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,5 +56,13 @@ class TrickController extends AbstractController
             }
             return new JsonResponse($arrayCollection);
         }
+    }
+
+    /**
+     * @Route("/tricks/{trickId}/view", name="trick_view")
+     */
+    public function viewOneTrick($trickId)
+    {
+
     }
 }

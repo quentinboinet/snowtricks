@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme registrationForm _self %}
+
+{% block form_row %}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+
+    <div class="form-group row">
+    {{- form_label(form, null, {label_attr: { class: 'col-sm-4 col-form-label' }}) -}}
+        <div class="col-sm-8">
+            {{- form_widget(form, {'attr': {'class': 'form-control'}}) -}}
+        </div>
+    {{- form_help(form) -}}
+    </div>
+    {{- form_errors(form) -}}
+{% endblock %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+            {% for error in errors %}
+                <span class="formErrorMessage"> {{  error.messageTemplate|trans(error.messageParameters, 'validators') }}</span><br/><br />
+            {% endfor %}
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center">
+            <div class="col col-md-4 text-center">
+                <div class="card loginCard">
+                    <div class="card-header"><h2>Inscription en 2 minutes !</h2></div>
+                    <div class="card-body">
+                        <p class="card-text">
+
+                            {{ form_start(registrationForm) }}
+                            {{ form_widget(registrationForm) }}
+                            <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
+                            {{ form_end(registrationForm) }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

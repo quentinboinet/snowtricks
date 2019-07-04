@@ -15,7 +15,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
     {
         $this->createMany(50, Trick::class, function($i) use ($manager){
             $trick = new Trick();
-            $trick->setAuthorName('Quentin Boinet')
+            $trick->setAuthorName($this->getRandomReference('main_users'))
                 ->setName('Backflip-' . $i)
                 ->setSlug('backflip-' . $i)
                 ->setDescription(<<<EOF
@@ -59,7 +59,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
     {
         //on s'assure que les images soient bien chargées et crées avant de les associer à des tricks
         return [
-            PictureFixtures::class, VideoFixtures::class
+            PictureFixtures::class, VideoFixtures::class, UserFixtures::class
         ];
     }
 }
