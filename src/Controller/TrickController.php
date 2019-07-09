@@ -61,8 +61,16 @@ class TrickController extends AbstractController
     /**
      * @Route("/tricks/{trickId}/view", name="trick_view")
      */
-    public function viewOneTrick($trickId)
+    public function viewOneTrick($trickId, EntityManagerInterface $em)
     {
-
+        $trickRepo = $em->getRepository(Trick::class);
+        $trick = $trickRepo->find($trickId);
+        if (!empty($trick)) {
+            return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
+        }
+        else {
+            //renvoyer un message d'erreur pour dire que la figure n'existe pas
+            return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
+        }
     }
 }

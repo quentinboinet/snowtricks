@@ -2,10 +2,10 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Category;
 use App\Entity\Picture;
 use App\Entity\Trick;
 use App\Entity\Video;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -35,7 +35,6 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
                 fugiat.
             EOF
                 )
-                ->setCategory('Rotation')
                 ->setPublishedAt(new \DateTime(sprintf('-%d days', rand(1, 100))))
                 ->setUpdatedAt(new \DateTime(sprintf('-%d days', rand(1, 100))));
 
@@ -49,6 +48,9 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
                 $trick->addVideo($video);
             }
 
+            $category = $this->getRandomReference(Category::class);
+            $trick->setCategory($category);
+
             return $trick;
         });
 
@@ -59,7 +61,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
     {
         //on s'assure que les images soient bien chargées et crées avant de les associer à des tricks
         return [
-            PictureFixtures::class, VideoFixtures::class, UserFixtures::class
+            CategoryFixtures::class, PictureFixtures::class, VideoFixtures::class, UserFixtures::class,
         ];
     }
 }

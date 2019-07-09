@@ -12,7 +12,7 @@ class VideoFixtures extends BaseFixture
     {
         $this->createMany(10, Video::class, function($i) use ($manager){
             $video = new Video();
-            $video->setUrl('/images/logo.png');
+            $video->setUrl('https://www.youtube.com/embed/dSZ7_TXcEdM');
 
             return $video;
         });

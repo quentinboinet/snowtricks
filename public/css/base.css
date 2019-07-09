@@ -122,6 +122,11 @@ body {
     margin-right: 5%;
 }
 
+#trickDetails {
+    padding-top: 50px;
+    padding-bottom: 100px;
+}
+
 .card {
     background-color: #5FC0C7 !important;
     margin-bottom: 15px;
@@ -171,4 +176,10 @@ body {
     text-align:center;
     font-weight: bold;
     margin-bottom: 0 !important;
+}
+
+#trickMedias:hover {
+    transform: scale(2.5);
+    transition: 1.5s;
+    z-index: 1;
 }
