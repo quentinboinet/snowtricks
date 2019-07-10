@@ -86,6 +86,14 @@
                                         </div>
                                     </div>
                                 {% endfor %}
+
+                                {% if trick.comments|length == 15 %}
+                                    <div class="row justify-content-center" id="divShowMore">
+                                        <button class="btn btn-info" id="showMore" data-path="{{ path('get_more_tricks') }}">Voir plus</button>
+                                        <button class="btn btn-info" id="showMoreGif" style="display:none;"><i class="fas fa-stroopwafel fa-spin fa-2x"></i></button>
+                                        <input type="text" id="showMoreOffset" value="15" style="display: none;"/>
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>

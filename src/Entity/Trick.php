@@ -69,6 +69,7 @@ class Trick
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="trick")
+     * @ORM\OrderBy({"publishedAt" = "DESC"})
      */
     private $comments;
 
