@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -19,6 +20,25 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
+
+    public static function createLimitedCommentsCriteria(): Criteria
+    {
+        return Criteria::create()
+            ->setMaxResults(10)
+            ;
+    }
+
+    public function showMoreComments($offset, $trickId)
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.trick = :trickId')
+            ->orderBy('t.publishedAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults(10)
+            ->setParameter('trickId', $trickId)
+            ->getQuery()
+            ->getResult();
+    }
     // /**
     //  * @return Comment[] Returns an array of Comment objects
     //  */

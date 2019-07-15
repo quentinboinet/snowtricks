@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Repository\CommentRepository;
+use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -227,6 +229,15 @@ class Trick
     public function getComments(): Collection
     {
         return $this->comments;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getLimitedComments(): Collection
+    {
+        $criteria = CommentRepository::createLimitedCommentsCriteria();
+        return $this->comments->matching($criteria);
     }
 
     public function addComment(Comment $comment): self
