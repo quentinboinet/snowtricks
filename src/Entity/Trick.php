@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Repository\CommentRepository;
+use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,10 +36,6 @@ class Trick
      */
     private $description;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $category;
 
     /**
      * @ORM\Column(type="datetime")
@@ -65,10 +63,23 @@ class Trick
      */
     private $authorName;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="tricks")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $category;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="trick")
+     * @ORM\OrderBy({"publishedAt" = "DESC"})
+     */
+    private $comments;
+
     public function __construct()
     {
         $this->pictures = new ArrayCollection();
         $this->videos = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -108,18 +119,6 @@ class Trick
     public function setDescription(?string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getCategory(): ?string
-    {
-        return $this->category;
-    }
-
-    public function setCategory(string $category): self
-    {
-        $this->category = $category;
 
         return $this;
     }
@@ -208,6 +207,58 @@ class Trick
     public function setAuthorName(?User $authorName): self
     {
         $this->authorName = $authorName;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getLimitedComments(): Collection
+    {
+        $criteria = CommentRepository::createLimitedCommentsCriteria();
+        return $this->comments->matching($criteria);
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setTrick($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getTrick() === $this) {
+                $comment->setTrick(null);
+            }
+        }
 
         return $this;
     }

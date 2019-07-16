@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ trick.name }}{% endblock %}
+
+{% block body %}
+    <div class="row no-gutters justify-content-center" style="background-image:url('{{ asset('images/cover.jpg') }}')">
+        <div id="trickDetails" class="row col-md-8 justify-content-center" data-defaultcover="{{ asset('images/default_cover.jpg') }}">
+                <div class="card rounded">
+                    {% if is_granted('ROLE_USER') %} <!-- on affiche les liens edit/suppression seulement si on est connecté -->
+                        <div class="card-img-overlay" id="editDeleteLinks">
+                            <h5 class="card-title text-right"><a href="" title="Modifier la figure"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
+                        </div>
+                    {% endif %}
+
+                    <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
+                    <img src="
+                {% if ((trick.pictures | length) == 0) %} {{ asset('images/default_cover.jpg') }}
+                {% else %} {%  for picture in trick.pictures %} {% if loop.first %}{{ asset(picture.path) }}{%  endif %} {% endfor %}
+                {% endif %}
+                " class="card-img-top border-bottom border-dark" alt="{{ trick.name }}">
+
+                    <div class="card-body">
+                        <div class="row justify-content-left align-items-center">
+                            {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
+                                <p>Aucun média pour cette figure !</p>
+                            {% else %}
+                                {% if ((trick.pictures | length) > 0) %}
+                                    {%  for picture in trick.pictures %}
+                                     <div class="col-lg-2 card rounded" id="trickMedias">
+                                    <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
+                                         <a href="{{ asset(picture.path) }}" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ trick.name }}"></a>
+                                     </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if ((trick.videos | length) > 0) %}
+                                    {%  for video in trick.videos %}
+                                        <div class="col-lg-2 card h-100 rounded" id="trickMedias">
+                                            <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
+                                            <embed src="{{ asset(video.url) }}" class="card-img-top" alt="{{ trick.name }}">
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <hr>
+                        <div class="row">
+                            {{ trick.description }}
+                        </div>
+                        <br />
+                        <div class="row justify-content-center text-center">
+                            <div class="col-md-3"><b>{{ trick.authorName.username }}</b></div>
+                            <div class="col-md-3"><b>Publiée le : {{ trick.publishedAt|date('d-m-Y H:i') }}</b></div>
+                            <div class="col-md-3"><b>Modifiée le : {{ trick.updatedAt|date('d-m-Y H:i') }}</b></div>
+                            <div class="col-md-3"><b>{{ trick.category.name }}</b></div>
+                        </div>
+                        <hr>
+
+                        {% if is_granted('ROLE_USER') %} <!-- on affiche le formulaire de commentaire seulement si on est connecté -->
+                        <div class="row justify-content-center text-center">
+                            <form method="post">
+                                <div class="form-group row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="comment" name="comment" placeholder="Votre commentaire" required minlength="2"/>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <button type="submit" class="btn btn-info">Commenter</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <hr>
+                        {% endif %}
+
+                        <div class="justify-content-center" id="tricksComments" data-trick_id="{{ trick.id }}">
+                            {% if ((trick.comments | length) == 0) %}
+                            <p>Aucun commentaire.</p>
+                            {% else %}
+                                {% for comment in trick.limitedComments() %}
+                                    <div class="row justify-content-center">
+                                        <div class="col col-sm-2 text-right"><i title="{{ comment.user.username }}" class="far fa-user-circle fa-2x"></i></div>
+                                        <div class="col col-sm-6">
+                                            <blockquote>
+                                                <p class="mb-0">{{ comment.content }}</p>
+                                                <footer class="blockquote-footer">{{ comment.user.username }} le <cite>{{ comment.publishedAt|date('d-m-Y H:i') }}</cite></footer>
+                                            </blockquote>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        {% if trick.limitedComments|length == 10 %}
+                            <div class="row justify-content-center" id="divShowMoreComments">
+                                <button class="btn btn-info" id="showMoreComments" data-path="{{ path('get_more_comments') }}">Voir plus</button>
+                                <button class="btn btn-info" id="showMoreGif" style="display:none;"><i class="fas fa-stroopwafel fa-spin fa-2x"></i></button>
+                                <input type="text" id="showMoreCommentsOffset" value="10" style="display: none;"/>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/showMoreComments.js') }}"></script>
+{%  endblock %}
