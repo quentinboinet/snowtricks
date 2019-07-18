@@ -178,10 +178,12 @@ class TrickController extends AbstractController
 
             $trickCategory = $em->getRepository(Category::class)->find($request->request->get('category'));
             $trick->setCategory($trickCategory);
-            
+
             $em->persist($trick);
             $em->flush();
-            return $this->render('tricks/trickAdd.html.twig', ['categories' => '', 'error' => '']);
+
+            $this->addFlash('success', 'La figure a bien été insérée dans notre base de données ! Vous pouvez la retrouver ci-dessous.');
+            return $this->redirectToRoute('home_page');
         }
         else {
             return $this->render('tricks/trickAdd.html.twig', ['categories' => $category, 'error' => '']);

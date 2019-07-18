@@ -24,6 +24,9 @@ $(document).ready(function() {
                     var username = val.author;
                     var content = val.content;
                     var date = val.date;
+                    var dateJS = new Date((date));
+                    var months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+                    dateJS = dateJS.getDate() + "-" + months[dateJS.getMonth()] + "-" + dateJS.getFullYear() + " " + dateJS.getHours() + ":" + dateJS.getMinutes();
                     //on déterminé si on affiche l'image par défault ou si on affiche celle en bdd
                     html = html + " <div class=\"row justify-content-center\">";
 
@@ -31,7 +34,7 @@ $(document).ready(function() {
                         " <div class=\"col col-sm-6\">\n" +
                         " <blockquote>" +
                         " <p class=\"mb-0\">" + content + "</p>\n" +
-                        " <footer class=\"blockquote-footer\">" + username + " le <cite>" + date + "</cite></footer>\n" +
+                        " <footer class=\"blockquote-footer\">" + username + " le <cite>" + dateJS  + "</cite></footer>\n" +
                         " </blockquote>\n" +
                         " </div>\n" +
                         " </div>";
