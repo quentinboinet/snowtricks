@@ -27,6 +27,7 @@
                     <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page') }}#tricksList" title="Accéder à la liste des figures">Figures</a></li>
 
                     {% if is_granted('ROLE_USER') %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('trick_add') }}" title="Publier une figure"><i class="fas fa-plus-circle"></i></a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}" title="Se déconnecter">Déconnexion</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}" title="Se connecter">Connexion</a></li>
@@ -59,6 +60,7 @@
             <div class="row d-flex align-items-center justify-content-around no-gutters d-block d-md-none fixed-bottom footerMobile">
                 <span><a href="{{ path('home_page') }}" title="Accueil"><i class="fas fa-home fa-2x"></i></a></span>
                 {% if is_granted('ROLE_USER') %}
+                    <span><a href="{{ path('trick_add') }}" title="Publier une figure"><i class="fas fa-plus-circle fa-2x"></i></a></span>
                     <span><a href="{{ path('app_logout') }}" title="Déconnexion"><i class="fas fa-sign-out-alt fa-2x"></i></a></span>
                 {% else %}
                     <span><a href="{{ path('app_register') }}" title="S'inscrire"><i class="fas fa-user-plus fa-2x"></i></a></span>

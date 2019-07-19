@@ -22,8 +22,8 @@ class CommentController extends AbstractController
             $arrayCollection = array();
             foreach($comments as $comment) {
                 $arrayCollection[] = array(
-                    'date' => $comment->getPublishedAt(),
-                    'author' => $comment->getUser(),
+                    'date' => $comment->getPublishedAt()->format('Y-m-d H:i:s'),
+                    'author' => $comment->getUser()->getUsername(),
                     'content' => $comment->getContent(),
                 );
             }

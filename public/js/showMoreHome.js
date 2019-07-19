@@ -9,6 +9,7 @@ $(document).ready(function() {
         var url = $("#showMore").data('path');
         var urlViewTrick = $("#urlViewTrick").data('path');
         var defaultCover = $("#tricksList").data('defaultcover');
+        var loggedin = $("#tricksList").data('loggedin');
         $.ajax({
             method: "POST",
             url: url,
@@ -34,9 +35,9 @@ $(document).ready(function() {
                         "                <img src=\""+ defaultCover + "\" class=\"card-img-top border-bottom border-dark\" alt=\"...\">\n" +
                         "                <div class=\"card-body\">\n" +
                         "                    <div class=\"row\">\n" +
-                        "                        <div class=\"col col-xs-8 col-sm-12 col-md-7\"><a href='" + urlViewTrick + "' title='Voir la figure'>" + val.name + "</a></div>\n" +
-                        "                        <div class=\"col col-xs-4 col-sm-12 col-md-5 text-right\"><i class=\"fas fa-pen-fancy\"></i> <i class=\"fas fa-trash-alt\"></i></div>\n" +
-                        "                    </div>\n" +
+                        "                        <div class=\"col col-xs-8 col-sm-12 col-md-7\"><a href='" + urlViewTrick + "' title='Voir la figure'>" + val.name + "</a></div>\n";
+                    if (loggedin == "true") { html = html + "<div class=\"col col-xs-4 col-sm-12 col-md-5 text-right\"><i class=\"fas fa-pen-fancy\"></i> <i class=\"fas fa-trash-alt\"></i></div>\n" }
+                    html = html + "                    </div>\n" +
                         "                </div>\n" +
                         "            </div>";
                     if (((i+1) % 5) == 0) { html = html + "</div>"; }
