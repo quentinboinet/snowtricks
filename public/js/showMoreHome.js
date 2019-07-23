@@ -6,7 +6,6 @@ $(document).ready(function() {
         $("#showMore").css('display', 'none');//on cache le bouton "voir plus"
         var offset = $('#showMoreOffset').val();
         var url = $("#showMore").data('path');
-        var urlViewTrick = $("#urlViewTrick").data('path');
         var defaultCover = $("#tricksList").data('defaultcover');
         var loggedin = $("#tricksList").data('loggedin');
         $.ajax({
@@ -21,6 +20,9 @@ $(document).ready(function() {
                 var html = "";
                 var i = 0;
                 $.each(data, function(key, val){
+
+                    var urlViewTrick = "/tricks/" + val.id + "/view";
+                    var urlEditTrick = "/tricks/" + val.id + "/edit";
                     //on déterminé si on affiche l'image par défault ou si on affiche celle en bdd
                     if (val.pictures.length != "") { defaultCover = val.pictures; }
                     if ((i % 5) == 0) { html = html + " <div class=\"row justify-content-around\">"; }
@@ -30,7 +32,7 @@ $(document).ready(function() {
                         "                <div class=\"card-body\">\n" +
                         "                    <div class=\"row\">\n" +
                         "                        <div class=\"col col-xs-8 col-sm-12 col-md-7\"><a href='" + urlViewTrick + "' title='Voir la figure'>" + val.name + "</a></div>\n";
-                    if (loggedin == "true") { html = html + "<div class=\"col col-xs-4 col-sm-12 col-md-5 text-right\"><i class=\"fas fa-pen-fancy\"></i> <i class=\"fas fa-trash-alt\"></i></div>\n" }
+                    if (loggedin === true) { html = html + "<div class=\"col col-xs-4 col-sm-12 col-md-5 text-right\"><a href='" + urlEditTrick + "' title='Modifier la figure'><i class=\"fas fa-pen-fancy\"></i></a> <i class=\"fas fa-trash-alt\"></i></div>\n"; }
                     html = html + "                    </div>\n" +
                         "                </div>\n" +
                         "            </div>";

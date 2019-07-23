@@ -126,7 +126,7 @@ class TrickController extends AbstractController
             //on vérifie qu'il n'y a pas de figure avec ce nom enregistré
             $trickRepo = $em->getRepository(Trick::class);
             $trick = $trickRepo->findOneBy(array('name' => $request->request->get('name')));
-            
+
             if (is_null($trick)) {
                 $trick = new Trick();
                 $trick->setName($request->request->get('name'));
@@ -193,6 +193,27 @@ class TrickController extends AbstractController
         }
         else {
             return $this->render('tricks/trickAdd.html.twig', ['categories' => $category, 'error' => '']);
+        }
+    }
+
+    /**
+     * @Route("/tricks/{trickId}/edit", name="trick_edit")
+     * @IsGranted("ROLE_USER")
+     */
+    public function trick_edit($trickId, EntityManagerInterface $em)
+    {
+        $trickRepo = $em->getRepository(Trick::class);
+        $trick = $trickRepo->find($trickId);
+
+        $categoryRepo = $em->getRepository(Category::class);
+        $category = $categoryRepo->findAll();
+
+        if (!empty($trick)) {
+            return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' =>$category, 'error' => '']);
+        }
+        else {
+            //renvoyer un message d'erreur pour dire que la figure n'existe pas
+            return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
         }
     }
 }

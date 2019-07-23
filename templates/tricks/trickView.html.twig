@@ -36,7 +36,7 @@
                 <div class="card rounded">
                     {% if is_granted('ROLE_USER') %} <!-- on affiche les liens edit/suppression seulement si on est connecté -->
                         <div class="card-img-overlay" id="editDeleteLinks">
-                            <h5 class="card-title text-right"><a href="" title="Modifier la figure"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
+                            <h5 class="card-title text-right"><a href="{{ path('trick_edit', {'trickId' : trick.id}) }}" title="Modifier la figure"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
                         </div>
                     {% endif %}
 

@@ -43,8 +43,8 @@
 
                 <div class="card-body">
                     <div class="row">
-                        <div class="col col-xs-8 col-sm-12 col-md-7" id="urlViewTrick" data-path="{{ path('trick_view', {'trickId': trick.id}) }}"><a href="{{ path('trick_view', {'trickId': trick.id}) }}" title="Accéder aux détails de la figure">{{ trick.name }}</a></div>
-                        {% if is_granted('ROLE_USER') %}<div class="col col-xs-4 col-sm-12 col-md-5 text-right"><a href="" title="Modifier la figure"><i class="fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="fas fa-trash-alt"></i></a></div>{% endif %}
+                        <div class="col col-xs-8 col-sm-12 col-md-7" id="urlViewTrick"><a href="{{ path('trick_view', {'trickId': trick.id}) }}" title="Accéder aux détails de la figure">{{ trick.name }}</a></div>
+                        {% if is_granted('ROLE_USER') %}<div class="col col-xs-4 col-sm-12 col-md-5 text-right" id="urlEditTrick"><a href="{{ path('trick_edit', {'trickId': trick.id}) }}" title="Modifier la figure"><i class="fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="fas fa-trash-alt"></i></a></div>{% endif %}
                     </div>
                 </div>
             </div>
