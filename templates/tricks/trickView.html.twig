@@ -50,7 +50,7 @@
                     <div class="card-body">
 
                         <!-- Bloc des images/vidéos pour affichage écran standard -->
-                        <div class="d-none d-sm-none d-md-block">
+                        <div class="d-none d-sm-none d-md-none d-lg-block">
                             <div class="row justify-content-left align-items-center">
                                 {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
                                     <p>Aucun média pour cette figure !</p>
@@ -77,7 +77,7 @@
                         </div>
 
                         <!-- Bloc images/vidéos pour affichage mobile -->
-                        <div class="d-block d-md-none">
+                        <div class="d-block d-lg-none">
                             <div class="row justify-content-center align-items-center" id="trickMediasMobileBlock" style="display:none;">
                                 {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
                                     <p>Aucun média pour cette figure !</p>
@@ -86,7 +86,7 @@
                                         {%  for picture in trick.pictures %}
                                             <div class="card h-100 rounded" id="trickMediasMobile">
                                                 <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                                                <a data-media="{{ asset(picture.path) }}" data-toggle="modal" data-target="#exampleModal" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top-mobile" alt="{{ trick.name }}"></a>
+                                                <a data-media="{{ asset(picture.path) }}" data-toggle="modal" data-target="#exampleModal" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ trick.name }}"></a>
                                             </div>
                                         {% endfor %}
                                     {% endif %}
@@ -95,7 +95,7 @@
                                         {%  for video in trick.videos %}
                                             <div class="card h-100 rounded" id="trickMediasMobile">
                                                 <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                                                <iframe src="{{ asset(video.url) }}" class="card-img-top-mobile" alt="{{ trick.name }}"></iframe>
+                                                <iframe src="{{ asset(video.url) }}" class="card-img-top" alt="{{ trick.name }}"></iframe>
                                             </div>
                                         {% endfor %}
                                     {% endif %}

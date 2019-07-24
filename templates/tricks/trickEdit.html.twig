@@ -35,9 +35,10 @@
     <div class="row no-gutters justify-content-center" style="background-image:url('{{ asset('images/cover.jpg') }}')">
         <div id="trickDetails" class="row col-md-8 justify-content-center" data-defaultcover="{{ asset('images/default_cover.jpg') }}">
             <div class="card rounded">
+                <form method="post" enctype="multipart/form-data">
                 {% if is_granted('ROLE_USER') %} <!-- on affiche les liens edit/suppression seulement si on est connecté -->
-                    <div class="card-img-overlay" id="editDeleteLinks">
-                        <h5 class="card-title text-right"><a href="{{ path('trick_edit', {'trickId' : trick.id}) }}" title="Modifier la figure"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
+                    <div class="card-img-overlay" id="editDeleteLinks" data-pictureid="{% if ((trick.pictures | length) == 0) %}cover{% else %}{%  for picture in trick.pictures %}{% if loop.first %}{{ picture.id }}{%  endif %}{% endfor %}{% endif %}">
+                        <h5 class="card-title text-right"><a id="coverTrickEdit" title="Modifier l'image de couverture"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a id="coverTrickDelete" title="Supprimer l'image de couverture"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
                     </div>
                 {% endif %}
 
@@ -49,9 +50,11 @@
                 " class="card-img-top-trickCover border-bottom border-dark" alt="{{ trick.name }}">
 
                 <div class="card-body">
-
+                    {% if error %}
+                        <div class="form-group row formErrorMessage justify-content-center align-items-center text-center">{{ error }}</div>
+                    {% endif %}
                     <!-- Bloc des images/vidéos pour affichage écran standard -->
-                    <div class="d-none d-sm-none d-md-block">
+                    <div class="d-none d-sm-none d-md-none d-lg-block">
                         <div class="row justify-content-left align-items-center">
                             {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
                                 <p>Aucun média pour cette figure !</p>
@@ -61,7 +64,7 @@
                                         <div class="col-lg-2 card rounded text-center">
                                             <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
                                             <a href="{{ asset(picture.path) }}" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ trick.name }}"></a>
-                                            <br/><span><a class="trickPictureEdit" title="Remplacer cette image" id="{{ picture.id }}"><i class="fas fa-pen-fancy"></i></a> | <a class="trickPictureDelete" title="Supprimer cette image"><i class="fas fa-trash-alt"></i></a></span>
+                                            <br/>{% if loop.first %}<span>A la une</span>{% else %}<span><a class="trickPictureEdit" title="Remplacer cette image" id="{{ picture.id }}"><i class="fas fa-pen-fancy"></i></a> | <a class="trickPictureDelete" title="Supprimer cette image" data-pictureid="{{ picture.id }}"><i class="fas fa-trash-alt"></i></a></span>{% endif %}
                                         </div>
                                     {% endfor %}
                                 {% endif %}
@@ -71,7 +74,7 @@
                                         <div class="col-lg-2 card h-100 rounded text-center">
                                             <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
                                             <embed src="{{ asset(video.url) }}" class="card-img-top" alt="{{ trick.name }}">
-                                            <br/><span><a data-videourl="{{ video.url }}" class="trickVideoEdit" title="Remplacer cette vidéo" id="{{ video.id }}"><i class="fas fa-pen-fancy"></i></a> | <a class="trickVideoDelete" title="Supprimer cette vidéo"><i class="fas fa-trash-alt"></i></a></span>
+                                            <br/><span><a data-videourl="{{ video.url }}" class="trickVideoEdit" title="Remplacer cette vidéo" id="{{ video.id }}"><i class="fas fa-pen-fancy"></i></a> | <a class="trickVideoDelete" title="Supprimer cette vidéo" data-videoid="{{ video.id }}"><i class="fas fa-trash-alt"></i></a></span>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
@@ -80,37 +83,46 @@
                         <hr>
                         <div class="row text-center justify-content-center" id="newVideosEdit">
                         </div>
+                        <br />
+                        <div class="row text-center justify-content-center formErrorMessage" id="videoErrorMessage">
+                        </div>
                     </div>
 
                     <!-- Bloc images/vidéos pour affichage mobile -->
-                    <div class="d-block d-md-none">
+                    <div class="d-block d-lg-none">
                         <div class="row justify-content-center align-items-center" id="trickMediasMobileBlock" style="display:none;">
                             {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
                                 <p>Aucun média pour cette figure !</p>
                             {% else %}
                                 {% if ((trick.pictures | length) > 0) %}
                                     {%  for picture in trick.pictures %}
-                                        <div class="card h-100 rounded" id="trickMediasMobile">
+                                        <div class="card h-100 rounded text-center" id="trickMediasMobile">
                                             <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                                            <a data-media="{{ asset(picture.path) }}" data-toggle="modal" data-target="#exampleModal" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top-mobile" alt="{{ trick.name }}"></a>
-                                            <br/><span><a class="trickPictureEdit" title="Remplacer cette image"><i class="fas fa-pen-fancy"></i></a> | <a title="Supprimer cette image"><i class="fas fa-trash-alt"></i></a></span>
+                                            <a data-media="{{ asset(picture.path) }}" data-toggle="modal" data-target="#exampleModal" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ trick.name }}"></a>
+                                            <br/>{% if loop.first %}<span>A la une</span>{% else %}<span><a class="trickPictureEdit" title="Remplacer cette image"><i class="fas fa-pen-fancy"></i></a> | <a title="Supprimer cette image" data-pictureid="{{ picture.id }}"><i class="fas fa-trash-alt"></i></a></span>{% endif %}
                                         </div>
                                     {% endfor %}
                                 {% endif %}
 
                                 {% if ((trick.videos | length) > 0) %}
                                     {%  for video in trick.videos %}
-                                        <div class="card h-100 rounded" id="trickMediasMobile">
+                                        <div class="card h-100 rounded text-center" id="trickMediasMobile">
                                             <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                                            <iframe src="{{ asset(video.url) }}" class="card-img-top-mobile" alt="{{ trick.name }}"></iframe>
-                                            <br/><span><a class="trickVideoEdit" title="Remplacer cette vidéo"><i class="fas fa-pen-fancy"></i></a> | <a title="Supprimer cette vidéo"><i class="fas fa-trash-alt"></i></a></span>
+                                            <iframe src="{{ asset(video.url) }}" class="card-img-top" alt="{{ trick.name }}"></iframe>
+                                            <br/><span><a data-videourl="{{ video.url }}" class="trickVideoEdit" title="Remplacer cette vidéo" id="{{ video.id }}"><i class="fas fa-pen-fancy"></i></a> | <a title="Supprimer cette vidéo" data-videoid="{{ video.id }}"><i class="fas fa-trash-alt"></i></a></span>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
                             {% endif %}
                         </div>
-                        <div class="row justify-content-center align-items-center"><button class="btn btn-info" id="showMediasLink">Voir les médias</button></div>
-                        <div class="row justify-content-center align-items-center"><button class="btn btn-info" id="hideMediasLink" style="display:none;">Cacher les médias</button></div>
+                        <div class="row justify-content-center align-items-center"><span class="btn btn-info" id="showMediasLink">Voir les médias</span></div>
+                        <div class="row justify-content-center align-items-center"><span class="btn btn-info" id="hideMediasLink" style="display:none;">Cacher les médias</span></div>
+                        <hr>
+                        <div class="row text-center justify-content-center" id="newVideosEditMobile">
+                        </div>
+                        <br />
+                        <div class="row text-center justify-content-center formErrorMessage" id="videoErrorMessageMobile">
+                        </div>
                     </div>
 
                     <hr>
@@ -122,7 +134,6 @@
                     </div>
                     <hr><br />
                     <div class="justify-content-center text-center">
-                        <form method="post" enctype="multipart/form-data">
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label">Nom de la figure :</label>
                                 <div class="col-md-8">
@@ -146,17 +157,17 @@
                                 </div>
                             </div>
 
-                            {% if error %}
-                                <div class="form-group row formErrorMessage">{{ error }}</div>
-                            {% endif %}
-
                             <div class="form-group row justify-content-center text-center">
-                                <button id="sumbitButtonAddTrick" type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
+                                <button id="sumbitButtonEditTrick" type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
                                 <a href="" title="Supprimer la figure"><button class="btn btn-danger btn-circle"><i class="fas fa-trash-alt"></i></button></a>
                             </div>
 
                             <input type="text" id="pictureNb" name="pictureNb" value="0" style="display: none;"/>
                             <input type="text" id="videoNb" name="videoNb" value="0" style="display: none;"/>
+                            <input type="text" id="picturesToDelete" name="picturesToDelete" value="" style="display:none;"/>
+                            <input type="text" id="videosToDelete" name="videosToDelete" value="" style="display:none;"/>
+                            <input type="text" id="picturesToEdit" name="picturesToEdit" value="" style="display:none;"/>
+                            <input type="text" id="videosToEdit" name="videosToEdit" value="" style="display:none;"/>
                         </form>
                     </div>
                 </div>
@@ -168,4 +179,5 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/editMedias.js') }}"></script>
+    <script src="{{ asset('js/editMediasMobile.js') }}"></script>
 {%  endblock %}
