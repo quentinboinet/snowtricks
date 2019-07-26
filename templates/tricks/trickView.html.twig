@@ -3,6 +3,30 @@
 {% block title %}{{ trick.name }}{% endblock %}
 
 {% block body %}
+
+    {{ parent() }}
+
+    <!-- modal pour demande de confirmation de suppression de commentaire -->
+    <div class="modal fade" id="deleteCommentModal" tabindex="-1" role="dialog" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Attention !</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Vous êtes sur le point de supprimer un commentaire. Etes-vous sûr de vouloir effectuer cette opération ?</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="" title="Supprimer le commentaire" class="deleteCommentLink"><button type="button" class="btn btn-primary">Supprimer</button></a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- modal pour affichage en grand des images -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -36,7 +60,7 @@
                 <div class="card rounded">
                     {% if is_granted('ROLE_USER') %} <!-- on affiche les liens edit/suppression seulement si on est connecté -->
                         <div class="card-img-overlay" id="editDeleteLinks">
-                            <h5 class="card-title text-right"><a href="{{ path('trick_edit', {'trickId' : trick.id}) }}" title="Modifier la figure"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
+                            <h5 class="card-title text-right"><a href="{{ path('trick_edit', {'trickId' : trick.id}) }}" title="Modifier la figure"><i class="btn btn-info fas fa-pen-fancy"></i></a> <a href="" data-toggle="modal" data-target="#deleteConfirmModal" data-deletepath="{{ path('trick_delete', {'trickId': trick.id}) }}" title="Supprimer la figure"><i class="btn btn-info fas fa-trash-alt"></i></a></h5>
                         </div>
                     {% endif %}
 
@@ -146,6 +170,11 @@
                                                 <p class="mb-0">{{ comment.content }}</p>
                                                 <footer class="blockquote-footer">{{ comment.user.username }} le <cite>{{ comment.publishedAt|date('d-m-Y H:i') }}</cite></footer>
                                             </blockquote>
+                                        </div>
+                                        <div class="col-sm-1 text-left">
+                                            {% if is_granted('ROLE_ADMIN') %}
+                                                <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 {% endfor %}

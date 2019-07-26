@@ -194,7 +194,7 @@ body {
     border-radius: 50% !important;
 }
 
-.formErrorMessage {
+.formErrorMessage, .formAddErrorMessage {
     color:red;
     font-style: italic;
     font-weight: bold;

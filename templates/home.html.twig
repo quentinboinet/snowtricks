@@ -3,7 +3,10 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
-    <div class="row no-gutters cover" style="background-image:url('{{ asset('images/cover.jpg') }}')">
+
+    {{ parent() }}
+
+        <div class="row no-gutters cover" style="background-image:url('{{ asset('images/cover.jpg') }}')">
         <span class="text-home  d-none d-sm-none d-md-block">Bienvenue sur SnowTricks, LE site communautaire 100% snowboard !</span>
         <span class="text-homeMobile  d-block d-md-none">SnowTricks, LE site communautaire 100% snowboard !</span>
         <a href="{{ path('home_page') }}#tricksList" class="arrowHome" title="Voir les figures">
@@ -44,7 +47,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col col-xs-8 col-sm-12 col-md-7" id="urlViewTrick"><a href="{{ path('trick_view', {'trickId': trick.id}) }}" title="Accéder aux détails de la figure">{{ trick.name }}</a></div>
-                        {% if is_granted('ROLE_USER') %}<div class="col col-xs-4 col-sm-12 col-md-5 text-right" id="urlEditTrick"><a href="{{ path('trick_edit', {'trickId': trick.id}) }}" title="Modifier la figure"><i class="fas fa-pen-fancy"></i></a> <a href="" title="Supprimer"><i class="fas fa-trash-alt"></i></a></div>{% endif %}
+                        {% if is_granted('ROLE_USER') %}<div class="col col-xs-4 col-sm-12 col-md-5 text-right" id="urlEditTrick"><a href="{{ path('trick_edit', {'trickId': trick.id}) }}" title="Modifier la figure"><i class="fas fa-pen-fancy"></i></a> <a href="" data-deletepath="{{ path('trick_delete', {'trickId': trick.id}) }}" data-toggle="modal" data-target="#deleteConfirmModal" title="Supprimer la figure"><i class="fas fa-trash-alt"></i></a></div>{% endif %}
                     </div>
                 </div>
             </div>

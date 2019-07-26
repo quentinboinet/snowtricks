@@ -210,6 +210,7 @@ class TrickController extends AbstractController
         $category = $categoryRepo->findAll();
 
         if ($request->isMethod('POST')) {
+
             $tricks = $trickRepo->findOneBy(['name' => $request->request->get('name')]);
             if ($tricks == "" OR $tricks->getId() == $trickId)//si il y a une figure avec le même nom (celle-ci) ou aucune
             {
@@ -329,6 +330,47 @@ class TrickController extends AbstractController
                     }
                 }
 
+                //on upload les nouvelles images
+                $nbNouvellesImages = $request->request->get('pictureAddNb');
+                    for ($i = 1; $i <= $nbNouvellesImages; $i++) {
+                        $pictureField = 'pictureAdd' . $i;
+                        if (!empty($request->files->get($pictureField))) {
+                            /** @var UploadedFile $uploadedFile */
+                            $uploadedFile = $request->files->get($pictureField);
+                            if ($uploadedFile->isValid() AND $uploadedFile->getSize() <= 2097152) {
+                                if ($uploadedFile->guessExtension() == "jpg" OR $uploadedFile->guessExtension() == "jpeg" OR $uploadedFile->guessExtension() == "png" OR $uploadedFile->guessExtension() == "gif") {
+                                    $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
+                                    $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
+                                    $uploadedFile->move($destination, $newFilename);
+
+                                    $picture = new Picture();
+                                    $picture->setPath('/images/uploads/' . $newFilename);
+                                    $em->persist($picture);
+
+                                    $trick->addPicture($picture);
+                                } else {
+                                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                                }
+                            } else {
+                                return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                            }
+                        }
+                    }
+
+                //on ajoute les nouvelles vidéos
+                $nbVideos = $request->request->get('videoAddNb');
+                //on boucle pour enregistrer toutes les videos
+                for ($i = 1; $i <= $nbVideos; $i++) {
+                    if (!empty($request->request->get('videoAdd' . $i))) {
+                        $videoURL = $request->request->get('videoAdd' . $i);
+                        $video = new Video();
+                        $video->setUrl($videoURL);
+                        $em->persist($video);
+
+                        $trick->addVideo($video);
+                    }
+                }
+
                 $trick->setName($request->request->get('name'));
                 $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->request->get('name')), '-')));
                 $trick->setDescription($request->request->get('description'));
@@ -355,6 +397,62 @@ class TrickController extends AbstractController
                 //renvoyer un message d'erreur pour dire que la figure n'existe pas
                 return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
             }
+        }
+    }
+
+
+    /**
+     * @Route("/tricks/{trickId}/delete", name="trick_delete")
+     * @IsGranted("ROLE_USER")
+     */
+    public function trick_delete($trickId, EntityManagerInterface $em) {
+
+        $trickRepo = $em->getRepository(Trick::class);
+        $trick = $trickRepo->find($trickId);
+
+        if (!empty($trick)) {
+
+            $pictureRepo = $em->getRepository(Picture::class);
+            $videoRepo = $em->getRepository(Video::class);
+            $commentsRepo = $em->getRepository(Comment::class);
+
+            //on supprime les commentaires associés
+            $commentsAssociated = $commentsRepo->findBy(['trick' => $trickId]);
+            foreach ($commentsAssociated as $comment)
+            {
+                $em->remove($comment);
+            }
+
+            //on supprime les images (en bdd + du serveur)
+            $picturesAssociated = $trick->getPictures();
+            $fileSystem = new Filesystem();
+            foreach ($picturesAssociated as $picture)
+            {
+                //on la supprime du serveur
+                $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picture->getPath();
+                $fileSystem->remove($fileName);
+
+                //et de la bdd
+                $em->remove($picture);
+            }
+
+            //on supprime les vidéos (bdd)
+            $videosAssociated = $trick->getVideos();
+            foreach ($videosAssociated as $video)
+            {
+                $em->remove($video);
+            }
+
+            $em->remove($trick);
+            $em->flush();
+
+            $tricks = $trickRepo->findBy([], ['updatedAt' => 'DESC'], 15); //On récupère les 15 derniers tricks
+            $this->addFlash('success', 'La figure a bien été supprimée !');
+            return $this->redirectToRoute('home_page', array('tricks' => $tricks));
+
+        } else {
+            //renvoyer un message d'erreur pour dire que la figure n'existe pas
+            return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
         }
     }
 }
