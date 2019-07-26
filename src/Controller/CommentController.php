@@ -15,6 +15,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 class CommentController extends AbstractController
 {
@@ -40,23 +41,33 @@ class CommentController extends AbstractController
     /**
      * @Route("/comments/{commentId}/delete", name="delete_comment")
      */
-    public function deleteComment($commentId, EntityManagerInterface $em) {
+    public function deleteComment($commentId, EntityManagerInterface $em, Security $security) {
 
         $commentRepo = $em->getRepository(Comment::class);
         $comment = $commentRepo->find($commentId);
 
         if (!empty($comment)) {
+            $role = $security->getUser()->getRoles();
+            $username = $security->getUser()->getUsername();
+            $commentUsername = $comment->getUser()->getUsername();
 
-            $trickRepo = $em->getRepository(Trick::class);
+            if($role == "ROLE_ADMIN" OR $username == $commentUsername) //on vérifie que la personne soit bien l'auteur du commentaire qu'elle veut supprimer ou qu'elle soit admin
+            {
+                $trickRepo = $em->getRepository(Trick::class);
 
-            $trickId = $comment->getTrick()->getId();
-            $trick = $trickRepo->find($trickId);
-            $trick->removeComment($comment);
-            $em->remove($comment);
-            $em->flush();
+                $trickId = $comment->getTrick()->getId();
+                $trick = $trickRepo->find($trickId);
+                $trick->removeComment($comment);
+                $em->remove($comment);
+                $em->flush();
 
-            $this->addFlash('success', 'Le commentaire a bien été supprimé !');
-            return $this->redirectToRoute('trick_view', array('trickId' => $trickId));
+                $this->addFlash('success', 'Le commentaire a bien été supprimé !');
+                return $this->redirectToRoute('trick_view', array('trickId' => $trickId));
+            }
+            else {
+                //renvoyer un message d'erreur pour dire que la figure n'existe pas
+                return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
+            }
 
         } else {
             //renvoyer un message d'erreur pour dire que la figure n'existe pas
