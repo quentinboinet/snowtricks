@@ -64,6 +64,7 @@
             <div class="row justify-content-center" id="divShowMore">
                 <button class="btn btn-info" id="showMore" data-path="{{ path('get_more_tricks') }}">Voir plus</button>
                 <button class="btn btn-info" id="showMoreGif" style="display:none;"><i class="fas fa-stroopwafel fa-spin fa-2x"></i></button>
+                <button class="btn btn-danger" id="showMoreError" style="display:none;">Erreur ! Réessayer</button>
                 <input type="text" id="showMoreOffset" value="15" style="display: none;"/>
             </div>
         {% endif %}
@@ -71,7 +72,7 @@
     {% endif %}
     </div>
 
-    <div class="row" id="divArrowUp" style="display:none;">
+ "  <div class="row" id="divArrowUp" style="display:none;">
             <!-- Flèche qui permet de remonter vers le haut de la section "figures" s'il y a plus de 15 figures affichées -->
             <a href="{{ path('home_page') }}#tricksList" class="arrowHome" title="Remonter en haut">
                 <span class="arrow-homeUp">
