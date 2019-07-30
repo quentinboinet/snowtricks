@@ -164,7 +164,7 @@
                             {% else %}
                                 {% for comment in trick.limitedComments() %}
                                     <div class="row justify-content-center">
-                                        <div class="col col-sm-2 text-right"><i title="{{ comment.user.username }}" class="far fa-user-circle fa-2x"></i></div>
+                                        <div class="col col-sm-2 text-right">{% if comment.user.profilePicture != "" %}<img class="commentProfilePicture" src="{{ comment.user.profilePicture.path }}" title="{{ comment.user.username }}" />{% else %}<i title="{{ comment.user.username }}" class="far fa-user-circle fa-2x"></i>{% endif %}</div>
                                         <div class="col col-sm-6">
                                             <blockquote>
                                                 <p class="mb-0">{{ comment.content }}</p>
@@ -172,8 +172,10 @@
                                             </blockquote>
                                         </div>
                                         <div class="text-left">
-                                            {% if (is_granted('ROLE_ADMIN') or (app.user.username == comment.user.username)) %}
-                                                <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+                                            {% if app.user != null %}
+                                                {% if (is_granted('ROLE_ADMIN') or (app.user.username == comment.user.username)) %}
+                                                    <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>
