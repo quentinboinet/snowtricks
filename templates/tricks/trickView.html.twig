@@ -171,7 +171,7 @@
                                                 <footer class="blockquote-footer">{{ comment.user.username }} le <cite>{{ comment.publishedAt|date('d-m-Y H:i') }}</cite></footer>
                                             </blockquote>
                                         </div>
-                                        <div class="col-sm-1 text-left">
+                                        <div class="text-left">
                                             {% if (is_granted('ROLE_ADMIN') or (app.user.username == comment.user.username)) %}
                                                 <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
                                             {% endif %}

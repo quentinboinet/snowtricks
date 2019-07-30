@@ -81,6 +81,11 @@ class User implements UserInterface
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Picture", inversedBy="users")
+     */
+    private $profilePicture;
+
     public function __construct()
     {
         $this->tricks = new ArrayCollection();
@@ -298,6 +303,18 @@ class User implements UserInterface
                 $comment->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?Picture
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?Picture $profilePicture): self
+    {
+        $this->profilePicture = $profilePicture;
 
         return $this;
     }
