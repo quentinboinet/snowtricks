@@ -185,6 +185,14 @@ body {
     color:white;
 }
 
+.profileCard {
+    margin-top : 50px;
+    margin-bottom: 100px;
+}
+.profileCard a {
+    color:white;
+
+}
 .card-header {
     color:white;
 }
@@ -216,4 +224,11 @@ body {
 
 #editDeleteLinks {
     bottom: auto !important;
+}
+
+.commentProfilePicture {
+    width: 50px;
+    height:50px;
+    object-fit: cover;
+    border-radius: 50%;
 }

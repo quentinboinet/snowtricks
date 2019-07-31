@@ -5,10 +5,14 @@ namespace App\Controller;
 
 
 use App\Entity\PasswordToken;
+use App\Entity\Picture;
 use App\Entity\RegistrationToken;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -17,6 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Security;
 
 class AccountController extends AbstractController
 {
@@ -198,6 +203,98 @@ class AccountController extends AbstractController
                 $this->addFlash('fail', 'Lien invalide ! Veuillez contacter l\'administrateur.');
                 return $this->redirectToRoute('home_page');
             }
+        }
+    }
+
+    /**
+     * @Route("/profile/view", name="profile_view")
+     * @IsGranted("ROLE_USER")
+     */
+    public function viewProfile()
+    {
+        return $this->render('profile/profileView.html.twig');
+    }
+
+    /**
+     * @Route("/profile/edit", name="profile_edit")
+     * @IsGranted("ROLE_USER")
+     */
+    public function editProfile(EntityManagerInterface $em, Request $request, Security $security)
+    {
+        if ($request->isMethod('POST')) {
+             $user = $security->getUser();
+             $user->setFirstName($request->request->get('firstName'));
+             $user->setLastName($request->request->get('lastName'));
+
+            if (!empty($request->files->get('profilePicture'))) {
+
+                //on upload et ajoute la nouvelle image à l'user
+                /** @var UploadedFile $uploadedFile */
+                $uploadedFile = $request->files->get('profilePicture');
+                if ($uploadedFile->isValid() AND $uploadedFile->getSize() <= 2097152) {
+                    if ($uploadedFile->guessExtension() == "jpg" OR $uploadedFile->guessExtension() == "jpeg" OR $uploadedFile->guessExtension() == "png" OR $uploadedFile->guessExtension() == "gif") {
+
+                        $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
+                        $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
+                        $uploadedFile->move($destination, $newFilename);
+
+                        if ($request->request->get('picturesToEdit') == "cover-") {
+
+                            $picture = new Picture();
+                            $picture->setPath('/images/uploads/' . $newFilename);
+                            $em->persist($picture);
+                            $user->setProfilePicture($picture);
+                        }
+                        else {
+                            $pictureIds = explode("-", $request->request->get('picturesToEdit'));
+                            $pictureId = $pictureIds[0];
+                            $picture = $em->getRepository(Picture::class)->find($pictureId);
+                            $picturePath = $picture->getPath();
+
+                            //on supprime l'ancienne image du serveur
+                            $fileSystem = new Filesystem();
+                            $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picturePath;
+                            $fileSystem->remove($fileName);
+
+                            $picture->setPath('/images/uploads/' . $newFilename);
+                            $em->persist($picture);
+                        }
+
+
+                    } else {
+                        return $this->render('profile/profileEdit.html.twig', ['error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                    }
+                } else {
+                    return $this->render('profile/profileEdit.html.twig', ['error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                }
+
+            }
+
+            //puis on supprime l'image de profil si le champ picturesToDelete est rempli
+            if ($request->request->get('picturesToDelete') != "") {
+
+                $pictureIds = explode("-", $request->request->get('picturesToDelete'));
+                $pictureIdToDelete = $pictureIds[0];
+
+                $picture = $em->getRepository(Picture::class)->find($pictureIdToDelete);
+                $em->remove($picture);
+
+                //on la supprime du serveur
+                $fileSystem = new Filesystem();
+                $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picture->getPath();
+                $fileSystem->remove($fileName);
+
+                $user->setProfilePicture(null);
+            }
+
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('success', 'Votre profil a bien été modifié !');
+            return $this->redirectToRoute('profile_view');
+        }
+        else {
+            return $this->render('profile/profileEdit.html.twig', ['error' => '']);
         }
     }
 }

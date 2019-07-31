@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil utilisateur{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center">
+            <div class="col col-md-8">
+                <div class="card profileCard">
+                    <div class="card-header text-center">
+                        <h2 class="card-title d-inline align-middle">Mon profil</h2>
+                        <span class="badge badge-default float-right m-2"><a href="{{ path('profile_edit') }}" title="Modifier mes informations"><i class="btn btn-info fas fa-pen-fancy"></i></a></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center text-center">
+                            <div class="col-md-6">
+                                <img class="img-fluid rounded" src="{% if app.user.profilePicture == "" %}{{ asset('images/default_cover.jpg') }}{% else %}{{ app.user.profilePicture.path }}{% endif %}" title="Votre photo de profil" />
+                            </div>
+                            <div class="col-md-6">
+                                <h3><b>{{ app.user.username }}</b></h3><br />
+                                <p><b>Nom :</b> {% if app.user.lastName != "" %}{{ app.user.lastName }}{% else %}<i>non renseigné</i>{% endif %}</p>
+                                <p><b>Prénom :</b> {% if app.user.firstName != "" %}{{ app.user.firstName }}{% else %}<i>non renseigné</i>{% endif %}</p>
+                                <p><i class="fas fa-envelope"></i> {{ app.user.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
