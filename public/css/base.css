@@ -5,6 +5,10 @@ html {
 body {
     background-color: #FEFEFE !important;
 }
+img {
+    image-orientation: from-image;
+}
+
 .navbar {
     background-color: #5FC0C7;
 }

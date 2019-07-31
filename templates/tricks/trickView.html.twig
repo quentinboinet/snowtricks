@@ -135,7 +135,7 @@
                         </div>
                         <br />
                         <div class="row justify-content-center text-center">
-                            <div class="col-md-3"><b>{{ trick.authorName.username }}</b></div>
+                            <div class="col-md-3"><b>{% if trick.authorName != NULL %}{{ trick.authorName.username }}{% else %}Anonyme{% endif %}</b></div>
                             <div class="col-md-3"><b>Publiée le : {{ trick.publishedAt|date('d-m-Y H:i') }}</b></div>
                             <div class="col-md-3"><b>Modifiée le : {{ trick.updatedAt|date('d-m-Y H:i') }}</b></div>
                             <div class="col-md-3"><b>{{ trick.category.name }}</b></div>
@@ -145,9 +145,9 @@
                         {% if is_granted('ROLE_USER') %} <!-- on affiche le formulaire de commentaire seulement si on est connecté -->
                         <div class="row justify-content-center text-center">
                             <form method="post">
-                                <div class="form-group row">
+                                <div class="form-group row align-items-center">
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="comment" name="comment" placeholder="Votre commentaire" required minlength="2"/>
+                                        <textarea class="form-control" id="comment" name="comment" required rows="3">Votre commentaire</textarea>
                                     </div>
                                     <div class="col-sm-4">
                                         <button type="submit" class="btn btn-info">Commenter</button>
@@ -164,16 +164,20 @@
                             {% else %}
                                 {% for comment in trick.limitedComments() %}
                                     <div class="row justify-content-center">
-                                        <div class="col col-sm-2 text-right"><i title="{{ comment.user.username }}" class="far fa-user-circle fa-2x"></i></div>
+
+                                        <div class="col col-sm-2 text-right">{% if comment.user != NULL %}{% if comment.user.profilePicture != "" %}<img class="commentProfilePicture" src="{{ comment.user.profilePicture.path }}" title="{{ comment.user.username }}" />{% else %}<i title="{{ comment.user.username }}" class="far fa-user-circle fa-2x"></i>{% endif %}{% else %}<i title="Anonyme" class="far fa-user-circle fa-2x"></i>{% endif %}</div>
                                         <div class="col col-sm-6">
                                             <blockquote>
-                                                <p class="mb-0">{{ comment.content }}</p>
-                                                <footer class="blockquote-footer">{{ comment.user.username }} le <cite>{{ comment.publishedAt|date('d-m-Y H:i') }}</cite></footer>
+                                                <p class="mb-0">{{ comment.content | nl2br }}</p>
+                                                <footer class="blockquote-footer">{% if comment.user != NULL %}{{ comment.user.username }}{% else %}Anonyme{% endif %} le <cite>{{ comment.publishedAt|date('d-m-Y H:i') }}</cite></footer>
                                             </blockquote>
                                         </div>
-                                        <div class="col-sm-1 text-left">
-                                            {% if (is_granted('ROLE_ADMIN') or (app.user.username == comment.user.username)) %}
-                                                <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+
+                                        <div class="text-left">
+                                            {% if (app.user != null and comment.user != NULL) %}
+                                                {% if (is_granted('ROLE_ADMIN') or (app.user.username == comment.user.username)) %}
+                                                    <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>

@@ -59,7 +59,6 @@ class Trick
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tricks")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $authorName;
 

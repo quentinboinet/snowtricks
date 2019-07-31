@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\RegistrationToken;
 use App\Form\UserRegistrationFormType;
+use Doctrine\DBAL\DBALException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
@@ -62,21 +63,26 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            //on insère l'user en BDD
-            $user = $form->getData();
-            $user->setPassword($passwordEncoder->encodePassword(
-                $user,
-                $form['plainPassword']->getData()
-            ));
-            $user->setStatus(0);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
+            try {
+                //on insère l'user en BDD
+                $user = $form->getData();
+                $user->setPassword($passwordEncoder->encodePassword(
+                    $user,
+                    $form['plainPassword']->getData()
+                ));
+                $user->setStatus(0);
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($user);
+                $em->flush();
 
-            //on crée le token qui servira à valider son compte
-            $token = new RegistrationToken($user);
-            $em->persist($token);
-            $em->flush();
+                //on crée le token qui servira à valider son compte
+                $token = new RegistrationToken($user);
+                $em->persist($token);
+                $em->flush();
+            } catch (DBALException $e) {
+                $this->addFlash('fail', 'Un problème est survenu lors de votre inscription. Veuillez réessayer.');
+                return $this->redirectToRoute('app_register');
+            }
 
             //on envoi l'e-mail de confirmation d'inscription
             $email = (new Email())
