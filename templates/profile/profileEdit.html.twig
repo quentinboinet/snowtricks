@@ -20,7 +20,7 @@
                                     </div>
                                     <img class="img-fluid rounded profilePictureClass" src="{% if app.user.profilePicture == "" %}{{ asset('images/default_cover.jpg') }}{% else %}{{ app.user.profilePicture.path }}{% endif %}" title="Votre photo de profil" />
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" id="userInfos">
                                     <h3><b>{{ app.user.username }}</b></h3><br />
 
                                     <div class="form-group row">
@@ -37,6 +37,27 @@
                                     </div>
 
                                     <p><i class="fas fa-envelope"></i> {{ app.user.email }}</p>
+
+                                    <hr />
+                                    <h3><b>Mot de passe</b></h3><br />
+                                    <div class="form-group row">
+                                        <label for="oldPassword" class="col-md-4 col-form-label text-center">Mot de passe actuel :</label>
+                                        <div class="col-md-8">
+                                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Votre mot de passe actuel">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="newPassword1" class="col-md-4 col-form-label text-center">Nouveau mot de passe :</label>
+                                        <div class="col-md-8">
+                                            <input type="password" class="form-control" id="newPassword1" name="newPassword1" placeholder="Nouveau mot de passe" minlength="5">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="newPassword2" class="col-md-4 col-form-label text-center">Confirmation :</label>
+                                        <div class="col-md-8">
+                                            <input type="password" class="form-control" id="newPassword2" name="newPassword2" placeholder="Saisir à nouveau le mot de passe" minlength="5">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

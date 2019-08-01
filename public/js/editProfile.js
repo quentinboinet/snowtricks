@@ -21,4 +21,56 @@ $(document).ready(function() {
         $('#picturesToDelete').val(newVal);//on l'ajoute à la liste de ceux à supprimer (champ input de type hidden
     });
 
+    $('#newPassword1').change(function () {
+       if($('#newPassword1').val().length < 5) {
+           if ($('#passwordErrorMessage').length == 0) {
+               var html = "<div id='passwordErrorMessage' class='justify-content-center formErrorMessage'>Votre mot de passe doit contenir au moins 5 caractères.</div>";
+               $('#userInfos').append(html);
+           }
+           else {
+               $('#passwordErrorMessage').text('Votre mot de passe doit contenir au moins 5 caractères.');
+           }
+       }
+       else {
+           if ($('#newPassword1').val() != $('#newPassword2').val()) {
+               if ($('#passwordErrorMessage').length == 0) {
+                   var html = "<div id='passwordErrorMessage' class='justify-content-center formErrorMessage'>Le mot de passe entré dans la confirmation n'est pas identique au premier.</div>";
+                   $('#userInfos').append(html);
+               }
+               else {
+                   $('#passwordErrorMessage').text('Le mot de passe entré dans la confirmation n\'est pas identique au premier.');
+               }
+           }
+           else {
+               $('#passwordErrorMessage').remove();
+           }
+       }
+    });
+
+    $('#newPassword2').change(function () {
+        if($('#newPassword2').val().length < 5) {
+            if ($('#passwordErrorMessage').length == 0) {
+                var html = "<div id='passwordErrorMessage' class='justify-content-center formErrorMessage'>Votre mot de passe doit contenir au moins 5 caractères.</div>";
+                $('#userInfos').append(html);
+            }
+            else {
+                $('#passwordErrorMessage').text('Votre mot de passe doit contenir au moins 5 caractères.');
+            }
+        }
+        else {
+            if ($('#newPassword1').val() != $('#newPassword2').val()) {
+                if ($('#passwordErrorMessage').length == 0) {
+                    var html = "<div id='passwordErrorMessage' class='justify-content-center formErrorMessage'>Le mot de passe entré dans la confirmation n'est pas identique au premier.</div>";
+                    $('#userInfos').append(html);
+                }
+                else {
+                    $('#passwordErrorMessage').text('Le mot de passe entré dans la confirmation n\'est pas identique au premier.');
+                }
+            }
+            else {
+                $('#passwordErrorMessage').remove();
+            }
+        }
+    });
+
 });

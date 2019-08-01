@@ -219,7 +219,7 @@ class AccountController extends AbstractController
      * @Route("/profile/edit", name="profile_edit")
      * @IsGranted("ROLE_USER")
      */
-    public function editProfile(EntityManagerInterface $em, Request $request, Security $security)
+    public function editProfile(EntityManagerInterface $em, Request $request, Security $security, UserPasswordEncoderInterface $passwordEncoder)
     {
         if ($request->isMethod('POST')) {
              $user = $security->getUser();
@@ -285,6 +285,32 @@ class AccountController extends AbstractController
                 $fileSystem->remove($fileName);
 
                 $user->setProfilePicture(null);
+            }
+
+            if($request->request->get('newPassword1') != "") { //si l'utilisateur souhaite modifier son mot de passe
+
+                $oldPassword = $request->request->get('oldPassword');
+                $newPassword1 = $request->request->get('newPassword1');
+                $newPassword2 = $request->request->get('newPassword2');
+
+                if ($oldPassword != "") {
+                    if ($newPassword1 == $newPassword2) {
+                        if ($passwordEncoder->isPasswordValid($user, $oldPassword)) { //si le mot de passe entré correspond bien à celui enregistré en bdd
+
+                            $user->setPassword($passwordEncoder->encodePassword($user, $newPassword1));
+
+                        }
+                        else {
+                            return $this->render('profile/profileEdit.html.twig', ['error' => 'Le mot de passe actuel entré est incorrect !']);
+                        }
+                    }
+                    else {
+                        return $this->render('profile/profileEdit.html.twig', ['error' => 'Le mot de passe entré dans la confirmation n\'est pas identique au premier.']);
+                    }
+                }
+                else {
+                    return $this->render('profile/profileEdit.html.twig', ['error' => 'Veuillez renseigner votre ancien mot de passe pour pouvoir le modifier.']);
+                }
             }
 
             $em->persist($user);
