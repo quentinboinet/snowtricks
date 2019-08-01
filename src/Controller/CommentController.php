@@ -61,7 +61,7 @@ class CommentController extends AbstractController
                 $em->remove($comment);
                 $em->flush();
 
-                $this->addFlash('success', 'Le commentaire a bien été supprimé !');
+                $this->addFlash('warning', 'Le commentaire a bien été supprimé !');
                 return $this->redirectToRoute('trick_view', array('trickId' => $trickId));
             }
             else {

@@ -51,6 +51,12 @@
         </div>
     {% endfor %}
 
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning">
+            {{ message|raw }}
+        </div>
+    {% endfor %}
+
         {% block body %}
             <!-- modal pour demande de confirmation de suppression de figure -->
             <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">

@@ -185,7 +185,7 @@ class TrickController extends AbstractController
                 $em->persist($trick);
                 $em->flush();
 
-                $this->addFlash('success', 'La figure a bien été insérée dans notre base de données ! Vous pouvez la retrouver ci-dessous.');
+                $this->addFlash('success', 'La figure a bien été publiée ! Vous pouvez la retrouver ci-dessous.');
                 return $this->redirectToRoute('home_page');
             }
             else {
@@ -447,7 +447,7 @@ class TrickController extends AbstractController
             $em->flush();
 
             $tricks = $trickRepo->findBy([], ['updatedAt' => 'DESC'], 15); //On récupère les 15 derniers tricks
-            $this->addFlash('success', 'La figure a bien été supprimée !');
+            $this->addFlash('warning', 'La figure a bien été supprimée !');
             return $this->redirectToRoute('home_page', array('tricks' => $tricks));
 
         } else {
