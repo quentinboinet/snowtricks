@@ -51,7 +51,7 @@ class CommentController extends AbstractController
             $username = $security->getUser()->getUsername();
             $commentUsername = $comment->getUser()->getUsername();
 
-            if($role[0] == "ROLE_ADMIN" OR $username == $commentUsername) //on vérifie que la personne soit bien l'auteur du commentaire qu'elle veut supprimer ou qu'elle soit admin
+            if($role[0] == "ROLE_USER" AND $username == $commentUsername) //on vérifie que la personne soit bien l'auteur du commentaire qu'elle veut supprimer ou qu'elle soit admin
             {
                 $trickRepo = $em->getRepository(Trick::class);
 
