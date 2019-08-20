@@ -62,17 +62,37 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getCredentials(Request $request)
     {
-        $credentials = [
-            'username' => $request->request->get('username'),
-            'password' => $request->request->get('password'),
-            'csrf_token' => $request->request->get('_csrf_token'),
-        ];
-        $request->getSession()->set(
-            Security::LAST_USERNAME,
-            $credentials['username']
-        );
+        // Ma clé privée
+        $secret = "6Lfe6rMUAAAAAJJywYLtiOkocjIsr63SrMiyKLgD";
+        // Paramètre renvoyé par le recaptcha
+        $response = $request->request->get('g-recaptcha-response');
+        // On récupère l'IP de l'utilisateur
+        $remoteip = $_SERVER['REMOTE_ADDR'];
 
-        return $credentials;
+        $api_url = "https://www.google.com/recaptcha/api/siteverify?secret="
+            . $secret
+            . "&response=" . $response
+            . "&remoteip=" . $remoteip ;
+
+        $decode = json_decode(file_get_contents($api_url), true);
+
+        if ($decode['success'] == true) {
+            // C'est un humain
+            $credentials = [
+                'username' => $request->request->get('username'),
+                'password' => $request->request->get('password'),
+                'csrf_token' => $request->request->get('_csrf_token'),
+            ];
+            $request->getSession()->set(
+                Security::LAST_USERNAME,
+                $credentials['username']
+            );
+
+            return $credentials;
+        }
+        else {
+            throw new InvalidCsrfTokenException();
+        }
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
@@ -91,7 +111,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         $user2 = $this->userRepository->findOneBy(['username' => $credentials['username']]);
         if ($user2->getStatus() === 0)
         {
-            $this->flash->add('fail', 'Votre compte inactif ! Veuillez l\'activer via le lien reçu par e-mail, ou <a href="/api/resendRegistrationToken/' . $user2->getId() . '">me renvoyer un lien</a>');
+            $this->flash->add('fail', 'Votre compte est inactif ! Veuillez l\'activer via le lien reçu par e-mail, ou <a href="/api/resendRegistrationToken/' . $user2->getId() . '">me renvoyer un lien</a>');
             throw new DisabledException();
             return new RedirectResponse($this->router->generate('home_page'));
         }
