@@ -10,6 +10,7 @@ use App\Entity\RegistrationToken;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -88,13 +89,19 @@ class AccountController extends AbstractController
         $em->flush();
 
         //on envoi l'e-mail de confirmation d'inscription
-        $email = (new Email())
+        $email = (new TemplatedEmail())
             ->from('quentinboinet@live.fr')
             ->to($user->getEmail())
             ->subject('SnowTricks - Validation d\'inscription')
-            ->html('<h3>SnowTricks</h3><p>Votre compte est pour le moment inactif. Afin
-                de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $userId . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
-                <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+            //->html('<h3>SnowTricks</h3><p>Votre compte est pour le moment inactif. Afin
+            //  de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $userId . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
+            //   <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+
+            ->htmlTemplate('email/registrationConfirm.html.twig')
+            ->context([
+                'api_token' => $token->getToken(),
+                'user_id' => $user->getId(),
+            ]);
 
         $this->mailer->send($email);
 
@@ -119,13 +126,19 @@ class AccountController extends AbstractController
                 $em->flush();
 
                 //on envoi le mail avec lien et token pour reset de mot de passe
-                $email = (new Email())
+                $email = (new TemplatedEmail())
                     ->from('quentinboinet@live.fr')
                     ->to($user->getEmail())
                     ->subject('SnowTricks - Mot de passe oublié')
-                    ->html('<h3>SnowTricks</h3><p>Il semble que vous ayez oublié votre mot de passe sur notre site. Afin
-                de pouvoir en choisir un nouveau et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/resetPassword/' . $user->getId() . '/' . $token->getToken() . '">redéfinir mon mot de passe !</a></p>
-                <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+                    //->html('<h3>SnowTricks</h3><p>Il semble que vous ayez oublié votre mot de passe sur notre site. Afin
+                    //de pouvoir en choisir un nouveau et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/resetPassword/' . $user->getId() . '/' . $token->getToken() . '">redéfinir mon mot de passe !</a></p>
+                    //<p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+
+                    ->htmlTemplate('email/forgetPassword.html.twig')
+                    ->context([
+                        'api_token' => $token->getToken(),
+                        'user_id' => $user->getId(),
+                    ]);
 
                 $this->mailer->send($email);
 

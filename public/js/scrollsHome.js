@@ -1,12 +1,16 @@
 $(function (keyframes, options) {
     $('#linkScroll').on('click', function(e) {
-        e.preventDefault();
-        var hash = this.hash;
-        $('html, body').animate({
-            scrollTop: $(this.hash).offset().top
-        }, 1000, function () {
-            window.location.hash = hash;
-        });
+
+        var hash= this.hash;
+        if ( hash == '' || hash == '#' || hash == undefined ) return false;
+        var target = $(hash);
+        target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+
+        if (target.length) {
+            $('html,body').stop().animate({
+                scrollTop: target.offset().top
+            }, 1000, 'linear');
+        }
     });
 });
 

@@ -26,7 +26,7 @@
                 <div class="text-center d-inline-flex"><a class="navbar-brand" href="{{ path('home_page') }}"><img src="{{ asset('images/logo.png') }}" width="130" height="70" alt="SnowTricks"/></a></div>
                 <ul class="navbar-nav text-center">
                     <li class="nav-item"><a class="nav-link" href="{{ path('home_page') }}" title="Accueil">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page') }}#tricksList" title="Accéder à la liste des figures">Figures</a></li>
+                    <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page', {'_fragment': 'tricksList'}) }}" title="Accéder à la liste des figures">Figures</a></li>
 
                     {% if is_granted('ROLE_USER') %}
                         <li class="nav-item"><a class="nav-link" href="{{ path('trick_add') }}" title="Publier une figure"><i class="fas fa-plus-circle"></i></a></li>
