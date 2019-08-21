@@ -4,12 +4,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}" />
+
         <title>SnowTricks - {% block title %}{% endblock %}</title>
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/base.css') }}"/>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
         {% endblock %}
+
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     </head>
     <body data-spy="scroll" data-target=".navbar">
@@ -24,10 +28,11 @@
                 <div class="text-center d-inline-flex"><a class="navbar-brand" href="{{ path('home_page') }}"><img src="{{ asset('images/logo.png') }}" width="130" height="70" alt="SnowTricks"/></a></div>
                 <ul class="navbar-nav text-center">
                     <li class="nav-item"><a class="nav-link" href="{{ path('home_page') }}" title="Accueil">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page') }}#tricksList" title="Accéder à la liste des figures">Figures</a></li>
+                    <li class="nav-item"><a class="nav-link" id="linkScroll" href="{{ path('home_page', {'_fragment': 'tricksList'}) }}" title="Accéder à la liste des figures">Figures</a></li>
 
                     {% if is_granted('ROLE_USER') %}
                         <li class="nav-item"><a class="nav-link" href="{{ path('trick_add') }}" title="Publier une figure"><i class="fas fa-plus-circle"></i></a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('profile_view') }}" title="Voir mon profil"><i class="far fa-user-circle fa-2x"></i></a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}" title="Se déconnecter">Déconnexion</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}" title="Se connecter">Connexion</a></li>
@@ -87,6 +92,7 @@
                 <span><a href="{{ path('home_page') }}" title="Accueil"><i class="fas fa-home fa-2x"></i></a></span>
                 {% if is_granted('ROLE_USER') %}
                     <span><a href="{{ path('trick_add') }}" title="Publier une figure"><i class="fas fa-plus-circle fa-2x"></i></a></span>
+                    <span><a href="{{ path('profile_view') }}" title="Voir mon profil"><i class="far fa-user-circle fa-2x"></i></a></span>
                     <span><a href="{{ path('app_logout') }}" title="Déconnexion"><i class="fas fa-sign-out-alt fa-2x"></i></a></span>
                 {% else %}
                     <span><a href="{{ path('app_register') }}" title="S'inscrire"><i class="fas fa-user-plus fa-2x"></i></a></span>

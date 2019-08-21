@@ -5,10 +5,15 @@ namespace App\Controller;
 
 
 use App\Entity\PasswordToken;
+use App\Entity\Picture;
 use App\Entity\RegistrationToken;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -17,6 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Security;
 
 class AccountController extends AbstractController
 {
@@ -83,13 +89,19 @@ class AccountController extends AbstractController
         $em->flush();
 
         //on envoi l'e-mail de confirmation d'inscription
-        $email = (new Email())
+        $email = (new TemplatedEmail())
             ->from('quentinboinet@live.fr')
             ->to($user->getEmail())
             ->subject('SnowTricks - Validation d\'inscription')
-            ->html('<h3>SnowTricks</h3><p>Votre compte est pour le moment inactif. Afin
-                de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $userId . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
-                <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+            //->html('<h3>SnowTricks</h3><p>Votre compte est pour le moment inactif. Afin
+            //  de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $userId . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
+            //   <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+
+            ->htmlTemplate('email/registrationConfirm.html.twig')
+            ->context([
+                'api_token' => $token->getToken(),
+                'user_id' => $user->getId(),
+            ]);
 
         $this->mailer->send($email);
 
@@ -114,13 +126,19 @@ class AccountController extends AbstractController
                 $em->flush();
 
                 //on envoi le mail avec lien et token pour reset de mot de passe
-                $email = (new Email())
+                $email = (new TemplatedEmail())
                     ->from('quentinboinet@live.fr')
                     ->to($user->getEmail())
                     ->subject('SnowTricks - Mot de passe oublié')
-                    ->html('<h3>SnowTricks</h3><p>Il semble que vous ayez oublié votre mot de passe sur notre site. Afin
-                de pouvoir en choisir un nouveau et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/resetPassword/' . $user->getId() . '/' . $token->getToken() . '">redéfinir mon mot de passe !</a></p>
-                <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+                    //->html('<h3>SnowTricks</h3><p>Il semble que vous ayez oublié votre mot de passe sur notre site. Afin
+                    //de pouvoir en choisir un nouveau et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/resetPassword/' . $user->getId() . '/' . $token->getToken() . '">redéfinir mon mot de passe !</a></p>
+                    //<p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
+
+                    ->htmlTemplate('email/forgetPassword.html.twig')
+                    ->context([
+                        'api_token' => $token->getToken(),
+                        'user_id' => $user->getId(),
+                    ]);
 
                 $this->mailer->send($email);
 
@@ -198,6 +216,124 @@ class AccountController extends AbstractController
                 $this->addFlash('fail', 'Lien invalide ! Veuillez contacter l\'administrateur.');
                 return $this->redirectToRoute('home_page');
             }
+        }
+    }
+
+    /**
+     * @Route("/profile/view", name="profile_view")
+     * @IsGranted("ROLE_USER")
+     */
+    public function viewProfile()
+    {
+        return $this->render('profile/profileView.html.twig');
+    }
+
+    /**
+     * @Route("/profile/edit", name="profile_edit")
+     * @IsGranted("ROLE_USER")
+     */
+    public function editProfile(EntityManagerInterface $em, Request $request, Security $security, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        if ($request->isMethod('POST')) {
+             $user = $security->getUser();
+             $user->setFirstName($request->request->get('firstName'));
+             $user->setLastName($request->request->get('lastName'));
+
+            if (!empty($request->files->get('profilePicture'))) {
+
+                //on upload et ajoute la nouvelle image à l'user
+                /** @var UploadedFile $uploadedFile */
+                $uploadedFile = $request->files->get('profilePicture');
+                if ($uploadedFile->isValid() AND $uploadedFile->getSize() <= 2097152) {
+                    if ($uploadedFile->guessExtension() == "jpg" OR $uploadedFile->guessExtension() == "jpeg" OR $uploadedFile->guessExtension() == "png" OR $uploadedFile->guessExtension() == "gif") {
+
+                        $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
+                        $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
+                        $uploadedFile->move($destination, $newFilename);
+
+                        if ($request->request->get('picturesToEdit') == "cover-") {
+
+                            $picture = new Picture();
+                            $picture->setPath('/images/uploads/' . $newFilename);
+                            $em->persist($picture);
+                            $user->setProfilePicture($picture);
+                        }
+                        else {
+                            $pictureIds = explode("-", $request->request->get('picturesToEdit'));
+                            $pictureId = $pictureIds[0];
+                            $picture = $em->getRepository(Picture::class)->find($pictureId);
+                            $picturePath = $picture->getPath();
+
+                            //on supprime l'ancienne image du serveur
+                            $fileSystem = new Filesystem();
+                            $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picturePath;
+                            $fileSystem->remove($fileName);
+
+                            $picture->setPath('/images/uploads/' . $newFilename);
+                            $em->persist($picture);
+                        }
+
+
+                    } else {
+                        return $this->render('profile/profileEdit.html.twig', ['error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                    }
+                } else {
+                    return $this->render('profile/profileEdit.html.twig', ['error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                }
+
+            }
+
+            //puis on supprime l'image de profil si le champ picturesToDelete est rempli
+            if ($request->request->get('picturesToDelete') != "") {
+
+                $pictureIds = explode("-", $request->request->get('picturesToDelete'));
+                $pictureIdToDelete = $pictureIds[0];
+
+                $picture = $em->getRepository(Picture::class)->find($pictureIdToDelete);
+                $em->remove($picture);
+
+                //on la supprime du serveur
+                $fileSystem = new Filesystem();
+                $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picture->getPath();
+                $fileSystem->remove($fileName);
+
+                $user->setProfilePicture(null);
+            }
+
+            if($request->request->get('newPassword1') != "") { //si l'utilisateur souhaite modifier son mot de passe
+
+                $oldPassword = $request->request->get('oldPassword');
+                $newPassword1 = $request->request->get('newPassword1');
+                $newPassword2 = $request->request->get('newPassword2');
+
+                if ($oldPassword != "") {
+                    if ($newPassword1 == $newPassword2) {
+                        if ($passwordEncoder->isPasswordValid($user, $oldPassword)) { //si le mot de passe entré correspond bien à celui enregistré en bdd
+
+                            $user->setPassword($passwordEncoder->encodePassword($user, $newPassword1));
+
+                        }
+                        else {
+                            return $this->render('profile/profileEdit.html.twig', ['error' => 'Le mot de passe actuel entré est incorrect !']);
+                        }
+                    }
+                    else {
+                        return $this->render('profile/profileEdit.html.twig', ['error' => 'Le mot de passe entré dans la confirmation n\'est pas identique au premier.']);
+                    }
+                }
+                else {
+                    return $this->render('profile/profileEdit.html.twig', ['error' => 'Veuillez renseigner votre ancien mot de passe pour pouvoir le modifier.']);
+                }
+            }
+
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('success', 'Votre profil a bien été modifié !');
+            return $this->redirectToRoute('profile_view');
+        }
+        else {
+            return $this->render('profile/profileEdit.html.twig', ['error' => '']);
         }
     }
 }

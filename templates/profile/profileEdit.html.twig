@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center">
+            <div class="col col-md-8">
+                <div class="card profileCard">
+                    <div class="card-header text-center">
+                        <h2 class="card-title d-inline align-middle">Modifier mes informations</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            <div class="row align-items-center text-center" id="profileSection" data-defaultpicture="{{ asset('images/default_cover.jpg') }}">
+                                <div class="col-md-6">
+                                    <div class="card-img-overlay" id="editDeleteLinks" data-pictureid="{% if (app.user.profilePicture == "") %}cover{% else %}{{ app.user.profilePicture.id }}{% endif %}">
+                                        <a id="profilePictureEdit" title="Modifier mon image de profil"><i class="btn btn-info fas fa-pen-fancy"></i></a>
+                                        <a id="profilePictureDelete" title="Supprimer mon image de profil"><i class="btn btn-info fas fa-trash-alt"></i></a>
+                                    </div>
+                                    <img class="img-fluid rounded profilePictureClass" src="{% if app.user.profilePicture == "" %}{{ asset('images/default_cover.jpg') }}{% else %}{{ app.user.profilePicture.path }}{% endif %}" title="Votre photo de profil" />
+                                </div>
+                                <div class="col-md-6" id="userInfos">
+                                    <h3><b>{{ app.user.username }}</b></h3><br />
+
+                                    <div class="form-group row">
+                                        <label for="lastName" class="col-md-4 col-form-label text-center">Nom :</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Votre nom de famille" value="{{ app.user.lastName }}" minlength="2" maxlength="50">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="firstName" class="col-md-4 col-form-label text-center">Prénom :</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Votre prénom" value="{{ app.user.firstName }}" minlength="2" maxlength="50">
+                                        </div>
+                                    </div>
+
+                                    <p><i class="fas fa-envelope"></i> {{ app.user.email }}</p>
+
+                                    <hr />
+                                    <h5><b>Mot de passe</b></h5><br />
+                                    <div class="form-group row">
+                                        <label for="oldPassword" class="col-md-4 col-form-label text-center">Mot de passe actuel :</label>
+                                        <div class="col-md-8">
+                                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Votre mot de passe actuel">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="newPassword1" class="col-md-4 col-form-label text-center">Nouveau mot de passe :</label>
+                                        <div class="col-md-8">
+                                            <input type="password" class="form-control" id="newPassword1" name="newPassword1" placeholder="Nouveau mot de passe" minlength="5">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="newPassword2" class="col-md-4 col-form-label text-center">Confirmation :</label>
+                                        <div class="col-md-8">
+                                            <input type="password" class="form-control" id="newPassword2" name="newPassword2" placeholder="Saisir à nouveau le mot de passe" minlength="5">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if error %}
+                                <div class="formErrorMessage text-center">{{ error }}</div>
+                            {% endif %}
+                            <hr />
+                            <div class="form-group row justify-content-center">
+                                <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
+                            </div>
+
+                            <input type="text" id="picturesToEdit" name="picturesToEdit" value="" style="display:none;"/>
+                            <input type="text" id="picturesToDelete" name="picturesToDelete" value="" style="display:none;"/>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('js/editProfile.js') }}"></script>
+
+{% endblock %}

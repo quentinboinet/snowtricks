@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\wamp64\www\projet6_OC\snowtricks\src\Entity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../.css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="../.css/nv.d3.min.css" rel="stylesheet" type="text/css">
+  <link href="../.css/style.css" rel="stylesheet" type="text/css">
+  <link href="../.css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">D:\wamp64\www\projet6_OC\snowtricks\src</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Entity</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Category.php.html#12">App\Entity\Category</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#10">App\Entity\Comment</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PasswordToken.php.html#10">App\Entity\PasswordToken</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#23">App\Entity\User</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#12">App\Entity\Video</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#12">App\Entity\Picture</a></td><td class="text-right">11%</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#10">App\Entity\RegistrationToken</a></td><td class="text-right">25%</td></tr>
+       <tr><td><a href="Trick.php.html#14">App\Entity\Trick</a></td><td class="text-right">25%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="User.php.html#23">App\Entity\User</a></td><td class="text-right">2256</td></tr>
+       <tr><td><a href="Trick.php.html#14">App\Entity\Trick</a></td><td class="text-right">860</td></tr>
+       <tr><td><a href="Comment.php.html#10">App\Entity\Comment</a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="Picture.php.html#12">App\Entity\Picture</a></td><td class="text-right">217</td></tr>
+       <tr><td><a href="Category.php.html#12">App\Entity\Category</a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="Video.php.html#12">App\Entity\Video</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="PasswordToken.php.html#10">App\Entity\PasswordToken</a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#10">App\Entity\RegistrationToken</a></td><td class="text-right">43</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Category.php.html#31"><abbr title="App\Entity\Category::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#121"><abbr title="App\Entity\User::getRoles">getRoles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#179"><abbr title="App\Entity\User::setLastName">setLastName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#174"><abbr title="App\Entity\User::getLastName">getLastName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#167"><abbr title="App\Entity\User::setEmail">setEmail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#162"><abbr title="App\Entity\User::getEmail">getEmail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#156"><abbr title="App\Entity\User::eraseCredentials">eraseCredentials</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#148"><abbr title="App\Entity\User::getSalt">getSalt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#140"><abbr title="App\Entity\User::getPassword">getPassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#130"><abbr title="App\Entity\User::setRoles">setRoles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#111"><abbr title="App\Entity\User::setUsername">setUsername</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#191"><abbr title="App\Entity\User::setFirstName">setFirstName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#106"><abbr title="App\Entity\User::getUsername">getUsername</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#96"><abbr title="App\Entity\User::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#89"><abbr title="App\Entity\User::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#253"><abbr title="App\Entity\Trick::removeComment">removeComment</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#243"><abbr title="App\Entity\Trick::addComment">addComment</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#237"><abbr title="App\Entity\Trick::getLimitedComments">getLimitedComments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#229"><abbr title="App\Entity\Trick::getComments">getComments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#219"><abbr title="App\Entity\Trick::setCategory">setCategory</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#186"><abbr title="App\Entity\User::getFirstName">getFirstName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#198"><abbr title="App\Entity\User::setPassword">setPassword</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#207"><abbr title="App\Entity\Trick::setAuthorName">setAuthorName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#297"><abbr title="App\Entity\User::removeComment">removeComment</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#61"><abbr title="App\Entity\Video::addTrick">addTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#56"><abbr title="App\Entity\Video::getTricks">getTricks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#46"><abbr title="App\Entity\Video::setUrl">setUrl</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#41"><abbr title="App\Entity\Video::getUrl">getUrl</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#36"><abbr title="App\Entity\Video::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#31"><abbr title="App\Entity\Video::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#315"><abbr title="App\Entity\User::setProfilePicture">setProfilePicture</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#310"><abbr title="App\Entity\User::getProfilePicture">getProfilePicture</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#287"><abbr title="App\Entity\User::addComment">addComment</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#208"><abbr title="App\Entity\User::getTricks">getTricks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#282"><abbr title="App\Entity\User::getComments">getComments</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#272"><abbr title="App\Entity\User::setStatus">setStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#267"><abbr title="App\Entity\User::getStatus">getStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#254"><abbr title="App\Entity\User::removeRegistrationToken">removeRegistrationToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#244"><abbr title="App\Entity\User::addRegistrationToken">addRegistrationToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#239"><abbr title="App\Entity\User::getRegistrationTokens">getRegistrationTokens</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#223"><abbr title="App\Entity\User::removeTrick">removeTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="User.php.html#213"><abbr title="App\Entity\User::addTrick">addTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#214"><abbr title="App\Entity\Trick::getCategory">getCategory</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#202"><abbr title="App\Entity\Trick::getAuthorName">getAuthorName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Category.php.html#36"><abbr title="App\Entity\Category::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#63"><abbr title="App\Entity\Comment::setUser">setUser</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PasswordToken.php.html#53"><abbr title="App\Entity\PasswordToken::getExpiresAt">getExpiresAt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PasswordToken.php.html#47"><abbr title="App\Entity\PasswordToken::getToken">getToken</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PasswordToken.php.html#42"><abbr title="App\Entity\PasswordToken::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PasswordToken.php.html#12"><abbr title="App\Entity\PasswordToken::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#87"><abbr title="App\Entity\Comment::setPublishedAt">setPublishedAt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#82"><abbr title="App\Entity\Comment::getPublishedAt">getPublishedAt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#75"><abbr title="App\Entity\Comment::setContent">setContent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#70"><abbr title="App\Entity\Comment::getContent">getContent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#58"><abbr title="App\Entity\Comment::getUser">getUser</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#42"><abbr title="App\Entity\Picture::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#51"><abbr title="App\Entity\Comment::setTrick">setTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#46"><abbr title="App\Entity\Comment::getTrick">getTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Comment.php.html#41"><abbr title="App\Entity\Comment::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Category.php.html#71"><abbr title="App\Entity\Category::removeTrick">removeTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Category.php.html#61"><abbr title="App\Entity\Category::addTrick">addTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Category.php.html#56"><abbr title="App\Entity\Category::getTricks">getTricks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Category.php.html#46"><abbr title="App\Entity\Category::setName">setName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Category.php.html#41"><abbr title="App\Entity\Category::getName">getName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PasswordToken.php.html#58"><abbr title="App\Entity\PasswordToken::getUser">getUser</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#47"><abbr title="App\Entity\Picture::getPath">getPath</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#193"><abbr title="App\Entity\Trick::removeVideo">removeVideo</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#85"><abbr title="App\Entity\Trick::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#184"><abbr title="App\Entity\Trick::addVideo">addVideo</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#179"><abbr title="App\Entity\Trick::getVideos">getVideos</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#143"><abbr title="App\Entity\Trick::setUpdatedAt">setUpdatedAt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#138"><abbr title="App\Entity\Trick::getUpdatedAt">getUpdatedAt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#119"><abbr title="App\Entity\Trick::setDescription">setDescription</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#114"><abbr title="App\Entity\Trick::getDescription">getDescription</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#107"><abbr title="App\Entity\Trick::setSlug">setSlug</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#102"><abbr title="App\Entity\Trick::getSlug">getSlug</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Trick.php.html#78"><abbr title="App\Entity\Trick::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#52"><abbr title="App\Entity\Picture::setPath">setPath</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#59"><abbr title="App\Entity\RegistrationToken::getUser">getUser</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#42"><abbr title="App\Entity\RegistrationToken::getId">getId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#12"><abbr title="App\Entity\RegistrationToken::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#105"><abbr title="App\Entity\Picture::removeUser">removeUser</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#95"><abbr title="App\Entity\Picture::addUser">addUser</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#90"><abbr title="App\Entity\Picture::getUsers">getUsers</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#77"><abbr title="App\Entity\Picture::removeTrick">removeTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#67"><abbr title="App\Entity\Picture::addTrick">addTrick</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Picture.php.html#62"><abbr title="App\Entity\Picture::getTricks">getTricks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Video.php.html#71"><abbr title="App\Entity\Video::removeTrick">removeTrick</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Category.php.html#71"><abbr title="App\Entity\Category::removeTrick">removeTrick</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Trick.php.html#253"><abbr title="App\Entity\Trick::removeComment">removeComment</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="User.php.html#297"><abbr title="App\Entity\User::removeComment">removeComment</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Picture.php.html#105"><abbr title="App\Entity\Picture::removeUser">removeUser</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="User.php.html#254"><abbr title="App\Entity\User::removeRegistrationToken">removeRegistrationToken</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="User.php.html#223"><abbr title="App\Entity\User::removeTrick">removeTrick</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Category.php.html#36"><abbr title="App\Entity\Category::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#179"><abbr title="App\Entity\User::setLastName">setLastName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#207"><abbr title="App\Entity\Trick::setAuthorName">setAuthorName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#214"><abbr title="App\Entity\Trick::getCategory">getCategory</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#219"><abbr title="App\Entity\Trick::setCategory">setCategory</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#243"><abbr title="App\Entity\Trick::addComment">addComment</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#96"><abbr title="App\Entity\User::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#162"><abbr title="App\Entity\User::getEmail">getEmail</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#174"><abbr title="App\Entity\User::getLastName">getLastName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#213"><abbr title="App\Entity\User::addTrick">addTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#186"><abbr title="App\Entity\User::getFirstName">getFirstName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#191"><abbr title="App\Entity\User::setFirstName">setFirstName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#193"><abbr title="App\Entity\Trick::removeVideo">removeVideo</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#244"><abbr title="App\Entity\User::addRegistrationToken">addRegistrationToken</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#267"><abbr title="App\Entity\User::getStatus">getStatus</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#287"><abbr title="App\Entity\User::addComment">addComment</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#310"><abbr title="App\Entity\User::getProfilePicture">getProfilePicture</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="User.php.html#315"><abbr title="App\Entity\User::setProfilePicture">setProfilePicture</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Video.php.html#36"><abbr title="App\Entity\Video::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Video.php.html#41"><abbr title="App\Entity\Video::getUrl">getUrl</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Video.php.html#61"><abbr title="App\Entity\Video::addTrick">addTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#202"><abbr title="App\Entity\Trick::getAuthorName">getAuthorName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#138"><abbr title="App\Entity\Trick::getUpdatedAt">getUpdatedAt</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#184"><abbr title="App\Entity\Trick::addVideo">addVideo</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PasswordToken.php.html#53"><abbr title="App\Entity\PasswordToken::getExpiresAt">getExpiresAt</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Category.php.html#61"><abbr title="App\Entity\Category::addTrick">addTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#41"><abbr title="App\Entity\Comment::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#46"><abbr title="App\Entity\Comment::getTrick">getTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#51"><abbr title="App\Entity\Comment::setTrick">setTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#58"><abbr title="App\Entity\Comment::getUser">getUser</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#63"><abbr title="App\Entity\Comment::setUser">setUser</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#70"><abbr title="App\Entity\Comment::getContent">getContent</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Comment.php.html#82"><abbr title="App\Entity\Comment::getPublishedAt">getPublishedAt</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PasswordToken.php.html#42"><abbr title="App\Entity\PasswordToken::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PasswordToken.php.html#47"><abbr title="App\Entity\PasswordToken::getToken">getToken</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="PasswordToken.php.html#58"><abbr title="App\Entity\PasswordToken::getUser">getUser</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Category.php.html#41"><abbr title="App\Entity\Category::getName">getName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Picture.php.html#42"><abbr title="App\Entity\Picture::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Picture.php.html#47"><abbr title="App\Entity\Picture::getPath">getPath</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Picture.php.html#67"><abbr title="App\Entity\Picture::addTrick">addTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Picture.php.html#77"><abbr title="App\Entity\Picture::removeTrick">removeTrick</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Picture.php.html#95"><abbr title="App\Entity\Picture::addUser">addUser</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#42"><abbr title="App\Entity\RegistrationToken::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="RegistrationToken.php.html#59"><abbr title="App\Entity\RegistrationToken::getUser">getUser</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#85"><abbr title="App\Entity\Trick::getId">getId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#102"><abbr title="App\Entity\Trick::getSlug">getSlug</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#114"><abbr title="App\Entity\Trick::getDescription">getDescription</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Trick.php.html#119"><abbr title="App\Entity\Trick::setDescription">setDescription</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Video.php.html#71"><abbr title="App\Entity\Video::removeTrick">removeTrick</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 6.1.4</a> using <a href="https://secure.php.net/" target="_top">PHP 7.3.1</a> with <a href="https://xdebug.org/">Xdebug 2.7.2</a> and <a href="https://phpunit.de/">PHPUnit 7.5.15</a> at Wed Aug 21 14:55:29 UTC 2019.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../.js/jquery.min.js" type="text/javascript"></script>
+  <script src="../.js/d3.min.js" type="text/javascript"></script>
+  <script src="../.js/nv.d3.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([5,0,1,2,0,0,0,0,0,0,0,0], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([88,0,0,0,0,0,0,0,0,0,0,10], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,12,"<a href=\"Category.php.html#12\">App\\Entity\\Category<\/a>"],[0,16,"<a href=\"Comment.php.html#10\">App\\Entity\\Comment<\/a>"],[0,9,"<a href=\"PasswordToken.php.html#10\">App\\Entity\\PasswordToken<\/a>"],[11.538461538461538,17,"<a href=\"Picture.php.html#12\">App\\Entity\\Picture<\/a>"],[25,9,"<a href=\"RegistrationToken.php.html#10\">App\\Entity\\RegistrationToken<\/a>"],[25,44,"<a href=\"Trick.php.html#14\">App\\Entity\\Trick<\/a>"],[0,47,"<a href=\"User.php.html#23\">App\\Entity\\User<\/a>"],[0,11,"<a href=\"Video.php.html#12\">App\\Entity\\Video<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Category.php.html#31\">App\\Entity\\Category::__construct<\/a>"],[0,2,"<a href=\"Category.php.html#36\">App\\Entity\\Category::getId<\/a>"],[0,2,"<a href=\"Category.php.html#41\">App\\Entity\\Category::getName<\/a>"],[0,1,"<a href=\"Category.php.html#46\">App\\Entity\\Category::setName<\/a>"],[0,1,"<a href=\"Category.php.html#56\">App\\Entity\\Category::getTricks<\/a>"],[0,2,"<a href=\"Category.php.html#61\">App\\Entity\\Category::addTrick<\/a>"],[0,3,"<a href=\"Category.php.html#71\">App\\Entity\\Category::removeTrick<\/a>"],[0,2,"<a href=\"Comment.php.html#41\">App\\Entity\\Comment::getId<\/a>"],[0,2,"<a href=\"Comment.php.html#46\">App\\Entity\\Comment::getTrick<\/a>"],[0,2,"<a href=\"Comment.php.html#51\">App\\Entity\\Comment::setTrick<\/a>"],[0,2,"<a href=\"Comment.php.html#58\">App\\Entity\\Comment::getUser<\/a>"],[0,2,"<a href=\"Comment.php.html#63\">App\\Entity\\Comment::setUser<\/a>"],[0,2,"<a href=\"Comment.php.html#70\">App\\Entity\\Comment::getContent<\/a>"],[0,1,"<a href=\"Comment.php.html#75\">App\\Entity\\Comment::setContent<\/a>"],[0,2,"<a href=\"Comment.php.html#82\">App\\Entity\\Comment::getPublishedAt<\/a>"],[0,1,"<a href=\"Comment.php.html#87\">App\\Entity\\Comment::setPublishedAt<\/a>"],[0,1,"<a href=\"PasswordToken.php.html#12\">App\\Entity\\PasswordToken::__construct<\/a>"],[0,2,"<a href=\"PasswordToken.php.html#42\">App\\Entity\\PasswordToken::getId<\/a>"],[0,2,"<a href=\"PasswordToken.php.html#47\">App\\Entity\\PasswordToken::getToken<\/a>"],[0,2,"<a href=\"PasswordToken.php.html#53\">App\\Entity\\PasswordToken::getExpiresAt<\/a>"],[0,2,"<a href=\"PasswordToken.php.html#58\">App\\Entity\\PasswordToken::getUser<\/a>"],[100,1,"<a href=\"Picture.php.html#36\">App\\Entity\\Picture::__construct<\/a>"],[0,2,"<a href=\"Picture.php.html#42\">App\\Entity\\Picture::getId<\/a>"],[0,2,"<a href=\"Picture.php.html#47\">App\\Entity\\Picture::getPath<\/a>"],[0,1,"<a href=\"Picture.php.html#52\">App\\Entity\\Picture::setPath<\/a>"],[0,1,"<a href=\"Picture.php.html#62\">App\\Entity\\Picture::getTricks<\/a>"],[0,2,"<a href=\"Picture.php.html#67\">App\\Entity\\Picture::addTrick<\/a>"],[0,2,"<a href=\"Picture.php.html#77\">App\\Entity\\Picture::removeTrick<\/a>"],[0,1,"<a href=\"Picture.php.html#90\">App\\Entity\\Picture::getUsers<\/a>"],[0,2,"<a href=\"Picture.php.html#95\">App\\Entity\\Picture::addUser<\/a>"],[0,3,"<a href=\"Picture.php.html#105\">App\\Entity\\Picture::removeUser<\/a>"],[0,1,"<a href=\"RegistrationToken.php.html#12\">App\\Entity\\RegistrationToken::__construct<\/a>"],[0,2,"<a href=\"RegistrationToken.php.html#42\">App\\Entity\\RegistrationToken::getId<\/a>"],[100,2,"<a href=\"RegistrationToken.php.html#47\">App\\Entity\\RegistrationToken::getToken<\/a>"],[100,2,"<a href=\"RegistrationToken.php.html#53\">App\\Entity\\RegistrationToken::getExpiresAt<\/a>"],[0,2,"<a href=\"RegistrationToken.php.html#59\">App\\Entity\\RegistrationToken::getUser<\/a>"],[0,1,"<a href=\"Trick.php.html#78\">App\\Entity\\Trick::__construct<\/a>"],[0,2,"<a href=\"Trick.php.html#85\">App\\Entity\\Trick::getId<\/a>"],[100,2,"<a href=\"Trick.php.html#90\">App\\Entity\\Trick::getName<\/a>"],[100,1,"<a href=\"Trick.php.html#95\">App\\Entity\\Trick::setName<\/a>"],[0,2,"<a href=\"Trick.php.html#102\">App\\Entity\\Trick::getSlug<\/a>"],[0,1,"<a href=\"Trick.php.html#107\">App\\Entity\\Trick::setSlug<\/a>"],[0,2,"<a href=\"Trick.php.html#114\">App\\Entity\\Trick::getDescription<\/a>"],[0,2,"<a href=\"Trick.php.html#119\">App\\Entity\\Trick::setDescription<\/a>"],[100,2,"<a href=\"Trick.php.html#126\">App\\Entity\\Trick::getPublishedAt<\/a>"],[100,1,"<a href=\"Trick.php.html#131\">App\\Entity\\Trick::setPublishedAt<\/a>"],[0,2,"<a href=\"Trick.php.html#138\">App\\Entity\\Trick::getUpdatedAt<\/a>"],[0,1,"<a href=\"Trick.php.html#143\">App\\Entity\\Trick::setUpdatedAt<\/a>"],[100,1,"<a href=\"Trick.php.html#153\">App\\Entity\\Trick::getPictures<\/a>"],[100,2,"<a href=\"Trick.php.html#158\">App\\Entity\\Trick::addPicture<\/a>"],[100,2,"<a href=\"Trick.php.html#167\">App\\Entity\\Trick::removePicture<\/a>"],[0,1,"<a href=\"Trick.php.html#179\">App\\Entity\\Trick::getVideos<\/a>"],[0,2,"<a href=\"Trick.php.html#184\">App\\Entity\\Trick::addVideo<\/a>"],[0,2,"<a href=\"Trick.php.html#193\">App\\Entity\\Trick::removeVideo<\/a>"],[0,2,"<a href=\"Trick.php.html#202\">App\\Entity\\Trick::getAuthorName<\/a>"],[0,2,"<a href=\"Trick.php.html#207\">App\\Entity\\Trick::setAuthorName<\/a>"],[0,2,"<a href=\"Trick.php.html#214\">App\\Entity\\Trick::getCategory<\/a>"],[0,2,"<a href=\"Trick.php.html#219\">App\\Entity\\Trick::setCategory<\/a>"],[0,1,"<a href=\"Trick.php.html#229\">App\\Entity\\Trick::getComments<\/a>"],[0,1,"<a href=\"Trick.php.html#237\">App\\Entity\\Trick::getLimitedComments<\/a>"],[0,2,"<a href=\"Trick.php.html#243\">App\\Entity\\Trick::addComment<\/a>"],[0,3,"<a href=\"Trick.php.html#253\">App\\Entity\\Trick::removeComment<\/a>"],[0,1,"<a href=\"User.php.html#89\">App\\Entity\\User::__construct<\/a>"],[0,2,"<a href=\"User.php.html#96\">App\\Entity\\User::getId<\/a>"],[0,1,"<a href=\"User.php.html#106\">App\\Entity\\User::getUsername<\/a>"],[0,1,"<a href=\"User.php.html#111\">App\\Entity\\User::setUsername<\/a>"],[0,1,"<a href=\"User.php.html#121\">App\\Entity\\User::getRoles<\/a>"],[0,1,"<a href=\"User.php.html#130\">App\\Entity\\User::setRoles<\/a>"],[0,1,"<a href=\"User.php.html#140\">App\\Entity\\User::getPassword<\/a>"],[0,1,"<a href=\"User.php.html#148\">App\\Entity\\User::getSalt<\/a>"],[0,1,"<a href=\"User.php.html#156\">App\\Entity\\User::eraseCredentials<\/a>"],[0,2,"<a href=\"User.php.html#162\">App\\Entity\\User::getEmail<\/a>"],[0,1,"<a href=\"User.php.html#167\">App\\Entity\\User::setEmail<\/a>"],[0,2,"<a href=\"User.php.html#174\">App\\Entity\\User::getLastName<\/a>"],[0,2,"<a href=\"User.php.html#179\">App\\Entity\\User::setLastName<\/a>"],[0,2,"<a href=\"User.php.html#186\">App\\Entity\\User::getFirstName<\/a>"],[0,2,"<a href=\"User.php.html#191\">App\\Entity\\User::setFirstName<\/a>"],[0,1,"<a href=\"User.php.html#198\">App\\Entity\\User::setPassword<\/a>"],[0,1,"<a href=\"User.php.html#208\">App\\Entity\\User::getTricks<\/a>"],[0,2,"<a href=\"User.php.html#213\">App\\Entity\\User::addTrick<\/a>"],[0,3,"<a href=\"User.php.html#223\">App\\Entity\\User::removeTrick<\/a>"],[0,1,"<a href=\"User.php.html#239\">App\\Entity\\User::getRegistrationTokens<\/a>"],[0,2,"<a href=\"User.php.html#244\">App\\Entity\\User::addRegistrationToken<\/a>"],[0,3,"<a href=\"User.php.html#254\">App\\Entity\\User::removeRegistrationToken<\/a>"],[0,2,"<a href=\"User.php.html#267\">App\\Entity\\User::getStatus<\/a>"],[0,1,"<a href=\"User.php.html#272\">App\\Entity\\User::setStatus<\/a>"],[0,1,"<a href=\"User.php.html#282\">App\\Entity\\User::getComments<\/a>"],[0,2,"<a href=\"User.php.html#287\">App\\Entity\\User::addComment<\/a>"],[0,3,"<a href=\"User.php.html#297\">App\\Entity\\User::removeComment<\/a>"],[0,2,"<a href=\"User.php.html#310\">App\\Entity\\User::getProfilePicture<\/a>"],[0,2,"<a href=\"User.php.html#315\">App\\Entity\\User::setProfilePicture<\/a>"],[0,1,"<a href=\"Video.php.html#31\">App\\Entity\\Video::__construct<\/a>"],[0,2,"<a href=\"Video.php.html#36\">App\\Entity\\Video::getId<\/a>"],[0,2,"<a href=\"Video.php.html#41\">App\\Entity\\Video::getUrl<\/a>"],[0,1,"<a href=\"Video.php.html#46\">App\\Entity\\Video::setUrl<\/a>"],[0,1,"<a href=\"Video.php.html#56\">App\\Entity\\Video::getTricks<\/a>"],[0,2,"<a href=\"Video.php.html#61\">App\\Entity\\Video::addTrick<\/a>"],[0,2,"<a href=\"Video.php.html#71\">App\\Entity\\Video::removeTrick<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

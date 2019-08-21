@@ -76,9 +76,6 @@
                         <!-- Bloc des images/vidéos pour affichage écran standard -->
                         <div class="d-none d-sm-none d-md-none d-lg-block">
                             <div class="row justify-content-left align-items-center">
-                                {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
-                                    <p>Aucun média pour cette figure !</p>
-                                {% else %}
                                     {% if ((trick.pictures | length) > 0) %}
                                         {%  for picture in trick.pictures %}
                                          <div class="col-lg-2 card rounded" id="trickMedias">
@@ -96,16 +93,12 @@
                                             </div>
                                         {% endfor %}
                                     {% endif %}
-                                {% endif %}
                             </div>
                         </div>
 
                         <!-- Bloc images/vidéos pour affichage mobile -->
                         <div class="d-block d-lg-none">
                             <div class="row justify-content-center align-items-center" id="trickMediasMobileBlock" style="display:none;">
-                                {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
-                                    <p>Aucun média pour cette figure !</p>
-                                {% else %}
                                     {% if ((trick.pictures | length) > 0) %}
                                         {%  for picture in trick.pictures %}
                                             <div class="card h-100 rounded" id="trickMediasMobile">
@@ -123,7 +116,6 @@
                                             </div>
                                         {% endfor %}
                                     {% endif %}
-                                {% endif %}
                             </div>
                             <div class="row justify-content-center align-items-center"><button class="btn btn-info" id="showMediasLink">Voir les médias</button></div>
                             <div class="row justify-content-center align-items-center"><button class="btn btn-info" id="hideMediasLink" style="display:none;">Cacher les médias</button></div>
@@ -147,7 +139,7 @@
                             <form method="post">
                                 <div class="form-group row align-items-center">
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="comment" name="comment" required rows="3">Votre commentaire</textarea>
+                                        <textarea id="comment" name="comment" rows="3" class="form-control" placeholder="Votre commentaire."></textarea>
                                     </div>
                                     <div class="col-sm-4">
                                         <button type="submit" class="btn btn-info">Commenter</button>
@@ -160,11 +152,10 @@
 
                         <div class="justify-content-center" id="tricksComments" data-trick_id="{{ trick.id }}">
                             {% if ((trick.comments | length) == 0) %}
-                            <p>Aucun commentaire.</p>
+                            <div class="text-center">Aucun commentaire.</div>
                             {% else %}
                                 {% for comment in trick.limitedComments() %}
                                     <div class="row justify-content-center">
-
                                         <div class="col col-sm-2 text-right">{% if comment.user != NULL %}{% if comment.user.profilePicture != "" %}<img class="commentProfilePicture" src="{{ comment.user.profilePicture.path }}" title="{{ comment.user.username }}" />{% else %}<i title="{{ comment.user.username }}" class="far fa-user-circle fa-2x"></i>{% endif %}{% else %}<i title="Anonyme" class="far fa-user-circle fa-2x"></i>{% endif %}</div>
                                         <div class="col col-sm-6">
                                             <blockquote>
@@ -174,9 +165,11 @@
                                         </div>
 
                                         <div class="text-left">
-                                            {% if (app.user != null and comment.user != NULL) %}
-                                                {% if (is_granted('ROLE_ADMIN') or (app.user.username == comment.user.username)) %}
-                                                    <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+                                            {% if app.user != null %}
+                                                {% if comment.user != NULL %}
+                                                    {% if (is_granted('ROLE_USER') and (app.user.username == comment.user.username)) %}
+                                                        <a href="" title="Supprimer le commentaire" data-toggle="modal" data-target="#deleteCommentModal" data-deletecommenturl="{{ path('delete_comment', {'commentId': comment.id}) }}"><i class="far fa-times-circle"></i></a>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                         </div>
