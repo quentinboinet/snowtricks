@@ -8,6 +8,10 @@ $(document).ready(function() {
     $("#picturesToEdit").val('');
     $("#videosToEdit").val('');
 
+    var regexYoutube = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+");
+    var regexDailymotion = new RegExp("^.+dailymotion.com\\/((video|hub)\\/([^_]+))?[^#]*(#video=([^_&]+))?/");
+    var regexVimeo = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?player.vimeo.com/video\\/.+");
+
     $('.trickPictureAdd').click(function () {
         //on ajoute la div qui contiendra les champs pour entrer les nouvelles images
         if ($('.picturesToAdd').length == 0) {//si on a pas encore ajouté le bloc
@@ -172,9 +176,6 @@ $(document).ready(function() {
 
     $(document).on('change', 'input.videoInput', function () {
         var nbVideoFields = $('#videoNb').val();
-        var regexYoutube = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+");
-        var regexDailymotion = new RegExp("^.+dailymotion.com\\/((video|hub)\\/([^_]+))?[^#]*(#video=([^_&]+))?/");
-        var regexVimeo = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?player.vimeo.com/video\\/.+");
         var i = 1;
         var nbNonValide = 0;
         for(i=1;i<=nbVideoFields;i++) {
@@ -200,9 +201,6 @@ $(document).ready(function() {
 
     $(document).on('change', 'input.videoInputAdd', function () {
         var nbVideoFields = $('#videoAddNb').val();
-        var regexYoutube = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+");
-        var regexDailymotion = new RegExp("^.+dailymotion.com\\/((video|hub)\\/([^_]+))?[^#]*(#video=([^_&]+))?/");
-        var regexVimeo = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?player.vimeo.com/video\\/.+");
         var i = 1;
         var nbNonValide = 0;
         for(i=1;i<=nbVideoFields;i++) {
