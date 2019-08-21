@@ -51,7 +51,7 @@ class CommentController extends AbstractController
             $username = $security->getUser()->getUsername();
             $commentUsername = $comment->getUser()->getUsername();
 
-            if($role[0] == "ROLE_ADMIN" OR $username == $commentUsername) //on vérifie que la personne soit bien l'auteur du commentaire qu'elle veut supprimer ou qu'elle soit admin
+            if($role[0] == "ROLE_USER" AND $username == $commentUsername) //on vérifie que la personne soit bien l'auteur du commentaire qu'elle veut supprimer ou qu'elle soit admin
             {
                 $trickRepo = $em->getRepository(Trick::class);
 
@@ -61,7 +61,7 @@ class CommentController extends AbstractController
                 $em->remove($comment);
                 $em->flush();
 
-                $this->addFlash('success', 'Le commentaire a bien été supprimé !');
+                $this->addFlash('warning', 'Le commentaire a bien été supprimé !');
                 return $this->redirectToRoute('trick_view', array('trickId' => $trickId));
             }
             else {

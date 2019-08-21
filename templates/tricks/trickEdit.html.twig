@@ -59,9 +59,6 @@
                     <!-- Bloc des images/vidéos pour affichage écran standard -->
                     <div class="d-none d-sm-none d-md-none d-lg-block trickMediaEditBlock">
                         <div class="row justify-content-left align-items-center">
-                            {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
-                                <p>Aucun média pour cette figure !</p>
-                            {% else %}
                                 {% if ((trick.pictures | length) > 0) %}
                                     {%  for picture in trick.pictures %}
                                         <div class="col-lg-2 card rounded text-center">
@@ -81,11 +78,10 @@
                                         </div>
                                     {% endfor %}
                                 {% endif %}
-                            {% endif %}
 
                             <div class="col-lg-2 card rounded text-center">
                                 <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                               <span>Ajouter un média :<br /><a class="trickPictureAdd" title="Ajouter une image"><i class="fas fa-camera-retro fa-3x"></i></a>   <a class="trickVideoAdd" title="Ajouter une vidéo"><i class="fas fa-video fa-3x"></i></a></span>
+                                <span>Ajouter un média :<br /> <span class="btn btn-info"><a class="trickPictureAdd" title="Ajouter une image"><i class="fas fa-camera-retro fa-2x"></i></a></span>    <span class="btn btn-info"><a class="trickVideoAdd" title="Ajouter une vidéo"><i class="fas fa-video fa-2x"></i></a></span></span>
                             </div>
                         </div>
                     </div>
@@ -93,9 +89,6 @@
                     <!-- Bloc images/vidéos pour affichage mobile -->
                     <div class="d-block d-lg-none trickMediaEditBlockMobile">
                         <div class="row justify-content-center align-items-center" id="trickMediasMobileBlock" style="display:none;">
-                            {% if ((trick.pictures | length) == 0 and (trick.videos | length) == 0) %}
-                                <p>Aucun média pour cette figure !</p>
-                            {% else %}
                                 {% if ((trick.pictures | length) > 0) %}
                                     {%  for picture in trick.pictures %}
                                         <div class="card h-100 rounded text-center" id="trickMediasMobile">
@@ -115,7 +108,6 @@
                                         </div>
                                     {% endfor %}
                                 {% endif %}
-                            {% endif %}
                             <div class="card h-100 rounded text-center" id="trickMediasMobile">
                                 <span>Ajouter un média :<br /><a class="trickPictureAdd" title="Ajouter une image"><i class="fas fa-camera-retro fa-3x"></i></a>   <a class="trickVideoAdd" title="Ajouter une vidéo"><i class="fas fa-video fa-3x"></i></a></span>
                             </div>
