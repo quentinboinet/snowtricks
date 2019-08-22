@@ -24,9 +24,6 @@
                                     <input type="password" class="form-control" id="password" name="password" placeholder="Votre mot de passe" required>
                                 </div>
                             </div>
-                            <div class="form-group row justify-content-center">
-                                <div class="col-sm-8 offset-sm-2 g-recaptcha" data-sitekey="6Lfe6rMUAAAAAPCFK_TmGDmEHeYvJQjAdm9Xd8Pj"></div>
-                            </div>
 
                             {% if error %}
                                 <div class="formErrorMessage">{{ error.messageKey|trans(error.messageData, 'security', 'fr') }}</div>

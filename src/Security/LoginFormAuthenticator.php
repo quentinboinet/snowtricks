@@ -62,22 +62,6 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getCredentials(Request $request)
     {
-        // Ma clé privée
-        $secret = "6Lfe6rMUAAAAAJJywYLtiOkocjIsr63SrMiyKLgD";
-        // Paramètre renvoyé par le recaptcha
-        $response = $request->request->get('g-recaptcha-response');
-        // On récupère l'IP de l'utilisateur
-        $remoteip = $_SERVER['REMOTE_ADDR'];
-
-        $api_url = "https://www.google.com/recaptcha/api/siteverify?secret="
-            . $secret
-            . "&response=" . $response
-            . "&remoteip=" . $remoteip ;
-
-        $decode = json_decode(file_get_contents($api_url), true);
-
-        if ($decode['success'] == true) {
-            // C'est un humain
             $credentials = [
                 'username' => $request->request->get('username'),
                 'password' => $request->request->get('password'),
@@ -89,10 +73,6 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             );
 
             return $credentials;
-        }
-        else {
-            throw new InvalidCsrfTokenException();
-        }
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
