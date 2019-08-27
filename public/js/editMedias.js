@@ -12,6 +12,16 @@ $(document).ready(function() {
     var regexDailymotion = new RegExp("^.+dailymotion.com\\/((video|hub)\\/([^_]+))?[^#]*(#video=([^_&]+))?/");
     var regexVimeo = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?player.vimeo.com/video\\/.+");
 
+    function testMobileOrNot(id, champURLS) {
+        if (id == "trickMediasMobile") //si le clic provient du site en affichage mobile
+        {
+            $('.trickMediaEditBlockMobile').append(champURLS);
+        }
+        else {
+            $('.trickMediaEditBlock').append(champURLS);
+        }
+    }
+
     $('.trickPictureAdd').click(function () {
         //on ajoute la div qui contiendra les champs pour entrer les nouvelles images
         if ($('.picturesToAdd').length == 0) {//si on a pas encore ajouté le bloc
@@ -23,13 +33,14 @@ $(document).ready(function() {
                 "                                </div>\n" +
                 "                            </div>";
 
-            if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
-            {
-                $('.trickMediaEditBlockMobile').append(champURLS);
-            }
-            else {
-                $('.trickMediaEditBlock').append(champURLS);
-            }
+            testMobileOrNot($(this).parent().parent().attr('id'), champURLS);
+            //if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
+            //{
+            //    $('.trickMediaEditBlockMobile').append(champURLS);
+            //}
+            //else {
+             //   $('.trickMediaEditBlock').append(champURLS);
+           // }
 
         }
 
@@ -54,13 +65,15 @@ $(document).ready(function() {
                 "                            </div>";
             champURLS = champURLS + "<br />\n" + "<div class=\"row text-center justify-content-center formAddErrorMessage\">\n" + "</div>";
 
-            if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
-            {
-                $('.trickMediaEditBlockMobile').append(champURLS);
-            }
-            else {
-                $('.trickMediaEditBlock').append(champURLS);
-            }
+            testMobileOrNot($(this).parent().parent().attr('id'), champURLS);
+
+            //if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
+            //{
+            //    $('.trickMediaEditBlockMobile').append(champURLS);
+            //}
+            //else {
+             //   $('.trickMediaEditBlock').append(champURLS);
+           // }
 
         }
 
@@ -144,13 +157,16 @@ $(document).ready(function() {
         if ($('.newVideosEdit').length == 0) {//si on a pas encore ajouté le bloc
             var champURLS = "<hr><div class=\"row text-center justify-content-center newVideosEdit\">\n" + "</div>";
             champURLS = champURLS + "<br />\n" + "<div class=\"row text-center justify-content-center formErrorMessage\">\n" + "</div>";
-            if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
-            {
-                $('.trickMediaEditBlockMobile').append(champURLS);
-            }
-            else {
-                $('.trickMediaEditBlock').append(champURLS);
-            }
+
+            testMobileOrNot($(this).parent().parent().attr('id'), champURLS);
+
+            //if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
+            //{
+            //    $('.trickMediaEditBlockMobile').append(champURLS);
+            //}
+            //else {
+            //    $('.trickMediaEditBlock').append(champURLS);
+            //}
 
         }
 
