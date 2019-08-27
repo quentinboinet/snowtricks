@@ -40,10 +40,10 @@ class MediaUploader extends AbstractController
 
                         $trick->addPicture($picture);
                     } else {
-                        return $this->render($view, ['categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                        return "wrongFormat";
                     }
                 } else {
-                    return $this->render($view, ['categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                    return "tooHeavy";
                 }
             }
         }

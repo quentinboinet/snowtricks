@@ -8,63 +8,36 @@ use App\Entity\PasswordToken;
 use App\Entity\Picture;
 use App\Entity\RegistrationToken;
 use App\Entity\User;
+use App\Service\Mailer;
+use App\Service\TokenChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Security;
 
 class AccountController extends AbstractController
 {
 
-    private $mailer;
-
-    public function __construct(MailerInterface $mailer)
-    {
-        $this->mailer = $mailer;
-    }
-
     /**
      * @Route ("/api/account/confirm/{userId}/{token}", name="api_account_confirm")
      */
-    public function registrationConfirm($userId, $token, EntityManagerInterface $em)
+    public function registrationConfirm($userId, $token, EntityManagerInterface $em, TokenChecker $tokenChecker)
     {
          //on regarde si un token avec cet id d'user existe bien dans la table RegistrationToken, et on vérifie aussi qu'il n'a pas expiré
         $tokenRepo = $em->getRepository(RegistrationToken::class);
         $token = $tokenRepo->findOneBy(['user' => $userId, 'token' => $token]);
         if (!empty($token)) {
-            //on vérifie si le token n'a pas expiré
-            $now = new \DateTime();
-            if ($token->getExpiresAt() > $now) {
-                $userRepo = $em->getRepository(User::class);
-                $user = $userRepo->find($userId);
-                $user->setStatus(1);//
-                $em->flush();
-
-                //on supprime le token associé
-                $em->remove($token);
-                $em->flush();
-
-                //enfin redirige vers l'accueil après avoir updaté le statut de l'user à 1
+            $result = $tokenChecker->registrationToken('accountConfirm', $token, null, $userId);
+            if ($result == "OK") {
                 $this->addFlash('success', 'Votre compte est désormais activé ! Vous pouvez vous connecter.');
                 return $this->redirectToRoute('home_page');
             }
-            else {
-
-                //on supprime le token associé
-                $em->remove($token);
-                $em->flush();
-
+            elseif ($result == "expired") {
                 $this->addFlash('fail', 'Le lien que vous avez utiilisé semble avoir expiré ! Veuillez contacter l\'administrateur.');
                 return $this->redirectToRoute('home_page');
             }
@@ -78,7 +51,7 @@ class AccountController extends AbstractController
     /**
      * @Route("/api/resendRegistrationToken/{userId}", name="api_resendRegistrationToken")
      */
-    public function resendRegistrationToken($userId, EntityManagerInterface $em)
+    public function resendRegistrationToken($userId, EntityManagerInterface $em, Mailer $mailerService)
     {
         $userRepo = $em->getRepository(User::class);
         $user = $userRepo->find($userId);
@@ -89,21 +62,7 @@ class AccountController extends AbstractController
         $em->flush();
 
         //on envoi l'e-mail de confirmation d'inscription
-        $email = (new TemplatedEmail())
-            ->from('quentinboinet@live.fr')
-            ->to($user->getEmail())
-            ->subject('SnowTricks - Validation d\'inscription')
-            //->html('<h3>SnowTricks</h3><p>Votre compte est pour le moment inactif. Afin
-            //  de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $userId . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
-            //   <p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
-
-            ->htmlTemplate('email/registrationConfirm.html.twig')
-            ->context([
-                'api_token' => $token->getToken(),
-                'user_id' => $user->getId(),
-            ]);
-
-        $this->mailer->send($email);
+        $mailerService->sendMail($user, 'SnowTricks - Validation d\'inscription', 'email/registrationConfirm.html.twig', $token);
 
         $this->addFlash('success', 'Merci ! Un e-mail contenant un lien d\'activation vous a été envoyé.');
         return $this->redirectToRoute('home_page');
@@ -112,7 +71,7 @@ class AccountController extends AbstractController
     /**
      * @Route("/forgotPassword", name="api_forgot_password")
      */
-    public function forgotPassword(Request $request, EntityManagerInterface $em)
+    public function forgotPassword(Request $request, EntityManagerInterface $em, Mailer $mailerService)
     {
         if ($request->isMethod('POST')) {
             $username = $request->request->get('username');
@@ -126,21 +85,7 @@ class AccountController extends AbstractController
                 $em->flush();
 
                 //on envoi le mail avec lien et token pour reset de mot de passe
-                $email = (new TemplatedEmail())
-                    ->from('quentinboinet@live.fr')
-                    ->to($user->getEmail())
-                    ->subject('SnowTricks - Mot de passe oublié')
-                    //->html('<h3>SnowTricks</h3><p>Il semble que vous ayez oublié votre mot de passe sur notre site. Afin
-                    //de pouvoir en choisir un nouveau et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/resetPassword/' . $user->getId() . '/' . $token->getToken() . '">redéfinir mon mot de passe !</a></p>
-                    //<p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
-
-                    ->htmlTemplate('email/forgetPassword.html.twig')
-                    ->context([
-                        'api_token' => $token->getToken(),
-                        'user_id' => $user->getId(),
-                    ]);
-
-                $this->mailer->send($email);
+                $mailerService->sendMail($user, 'SnowTricks - Mot de passe oublié', 'email/forgetPassword.html.twig', null, $token);
 
                 $this->addFlash('success', 'Merci ! Un e-mail contenant un lien permettant de remettre à zéro votre mot de passe vous a été envoyé.');
                 return $this->redirectToRoute('home_page');
@@ -157,7 +102,7 @@ class AccountController extends AbstractController
     /**
      * @Route ("/api/account/resetPassword/{userId}/{token}", name="api_account_resetPassword")
      */
-    public function resetPassword($userId, $token, EntityManagerInterface $em, Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function resetPassword($userId, $token, EntityManagerInterface $em, Request $request, UserPasswordEncoderInterface $passwordEncoder, TokenChecker $tokenChecker)
     {
 
         if ($request->isMethod('POST')) {
@@ -190,24 +135,13 @@ class AccountController extends AbstractController
             $tokenRepo = $em->getRepository(PasswordToken::class);
             $token = $tokenRepo->findOneBy(['user' => $userId, 'token' => $token]);
             if (!empty($token)) {
-                //on vérifie si le token n'a pas expiré
-                $now = new \DateTime();
-                if ($token->getExpiresAt() > $now) {
+                $result = $tokenChecker->registrationToken('resetPassword', null, $token, $userId);
+                if ($result == "OK") {
                     $userRepo = $em->getRepository(User::class);
                     $user = $userRepo->find($userId);
-
-                    //on supprime le token associé
-                    $em->remove($token);
-                    $em->flush();
-
                     return $this->render('security/resetPassword.html.twig', ['error' => '', 'username' => $user->getUsername()]);
                 }
-                else {
-
-                    //on supprime le token associé
-                    $em->remove($token);
-                    $em->flush();
-
+                elseif ($result == "expired") {
                     $this->addFlash('fail', 'Le lien que vous avez utiilisé semble avoir expiré ! Veuillez contacter l\'administrateur.');
                     return $this->redirectToRoute('home_page');
                 }

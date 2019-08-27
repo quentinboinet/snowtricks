@@ -46,10 +46,10 @@ class MediaEditer extends AbstractController
                             $picture->setPath('/images/uploads/' . $newFilename);
                             $this->em->flush();
                         } else {
-                            return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                            return "wrongFormat";
                         }
                     } else {
-                        return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                        return "tooHeavy";
                     }
                 }
             } elseif ($picturesToEdit[$i] == "cover") {
@@ -70,10 +70,10 @@ class MediaEditer extends AbstractController
                             $this->em->persist($picture);
 
                         } else {
-                            return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                            return "wrongFormat";
                         }
                     } else {
-                        return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                        return "tooHeavy";
                     }
                 }
             }

@@ -142,7 +142,13 @@ class TrickController extends AbstractController
 
                 //on appelle le service uploader pour uploader toutes les images
                 $nbImages = $request->request->get('pictureNb');
-                $uploader->picturesUpload('add', $nbImages, $request, $trick, $category);
+                $result = $uploader->picturesUpload('add', $nbImages, $request, $trick, $category);
+                if ($result == "tooHeavy") {
+                    return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                }
+                elseif ($result == "wrongFormat") {
+                    return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                }
 
                 //on appelle le service uploader pour uploader toutes les vidéos
                 $nbVideos = $request->request->get('videoNb');
@@ -200,7 +206,13 @@ class TrickController extends AbstractController
 
                 //puis on édite les images (upload des nouvelles, maj de bdd et suppression des anciennes sur le serveur
                 $nbImages = $request->request->get('pictureNb');
-                $mediaEditer->picturesEdit($nbrePicturesToEdit, $picturesToEdit, $request, $pictureRepo, $trick, $category);
+                $result = $mediaEditer->picturesEdit($nbrePicturesToEdit, $picturesToEdit, $request, $pictureRepo, $trick, $category);
+                if ($result == "tooHeavy") {
+                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                }
+                elseif ($result == "wrongFormat") {
+                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                }
 
                 //puis on édite les vidéos (maj de BDD)
                 $videosToEdit = explode("-", $request->request->get('videosToEdit'));
@@ -210,7 +222,13 @@ class TrickController extends AbstractController
                 //on upload les nouvelles images
                 //on appelle le service uploader pour uploader toutes les images
                 $nbNouvellesImages = $request->request->get('pictureAddNb');
-                $uploader->picturesUpload('edit', $nbNouvellesImages, $request, $trick, $category);
+                $result = $uploader->picturesUpload('edit', $nbNouvellesImages, $request, $trick, $category);
+                if ($result == "tooHeavy") {
+                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
+                }
+                elseif ($result == "wrongFormat") {
+                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
+                }
 
                 //on ajoute les nouvelles vidéos, en passant par le service uploader
                 $nbVideos = $request->request->get('videoAddNb');
