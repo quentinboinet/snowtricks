@@ -9,6 +9,10 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use Throwable;
+use function sprintf;
+use function strpos;
+
 class ExceptionMessage extends Constraint
 {
     /**
@@ -36,7 +40,7 @@ class ExceptionMessage extends Constraint
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
      *
-     * @param \Throwable $other
+     * @param Throwable $other
      */
     protected function matches($other): bool
     {
@@ -44,7 +48,7 @@ class ExceptionMessage extends Constraint
             return $other->getMessage() === '';
         }
 
-        return \strpos($other->getMessage(), $this->expectedMessage) !== false;
+        return strpos($other->getMessage(), $this->expectedMessage) !== false;
     }
 
     /**
@@ -58,13 +62,13 @@ class ExceptionMessage extends Constraint
     protected function failureDescription($other): string
     {
         if ($this->expectedMessage === '') {
-            return \sprintf(
+            return sprintf(
                 "exception message is empty but is '%s'",
                 $other->getMessage()
             );
         }
 
-        return \sprintf(
+        return sprintf(
             "exception message '%s' contains '%s'",
             $other->getMessage(),
             $this->expectedMessage

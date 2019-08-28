@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Framework;
 
+use function count;
+
 class DataProviderTestSuite extends TestSuite
 {
     /**
@@ -35,6 +37,6 @@ class DataProviderTestSuite extends TestSuite
 
     public function hasDependencies(): bool
     {
-        return \count($this->dependencies) > 0;
+        return count($this->dependencies) > 0;
     }
 }

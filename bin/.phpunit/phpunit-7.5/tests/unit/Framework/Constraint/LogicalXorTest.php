@@ -12,6 +12,8 @@ namespace Framework\Constraint;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\LogicalXor;
 use PHPUnit\Framework\TestCase;
+use function array_fill;
+use function array_map;
 
 final class LogicalXorTest extends TestCase
 {
@@ -20,7 +22,7 @@ final class LogicalXorTest extends TestCase
         $other = 'Foo';
         $count = 5;
 
-        $constraints = \array_map(function () use ($other) {
+        $constraints = array_map(function () use ($other) {
             static $count = 0;
 
             $constraint = $this->getMockBuilder(Constraint::class)->getMock();
@@ -34,7 +36,7 @@ final class LogicalXorTest extends TestCase
             ++$count;
 
             return $constraint;
-        }, \array_fill(0, $count, null));
+        }, array_fill(0, $count, null));
 
         $constraint = LogicalXor::fromConstraints(...$constraints);
 

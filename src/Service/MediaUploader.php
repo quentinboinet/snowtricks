@@ -23,7 +23,7 @@ class MediaUploader extends AbstractController
     {
         for ($i = 1; $i <= $nbImages; $i++) {
 
-            if ($type == "add") { $pictureField = 'picture' . $i; $view = 'tricks/trickAdd.html.twig'; } else { $pictureField = 'pictureAdd' . $i; $view = 'tricks/trickEdit.html.twig'; }
+            if ($type == "add") { $pictureField = 'picture' . $i; } else { $pictureField = 'pictureAdd' . $i; }
 
             if (!empty($request->files->get($pictureField))) {
                 /** @var UploadedFile $uploadedFile */
@@ -40,10 +40,10 @@ class MediaUploader extends AbstractController
 
                         $trick->addPicture($picture);
                     } else {
-                        return "wrongFormat";
+                        return "Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.";
                     }
                 } else {
-                    return "tooHeavy";
+                    return "Image trop lourde ! (max. 2Mo autorisé)";
                 }
             }
         }

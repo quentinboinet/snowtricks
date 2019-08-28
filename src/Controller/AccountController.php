@@ -179,7 +179,8 @@ class AccountController extends AbstractController
                 /** @var UploadedFile $uploadedFile */
                 $uploadedFile = $request->files->get('profilePicture');
                 if ($uploadedFile->isValid() AND $uploadedFile->getSize() <= 2097152) {
-                    if ($uploadedFile->guessExtension() == "jpg" OR $uploadedFile->guessExtension() == "jpeg" OR $uploadedFile->guessExtension() == "png" OR $uploadedFile->guessExtension() == "gif") {
+                    $extensionsAccepted = array('jpg', 'jpeg', 'png', 'gif');
+                    if (in_array($uploadedFile->guessExtension(), $extensionsAccepted)) {
 
                         $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
                         $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();

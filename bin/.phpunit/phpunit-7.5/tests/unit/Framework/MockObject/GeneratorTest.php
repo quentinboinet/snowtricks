@@ -48,7 +48,7 @@ class GeneratorTest extends TestCase
     {
         $mock = $this->generator->getMock(stdClass::class, ['testFunction']);
 
-        $this->assertTrue(\method_exists($mock, 'testFunction'));
+        $this->assertTrue(method_exists($mock, 'testFunction'));
     }
 
     public function testGetMockGeneratorFails(): void
@@ -63,7 +63,7 @@ class GeneratorTest extends TestCase
     {
         $mock = $this->generator->getMock(InterfaceWithSemiReservedMethodName::class);
 
-        $this->assertTrue(\method_exists($mock, 'unset'));
+        $this->assertTrue(method_exists($mock, 'unset'));
         $this->assertInstanceOf(InterfaceWithSemiReservedMethodName::class, $mock);
     }
 
@@ -71,14 +71,14 @@ class GeneratorTest extends TestCase
     {
         $mock = $this->generator->getMockForAbstractClass(Countable::class);
 
-        $this->assertTrue(\method_exists($mock, 'count'));
+        $this->assertTrue(method_exists($mock, 'count'));
     }
 
     public function testGetMockForAbstractClassStubbingAbstractClass(): void
     {
         $mock = $this->generator->getMockForAbstractClass(AbstractMockTestClass::class);
 
-        $this->assertTrue(\method_exists($mock, 'doSomething'));
+        $this->assertTrue(method_exists($mock, 'doSomething'));
     }
 
     public function testGetMockForAbstractClassWithNonExistentMethods(): void
@@ -93,8 +93,8 @@ class GeneratorTest extends TestCase
             ['nonexistentMethod']
         );
 
-        $this->assertTrue(\method_exists($mock, 'nonexistentMethod'));
-        $this->assertTrue(\method_exists($mock, 'doSomething'));
+        $this->assertTrue(method_exists($mock, 'nonexistentMethod'));
+        $this->assertTrue(method_exists($mock, 'doSomething'));
     }
 
     public function testGetMockForAbstractClassShouldCreateStubsOnlyForAbstractMethodWhenNoMethodsWereInformed(): void
@@ -146,8 +146,8 @@ class GeneratorTest extends TestCase
             ['nonexistentMethod']
         );
 
-        $this->assertTrue(\method_exists($mock, 'nonexistentMethod'));
-        $this->assertTrue(\method_exists($mock, 'doSomething'));
+        $this->assertTrue(method_exists($mock, 'nonexistentMethod'));
+        $this->assertTrue(method_exists($mock, 'doSomething'));
         $this->assertTrue($mock->mockableMethod());
         $this->assertTrue($mock->anotherMockableMethod());
     }
@@ -156,7 +156,7 @@ class GeneratorTest extends TestCase
     {
         $mock = $this->generator->getMockForTrait(AbstractTrait::class);
 
-        $this->assertTrue(\method_exists($mock, 'doSomething'));
+        $this->assertTrue(method_exists($mock, 'doSomething'));
     }
 
     public function testGetMockForSingletonWithReflectionSuccess(): void
@@ -184,7 +184,7 @@ class GeneratorTest extends TestCase
 
     public function testCanConfigureMethodsForDoubleOfNonExistentClass(): void
     {
-        $className = 'X' . \md5(\microtime());
+        $className = 'X' . md5(microtime());
 
         $mock = $this->generator->getMock($className, ['someMethod']);
 
@@ -193,7 +193,7 @@ class GeneratorTest extends TestCase
 
     public function testCanInvokeMethodsOfNonExistentClass(): void
     {
-        $className = 'X' . \md5(\microtime());
+        $className = 'X' . md5(microtime());
 
         $mock = $this->generator->getMock($className, ['someMethod']);
 

@@ -171,9 +171,9 @@ class MockObjectTest extends TestCase
 
         $mock->expects($this->any())
              ->method('doSomething')
-             ->will($this->throwException(new \Exception));
+             ->will($this->throwException(new Exception));
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $mock->doSomething();
     }
@@ -185,9 +185,9 @@ class MockObjectTest extends TestCase
 
         $mock->expects($this->any())
              ->method('doSomething')
-             ->willThrowException(new \Exception);
+             ->willThrowException(new Exception);
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $mock->doSomething();
     }
@@ -367,7 +367,7 @@ class MockObjectTest extends TestCase
         $mock2 = $this->getMockBuilder(AnInterface::class)
                      ->getMock();
 
-        $this->assertEquals(\get_class($mock1), \get_class($mock2));
+        $this->assertEquals(get_class($mock1), get_class($mock2));
     }
 
     public function testMockClassDifferentForPartialMocks(): void
@@ -391,14 +391,14 @@ class MockObjectTest extends TestCase
                       ->setMethods(['doAnotherThing'])
                       ->getMock();
 
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock2));
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock3));
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock4));
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock5));
-        $this->assertEquals(\get_class($mock2), \get_class($mock3));
-        $this->assertNotEquals(\get_class($mock2), \get_class($mock4));
-        $this->assertNotEquals(\get_class($mock2), \get_class($mock5));
-        $this->assertEquals(\get_class($mock4), \get_class($mock5));
+        $this->assertNotEquals(get_class($mock1), get_class($mock2));
+        $this->assertNotEquals(get_class($mock1), get_class($mock3));
+        $this->assertNotEquals(get_class($mock1), get_class($mock4));
+        $this->assertNotEquals(get_class($mock1), get_class($mock5));
+        $this->assertEquals(get_class($mock2), get_class($mock3));
+        $this->assertNotEquals(get_class($mock2), get_class($mock4));
+        $this->assertNotEquals(get_class($mock2), get_class($mock5));
+        $this->assertEquals(get_class($mock4), get_class($mock5));
     }
 
     public function testMockClassStoreOverrulable(): void
@@ -422,15 +422,15 @@ class MockObjectTest extends TestCase
                       ->setMockClassName('MyMockClassNameForPartialMockTestClass2')
                       ->getMock();
 
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock2));
-        $this->assertEquals(\get_class($mock1), \get_class($mock3));
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock4));
-        $this->assertNotEquals(\get_class($mock2), \get_class($mock3));
-        $this->assertNotEquals(\get_class($mock2), \get_class($mock4));
-        $this->assertNotEquals(\get_class($mock2), \get_class($mock5));
-        $this->assertNotEquals(\get_class($mock3), \get_class($mock4));
-        $this->assertNotEquals(\get_class($mock3), \get_class($mock5));
-        $this->assertNotEquals(\get_class($mock4), \get_class($mock5));
+        $this->assertNotEquals(get_class($mock1), get_class($mock2));
+        $this->assertEquals(get_class($mock1), get_class($mock3));
+        $this->assertNotEquals(get_class($mock1), get_class($mock4));
+        $this->assertNotEquals(get_class($mock2), get_class($mock3));
+        $this->assertNotEquals(get_class($mock2), get_class($mock4));
+        $this->assertNotEquals(get_class($mock2), get_class($mock5));
+        $this->assertNotEquals(get_class($mock3), get_class($mock4));
+        $this->assertNotEquals(get_class($mock3), get_class($mock5));
+        $this->assertNotEquals(get_class($mock4), get_class($mock5));
     }
 
     public function testGetMockWithFixedClassNameCanProduceTheSameMockTwice(): void
@@ -461,7 +461,7 @@ class MockObjectTest extends TestCase
                       ->disableOriginalClone()
                       ->getMock();
 
-        $this->assertNotEquals(\get_class($mock1), \get_class($mock2));
+        $this->assertNotEquals(get_class($mock1), get_class($mock2));
     }
 
     public function testGetMockForAbstractClass(): void
@@ -500,8 +500,8 @@ class MockObjectTest extends TestCase
         $mock->expects($this->never())
              ->method('doSomething');
 
-        $parent = \get_parent_class($mock);
-        $traits = \class_uses($parent, false);
+        $parent = get_parent_class($mock);
+        $traits = class_uses($parent, false);
 
         $this->assertContains(AbstractTrait::class, $traits);
     }
@@ -590,7 +590,7 @@ class MockObjectTest extends TestCase
              ->will(
                  $this->returnCallback(
                      function () use (&$actualArguments): void {
-                         $actualArguments = \func_get_args();
+                         $actualArguments = func_get_args();
                      }
                  )
              );
@@ -618,7 +618,7 @@ class MockObjectTest extends TestCase
              ->will(
                  $this->returnCallback(
                      function () use (&$actualArguments): void {
-                         $actualArguments = \func_get_args();
+                         $actualArguments = func_get_args();
                      }
                  )
              );
@@ -911,7 +911,7 @@ class MockObjectTest extends TestCase
 
         $this->assertStringStartsWith(
             'Mock_WsdlMock_',
-            \get_class($mock)
+            get_class($mock)
         );
     }
 
@@ -924,7 +924,7 @@ class MockObjectTest extends TestCase
 
         $this->assertStringStartsWith(
             'Mock_WsdlMock_',
-            \get_class($mock)
+            get_class($mock)
         );
     }
 
@@ -936,8 +936,8 @@ class MockObjectTest extends TestCase
         $a = $this->getMockFromWsdl(TEST_FILES_PATH . 'GoogleSearch.wsdl');
         $b = $this->getMockFromWsdl(TEST_FILES_PATH . 'GoogleSearch.wsdl');
 
-        $this->assertStringStartsWith('Mock_GoogleSearch_', \get_class($a));
-        $this->assertEquals(\get_class($a), \get_class($b));
+        $this->assertStringStartsWith('Mock_GoogleSearch_', get_class($a));
+        $this->assertEquals(get_class($a), get_class($b));
     }
 
     /**
@@ -949,7 +949,7 @@ class MockObjectTest extends TestCase
     {
         $mock = $this->getMockFromWsdl(TEST_FILES_PATH . 'Go ogle-Sea.rch.wsdl');
 
-        $this->assertStringStartsWith('Mock_GoogleSearch_', \get_class($mock));
+        $this->assertStringStartsWith('Mock_GoogleSearch_', get_class($mock));
     }
 
     /**

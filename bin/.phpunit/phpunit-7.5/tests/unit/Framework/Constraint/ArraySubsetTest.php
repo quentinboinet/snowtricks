@@ -9,7 +9,12 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use ArrayAccessible;
+use ArrayObject;
 use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use Traversable;
+use function sprintf;
 
 class ArraySubsetTest extends ConstraintTestCase
 {
@@ -31,12 +36,12 @@ class ArraySubsetTest extends ConstraintTestCase
             'loose array subset and ArrayObject other' => [
                 'expected' => true,
                 'subset'   => ['bar' => 0],
-                'other'    => new \ArrayObject(['foo' => '', 'bar' => '0']),
+                'other'    => new ArrayObject(['foo' => '', 'bar' => '0']),
                 'strict'   => false,
             ],
             'strict ArrayObject subset and array other' => [
                 'expected' => true,
-                'subset'   => new \ArrayObject(['bar' => 0]),
+                'subset'   => new ArrayObject(['bar' => 0]),
                 'other'    => ['foo' => '', 'bar' => 0],
                 'strict'   => true,
             ],
@@ -45,12 +50,12 @@ class ArraySubsetTest extends ConstraintTestCase
 
     /**
      * @param bool               $expected
-     * @param array|\Traversable $subset
-     * @param array|\Traversable $other
+     * @param array|Traversable $subset
+     * @param array|Traversable $other
      * @param bool               $strict
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @dataProvider evaluateDataProvider
      */
     public function testEvaluate($expected, $subset, $other, $strict): void
@@ -62,7 +67,7 @@ class ArraySubsetTest extends ConstraintTestCase
 
     public function testEvaluateWithArrayAccess(): void
     {
-        $arrayAccess = new \ArrayAccessible(['foo' => 'bar']);
+        $arrayAccess = new ArrayAccessible(['foo' => 'bar']);
 
         $constraint = new ArraySubset(['foo' => 'bar']);
 
@@ -75,7 +80,7 @@ class ArraySubsetTest extends ConstraintTestCase
 
         try {
             $constraint->evaluate(['baz' => 'bar'], '', false);
-            $this->fail(\sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
+            $this->fail(sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
         } catch (ExpectationFailedException $expectedException) {
             $comparisonFailure = $expectedException->getComparisonFailure();
             $this->assertNotNull($comparisonFailure);

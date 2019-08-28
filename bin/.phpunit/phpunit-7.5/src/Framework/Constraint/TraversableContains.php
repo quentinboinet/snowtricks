@@ -9,7 +9,13 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use SplObjectStorage;
+use function is_array;
+use function is_object;
+use function is_string;
+use function sprintf;
+use function strpos;
 
 /**
  * Constraint that asserts that the Traversable it is applied to contains
@@ -47,11 +53,11 @@ class TraversableContains extends Constraint
     /**
      * Returns a string representation of the constraint.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function toString(): string
     {
-        if (\is_string($this->value) && \strpos($this->value, "\n") !== false) {
+        if (is_string($this->value) && strpos($this->value, "\n") !== false) {
             return 'contains "' . $this->value . '"';
         }
 
@@ -70,7 +76,7 @@ class TraversableContains extends Constraint
             return $other->contains($this->value);
         }
 
-        if (\is_object($this->value)) {
+        if (is_object($this->value)) {
             foreach ($other as $element) {
                 if ($this->checkForObjectIdentity && $element === $this->value) {
                     return true;
@@ -103,13 +109,13 @@ class TraversableContains extends Constraint
      *
      * @param mixed $other evaluated value or object
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function failureDescription($other): string
     {
-        return \sprintf(
+        return sprintf(
             '%s %s',
-            \is_array($other) ? 'an array' : 'a traversable',
+            is_array($other) ? 'an array' : 'a traversable',
             $this->toString()
         );
     }

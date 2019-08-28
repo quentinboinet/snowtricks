@@ -12,6 +12,8 @@ namespace PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\MockObject\Invocation;
 use PHPUnit\Framework\MockObject\Stub;
 use SebastianBergmann\Exporter\Exporter;
+use function array_shift;
+use function sprintf;
 
 /**
  * Stubs a method by returning a user-defined stack of values.
@@ -35,7 +37,7 @@ class ConsecutiveCalls implements Stub
 
     public function invoke(Invocation $invocation)
     {
-        $this->value = \array_shift($this->stack);
+        $this->value = array_shift($this->stack);
 
         if ($this->value instanceof Stub) {
             $this->value = $this->value->invoke($invocation);
@@ -48,7 +50,7 @@ class ConsecutiveCalls implements Stub
     {
         $exporter = new Exporter;
 
-        return \sprintf(
+        return sprintf(
             'return user-specified value %s',
             $exporter->export($this->value)
         );

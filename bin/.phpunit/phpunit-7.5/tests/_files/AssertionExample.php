@@ -11,6 +11,6 @@ class AssertionExample
 {
     public function doSomething(): void
     {
-        \assert(false);
+        assert(false);
     }
 }

@@ -10,6 +10,9 @@
 namespace PHPUnit\Framework\Constraint;
 
 use ArrayAccess;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function array_key_exists;
+use function is_array;
 
 /**
  * Constraint that asserts that the array it is evaluated for has a given key.
@@ -38,7 +41,7 @@ class ArrayHasKey extends Constraint
     /**
      * Returns a string representation of the constraint.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function toString(): string
     {
@@ -53,8 +56,8 @@ class ArrayHasKey extends Constraint
      */
     protected function matches($other): bool
     {
-        if (\is_array($other)) {
-            return \array_key_exists($this->key, $other);
+        if (is_array($other)) {
+            return array_key_exists($this->key, $other);
         }
 
         if ($other instanceof ArrayAccess) {
@@ -72,7 +75,7 @@ class ArrayHasKey extends Constraint
      *
      * @param mixed $other evaluated value or object
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function failureDescription($other): string
     {

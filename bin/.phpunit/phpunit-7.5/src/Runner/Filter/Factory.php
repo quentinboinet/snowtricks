@@ -13,7 +13,9 @@ use FilterIterator;
 use InvalidArgumentException;
 use Iterator;
 use PHPUnit\Framework\TestSuite;
+use RecursiveFilterIterator;
 use ReflectionClass;
+use function sprintf;
 
 class Factory
 {
@@ -27,9 +29,9 @@ class Factory
      */
     public function addFilter(ReflectionClass $filter, $args): void
     {
-        if (!$filter->isSubclassOf(\RecursiveFilterIterator::class)) {
+        if (!$filter->isSubclassOf(RecursiveFilterIterator::class)) {
             throw new InvalidArgumentException(
-                \sprintf(
+                sprintf(
                     'Class "%s" does not extend RecursiveFilterIterator',
                     $filter->name
                 )

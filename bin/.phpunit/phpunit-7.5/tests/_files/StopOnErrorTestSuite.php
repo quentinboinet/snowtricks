@@ -8,7 +8,9 @@
  * file that was distributed with this source code.
  */
 
-class StopOnErrorTestSuite extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class StopOnErrorTestSuite extends TestCase
 {
     public function testIncomplete()
     {

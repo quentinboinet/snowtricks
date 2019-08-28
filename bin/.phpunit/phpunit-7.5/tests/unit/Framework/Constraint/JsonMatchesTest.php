@@ -9,18 +9,22 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Util\Json;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function json_encode;
+use function sprintf;
 
 class JsonMatchesTest extends ConstraintTestCase
 {
     public static function evaluateDataprovider(): array
     {
         return [
-            'valid JSON'                              => [true, \json_encode(['Mascott'                           => 'Tux']), \json_encode(['Mascott'                           => 'Tux'])],
-            'error syntax'                            => [false, '{"Mascott"::}', \json_encode(['Mascott'         => 'Tux'])],
-            'error UTF-8'                             => [false, \json_encode('\xB1\x31'), \json_encode(['Mascott' => 'Tux'])],
-            'invalid JSON in class instantiation'     => [false, \json_encode(['Mascott'                          => 'Tux']), '{"Mascott"::}'],
+            'valid JSON'                              => [true, json_encode(['Mascott'                           => 'Tux']), json_encode(['Mascott'                           => 'Tux'])],
+            'error syntax'                            => [false, '{"Mascott"::}', json_encode(['Mascott'         => 'Tux'])],
+            'error UTF-8'                             => [false, json_encode('\xB1\x31'), json_encode(['Mascott' => 'Tux'])],
+            'invalid JSON in class instantiation'     => [false, json_encode(['Mascott'                          => 'Tux']), '{"Mascott"::}'],
             'string type not equals number'           => [false, '{"age": "5"}', '{"age": 5}'],
             'string type not equals boolean'          => [false, '{"age": "true"}', '{"age": true}'],
             'string type not equals null'             => [false, '{"age": "null"}', '{"age": null}'],
@@ -38,7 +42,7 @@ class JsonMatchesTest extends ConstraintTestCase
     public static function evaluateThrowsExpectationFailedExceptionWhenJsonIsValidButDoesNotMatchDataprovider(): array
     {
         return [
-            'error UTF-8'                             => [\json_encode('\xB1\x31'), \json_encode(['Mascott' => 'Tux'])],
+            'error UTF-8'                             => [json_encode('\xB1\x31'), json_encode(['Mascott' => 'Tux'])],
             'string type not equals number'           => ['{"age": "5"}', '{"age": 5}'],
             'string type not equals boolean'          => ['{"age": "true"}', '{"age": true}'],
             'string type not equals null'             => ['{"age": "null"}', '{"age": null}'],
@@ -51,7 +55,7 @@ class JsonMatchesTest extends ConstraintTestCase
      * @dataProvider evaluateDataprovider
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testEvaluate($expected, $jsonOther, $jsonValue): void
     {
@@ -64,9 +68,9 @@ class JsonMatchesTest extends ConstraintTestCase
      * @dataProvider evaluateThrowsExpectationFailedExceptionWhenJsonIsValidButDoesNotMatchDataprovider
      *
      * @throws ExpectationFailedException
-     * @throws \PHPUnit\Framework\AssertionFailedError
+     * @throws AssertionFailedError
      * @throws \PHPUnit\Framework\Exception
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testEvaluateThrowsExpectationFailedExceptionWhenJsonIsValidButDoesNotMatch($jsonOther, $jsonValue): void
     {
@@ -74,7 +78,7 @@ class JsonMatchesTest extends ConstraintTestCase
 
         try {
             $constraint->evaluate($jsonOther, '', false);
-            $this->fail(\sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
+            $this->fail(sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
         } catch (ExpectationFailedException $expectedException) {
             $comparisonFailure = $expectedException->getComparisonFailure();
             $this->assertNotNull($comparisonFailure);
@@ -86,7 +90,7 @@ class JsonMatchesTest extends ConstraintTestCase
 
     public function testToString(): void
     {
-        $jsonValue  = \json_encode(['Mascott' => 'Tux']);
+        $jsonValue  = json_encode(['Mascott' => 'Tux']);
         $constraint = new JsonMatches($jsonValue);
 
         $this->assertEquals('matches JSON string "' . $jsonValue . '"', $constraint->toString());

@@ -11,6 +11,7 @@ namespace vendor\project;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
+use RuntimeException;
 
 class StatusTest extends TestCase
 {
@@ -26,7 +27,7 @@ class StatusTest extends TestCase
 
     public function testError(): void
     {
-        throw new \RuntimeException;
+        throw new RuntimeException;
     }
 
     public function testIncomplete(): void

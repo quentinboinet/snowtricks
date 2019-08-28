@@ -18,26 +18,26 @@ class TestIterator2 implements Iterator
 
     public function current()
     {
-        return \current($this->data);
+        return current($this->data);
     }
 
     public function next(): void
     {
-        \next($this->data);
+        next($this->data);
     }
 
     public function key()
     {
-        return \key($this->data);
+        return key($this->data);
     }
 
     public function valid()
     {
-        return \key($this->data) !== null;
+        return key($this->data) !== null;
     }
 
     public function rewind(): void
     {
-        \reset($this->data);
+        reset($this->data);
     }
 }

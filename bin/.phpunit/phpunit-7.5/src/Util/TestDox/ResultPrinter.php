@@ -10,6 +10,7 @@
 namespace PHPUnit\Util\TestDox;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestListener;
@@ -18,6 +19,10 @@ use PHPUnit\Framework\Warning;
 use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Runner\BaseTestRunner;
 use PHPUnit\Util\Printer;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use Throwable;
+use function get_class;
+use function in_array;
 
 /**
  * Base class for printers of TestDox documentation.
@@ -97,7 +102,7 @@ abstract class ResultPrinter extends Printer implements TestListener
     /**
      * @param resource $out
      *
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Exception
      */
     public function __construct($out = null, array $groups = [], array $excludeGroups = [])
     {
@@ -124,7 +129,7 @@ abstract class ResultPrinter extends Printer implements TestListener
     /**
      * An error occurred.
      */
-    public function addError(Test $test, \Throwable $t, float $time): void
+    public function addError(Test $test, Throwable $t, float $time): void
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -163,7 +168,7 @@ abstract class ResultPrinter extends Printer implements TestListener
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, \Throwable $t, float $time): void
+    public function addIncompleteTest(Test $test, Throwable $t, float $time): void
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -176,7 +181,7 @@ abstract class ResultPrinter extends Printer implements TestListener
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, \Throwable $t, float $time): void
+    public function addRiskyTest(Test $test, Throwable $t, float $time): void
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -189,7 +194,7 @@ abstract class ResultPrinter extends Printer implements TestListener
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, \Throwable $t, float $time): void
+    public function addSkippedTest(Test $test, Throwable $t, float $time): void
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -216,7 +221,7 @@ abstract class ResultPrinter extends Printer implements TestListener
     /**
      * A test started.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function startTest(Test $test): void
     {
@@ -224,7 +229,7 @@ abstract class ResultPrinter extends Printer implements TestListener
             return;
         }
 
-        $class = \get_class($test);
+        $class = get_class($test);
 
         if ($this->testClass !== $class) {
             if ($this->testClass !== '') {
@@ -316,7 +321,7 @@ abstract class ResultPrinter extends Printer implements TestListener
 
         if (!empty($this->groups)) {
             foreach ($test->getGroups() as $group) {
-                if (\in_array($group, $this->groups)) {
+                if (in_array($group, $this->groups)) {
                     return true;
                 }
             }
@@ -326,7 +331,7 @@ abstract class ResultPrinter extends Printer implements TestListener
 
         if (!empty($this->excludeGroups)) {
             foreach ($test->getGroups() as $group) {
-                if (\in_array($group, $this->excludeGroups)) {
+                if (in_array($group, $this->excludeGroups)) {
                     return false;
                 }
             }

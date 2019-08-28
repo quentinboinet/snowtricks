@@ -142,13 +142,8 @@ class TrickController extends AbstractController
 
                 //on appelle le service uploader pour uploader toutes les images
                 $nbImages = $request->request->get('pictureNb');
-                $result = $uploader->picturesUpload('add', $nbImages, $request, $trick, $category);
-                if ($result == "tooHeavy") {
-                    return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
-                }
-                elseif ($result == "wrongFormat") {
-                    return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
-                }
+                $error = $uploader->picturesUpload('add', $nbImages, $request, $trick, $category);
+                if ($error != null) { return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]);}
 
                 //on appelle le service uploader pour uploader toutes les vidéos
                 $nbVideos = $request->request->get('videoNb');
@@ -205,14 +200,8 @@ class TrickController extends AbstractController
                 $nbrePicturesToEdit = count($picturesToEdit);
 
                 //puis on édite les images (upload des nouvelles, maj de bdd et suppression des anciennes sur le serveur
-                $nbImages = $request->request->get('pictureNb');
-                $result = $mediaEditer->picturesEdit($nbrePicturesToEdit, $picturesToEdit, $request, $pictureRepo, $trick, $category);
-                if ($result == "tooHeavy") {
-                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
-                }
-                elseif ($result == "wrongFormat") {
-                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
-                }
+                $error = $mediaEditer->picturesEdit($nbrePicturesToEdit, $picturesToEdit, $request, $pictureRepo, $trick, $category);
+                if ($error != null) { return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]); }
 
                 //puis on édite les vidéos (maj de BDD)
                 $videosToEdit = explode("-", $request->request->get('videosToEdit'));
@@ -222,13 +211,8 @@ class TrickController extends AbstractController
                 //on upload les nouvelles images
                 //on appelle le service uploader pour uploader toutes les images
                 $nbNouvellesImages = $request->request->get('pictureAddNb');
-                $result = $uploader->picturesUpload('edit', $nbNouvellesImages, $request, $trick, $category);
-                if ($result == "tooHeavy") {
-                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
-                }
-                elseif ($result == "wrongFormat") {
-                    return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
-                }
+                $error = $uploader->picturesUpload('edit', $nbNouvellesImages, $request, $trick, $category);
+                if ($error != null) { return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]); }
 
                 //on ajoute les nouvelles vidéos, en passant par le service uploader
                 $nbVideos = $request->request->get('videoAddNb');
@@ -274,9 +258,6 @@ class TrickController extends AbstractController
         $trick = $trickRepo->find($trickId);
 
         if (!empty($trick)) {
-
-            $pictureRepo = $em->getRepository(Picture::class);
-            $videoRepo = $em->getRepository(Video::class);
             $commentsRepo = $em->getRepository(Comment::class);
 
             //on supprime les commentaires associés

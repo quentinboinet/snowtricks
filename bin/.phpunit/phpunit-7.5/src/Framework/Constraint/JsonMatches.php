@@ -12,6 +12,9 @@ namespace PHPUnit\Framework\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Util\Json;
 use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function json_decode;
+use function sprintf;
 
 /**
  * Asserts whether or not two JSON objects are equal.
@@ -35,7 +38,7 @@ class JsonMatches extends Constraint
      */
     public function toString(): string
     {
-        return \sprintf(
+        return sprintf(
             'matches JSON string "%s"',
             $this->value
         );
@@ -75,7 +78,7 @@ class JsonMatches extends Constraint
      *
      * @throws ExpectationFailedException
      * @throws \PHPUnit\Framework\Exception
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
     {
@@ -97,8 +100,8 @@ class JsonMatches extends Constraint
             }
 
             $comparisonFailure = new ComparisonFailure(
-                \json_decode($this->value),
-                \json_decode($other),
+                json_decode($this->value),
+                json_decode($other),
                 Json::prettify($this->value),
                 Json::prettify($other),
                 false,

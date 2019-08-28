@@ -12,6 +12,10 @@ namespace PHPUnit\Framework\Constraint;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestFailure;
+use stdClass;
+use function fclose;
+use function fopen;
+use function preg_replace;
 
 class IsTypeTest extends ConstraintTestCase
 {
@@ -25,7 +29,7 @@ class IsTypeTest extends ConstraintTestCase
         $this->assertCount(1, $constraint);
 
         try {
-            $constraint->evaluate(new \stdClass);
+            $constraint->evaluate(new stdClass);
         } catch (ExpectationFailedException $e) {
             $this->assertStringMatchesFormat(
                 <<<EOF
@@ -47,7 +51,7 @@ EOF
         $constraint = Assert::isType('string');
 
         try {
-            $constraint->evaluate(new \stdClass, 'custom message');
+            $constraint->evaluate(new stdClass, 'custom message');
         } catch (ExpectationFailedException $e) {
             $this->assertStringMatchesFormat(
                 <<<EOF
@@ -74,16 +78,16 @@ EOF
 
         $this->assertTrue($constraint->evaluate($resource, '', true));
 
-        @\fclose($resource);
+        @fclose($resource);
     }
 
     public function resources()
     {
-        $fh = \fopen(__FILE__, 'r');
-        \fclose($fh);
+        $fh = fopen(__FILE__, 'r');
+        fclose($fh);
 
         return [
-            'open resource'     => [\fopen(__FILE__, 'r')],
+            'open resource'     => [fopen(__FILE__, 'r')],
             'closed resource'   => [$fh],
         ];
     }
@@ -106,6 +110,6 @@ EOF
      */
     private function trimnl($string)
     {
-        return \preg_replace('/[ ]*\n/', "\n", $string);
+        return preg_replace('/[ ]*\n/', "\n", $string);
     }
 }

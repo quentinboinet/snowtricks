@@ -10,6 +10,7 @@
 namespace PHPUnit\Framework;
 
 use RecursiveIterator;
+use function count;
 
 /**
  * Iterator for test suites.
@@ -44,7 +45,7 @@ final class TestSuiteIterator implements RecursiveIterator
      */
     public function valid(): bool
     {
-        return $this->position < \count($this->tests);
+        return $this->position < count($this->tests);
     }
 
     /**

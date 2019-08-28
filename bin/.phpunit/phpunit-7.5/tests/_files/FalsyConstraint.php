@@ -18,7 +18,7 @@ final class FalsyConstraint extends Constraint
 
     public function toString(): string
     {
-        return \sprintf(
+        return sprintf(
             'is accepted by %s',
             self::class
         );

@@ -9,10 +9,21 @@
  */
 namespace PHPUnit\Framework\MockObject;
 
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use Text_Template;
+use function defined;
+use function implode;
+use function is_string;
+use function preg_match;
+use function preg_replace;
+use function sprintf;
+use function substr_count;
+use function trim;
+use function var_export;
+use const DIRECTORY_SEPARATOR;
 
 final class MockMethod
 {
@@ -109,10 +120,10 @@ final class MockMethod
 
         $docComment = $method->getDocComment();
 
-        if (\is_string($docComment)
-            && \preg_match('#\*[ \t]*+@deprecated[ \t]*+(.*?)\r?+\n[ \t]*+\*(?:[ \t]*+@|/$)#s', $docComment, $deprecation)
+        if (is_string($docComment)
+            && preg_match('#\*[ \t]*+@deprecated[ \t]*+(.*?)\r?+\n[ \t]*+\*(?:[ \t]*+@|/$)#s', $docComment, $deprecation)
         ) {
-            $deprecation = \trim(\preg_replace('#[ \t]*\r?\n[ \t]*+\*[ \t]*+#', ' ', $deprecation[1]));
+            $deprecation = trim(preg_replace('#[ \t]*\r?\n[ \t]*+\*[ \t]*+#', ' ', $deprecation[1]));
         } else {
             $deprecation = null;
         }
@@ -173,21 +184,21 @@ final class MockMethod
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \PHPUnit\Framework\MockObject\RuntimeException
-     * @throws \InvalidArgumentException
+     * @throws ReflectionException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     public function generateCode(): string
     {
         if ($this->static) {
             $templateFile = 'mocked_static_method.tpl';
         } elseif ($this->returnType === 'void') {
-            $templateFile = \sprintf(
+            $templateFile = sprintf(
                 '%s_method_void.tpl',
                 $this->callOriginalMethod ? 'proxied' : 'mocked'
             );
         } else {
-            $templateFile = \sprintf(
+            $templateFile = sprintf(
                 '%s_method.tpl',
                 $this->callOriginalMethod ? 'proxied' : 'mocked'
             );
@@ -207,7 +218,7 @@ final class MockMethod
 
             if ($parentClass === false) {
                 throw new RuntimeException(
-                    \sprintf(
+                    sprintf(
                         'Cannot mock %s::%s because "parent" return type declaration is used but %s does not have a parent class',
                         $this->className,
                         $this->methodName,
@@ -226,7 +237,7 @@ final class MockMethod
             $deprecationTemplate = $this->getTemplate('deprecation.tpl');
 
             $deprecationTemplate->setVar([
-                'deprecation' => \var_export($deprecation, true),
+                'deprecation' => var_export($deprecation, true),
             ]);
 
             $deprecation = $deprecationTemplate->render();
@@ -240,7 +251,7 @@ final class MockMethod
                 'arguments_call'  => $this->argumentsForCall,
                 'return_delim'    => $returnType ? ': ' : '',
                 'return_type'     => $this->allowsReturnNull ? '?' . $returnType : $returnType,
-                'arguments_count' => !empty($this->argumentsForCall) ? \substr_count($this->argumentsForCall, ',') + 1 : 0,
+                'arguments_count' => !empty($this->argumentsForCall) ? substr_count($this->argumentsForCall, ',') + 1 : 0,
                 'class_name'      => $this->className,
                 'method_name'     => $this->methodName,
                 'modifier'        => $this->modifier,
@@ -255,7 +266,7 @@ final class MockMethod
 
     private function getTemplate(string $template): Text_Template
     {
-        $filename = __DIR__ . \DIRECTORY_SEPARATOR . 'Generator' . \DIRECTORY_SEPARATOR . $template;
+        $filename = __DIR__ . DIRECTORY_SEPARATOR . 'Generator' . DIRECTORY_SEPARATOR . $template;
 
         if (!isset(self::$templates[$filename])) {
             self::$templates[$filename] = new Text_Template($filename);
@@ -308,7 +319,7 @@ final class MockMethod
                         $class = $parameter->getClass();
                     } catch (ReflectionException $e) {
                         throw new RuntimeException(
-                            \sprintf(
+                            sprintf(
                                 'Cannot mock %s::%s() because a class or ' .
                                 'interface used in the signature is not loaded',
                                 $method->getDeclaringClass()->getName(),
@@ -329,10 +340,10 @@ final class MockMethod
                         $value = $parameter->getDefaultValueConstantName();
 
                         if ($value === null) {
-                            $value = \var_export($parameter->getDefaultValue(), true);
-                        } elseif (!\defined($value)) {
-                            $rootValue = \preg_replace('/^.*\\\\/', '', $value);
-                            $value     = \defined($rootValue) ? $rootValue : $value;
+                            $value = var_export($parameter->getDefaultValue(), true);
+                        } elseif (!defined($value)) {
+                            $rootValue = preg_replace('/^.*\\\\/', '', $value);
+                            $value     = defined($rootValue) ? $rootValue : $value;
                         }
 
                         $default = ' = ' . $value;
@@ -349,6 +360,6 @@ final class MockMethod
             $parameters[] = $nullable . $typeDeclaration . $reference . $name . $default;
         }
 
-        return \implode(', ', $parameters);
+        return implode(', ', $parameters);
     }
 }

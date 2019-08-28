@@ -9,6 +9,7 @@
  */
 namespace PHPUnit\Runner\Filter;
 
+use BankAccountTest;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
 
@@ -27,7 +28,7 @@ class NameFilterIteratorTest extends TestCase
     private function createFilter(string $filter): NameFilterIterator
     {
         $suite = new TestSuite;
-        $suite->addTest(new \BankAccountTest('testBalanceIsInitiallyZero'));
+        $suite->addTest(new BankAccountTest('testBalanceIsInitiallyZero'));
 
         $iterator = new NameFilterIterator($suite->getIterator(), $filter);
 

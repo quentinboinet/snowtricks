@@ -12,6 +12,7 @@ namespace PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\MockObject\Invocation;
 use PHPUnit\Framework\MockObject\Stub;
 use SebastianBergmann\Exporter\Exporter;
+use function sprintf;
 
 /**
  * Stubs a method by returning a user-defined reference to a value.
@@ -37,7 +38,7 @@ class ReturnReference implements Stub
     {
         $exporter = new Exporter;
 
-        return \sprintf(
+        return sprintf(
             'return user-specified reference %s',
             $exporter->export($this->reference)
         );

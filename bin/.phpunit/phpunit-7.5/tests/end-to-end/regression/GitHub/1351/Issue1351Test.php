@@ -25,7 +25,7 @@ class Issue1351Test extends TestCase
     public function testFailurePost(): void
     {
         $this->assertNull($this->instance);
-        $this->assertFalse(\class_exists(ChildProcessClass1351::class, false), 'ChildProcessClass1351 is not loaded.');
+        $this->assertFalse(class_exists(ChildProcessClass1351::class, false), 'ChildProcessClass1351 is not loaded.');
     }
 
     /**
@@ -45,7 +45,7 @@ class Issue1351Test extends TestCase
     public function testExceptionPost(): void
     {
         $this->assertNull($this->instance);
-        $this->assertFalse(\class_exists(ChildProcessClass1351::class, false), 'ChildProcessClass1351 is not loaded.');
+        $this->assertFalse(class_exists(ChildProcessClass1351::class, false), 'ChildProcessClass1351 is not loaded.');
     }
 
     public function testPhpCoreLanguageException(): void

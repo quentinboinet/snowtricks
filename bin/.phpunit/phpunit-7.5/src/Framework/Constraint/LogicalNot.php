@@ -10,6 +10,11 @@
 namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function count;
+use function get_class;
+use function preg_match;
+use function str_replace;
 
 /**
  * Logical NOT.
@@ -49,14 +54,14 @@ class LogicalNot extends Constraint
             'not ',
         ];
 
-        \preg_match('/(\'[\w\W]*\')([\w\W]*)("[\w\W]*")/i', $string, $matches);
+        preg_match('/(\'[\w\W]*\')([\w\W]*)("[\w\W]*")/i', $string, $matches);
 
-        if (\count($matches) > 0) {
+        if (count($matches) > 0) {
             $nonInput = $matches[2];
 
-            $negatedString = \str_replace(
+            $negatedString = str_replace(
                 $nonInput,
-                \str_replace(
+                str_replace(
                     $positives,
                     $negatives,
                     $nonInput
@@ -64,7 +69,7 @@ class LogicalNot extends Constraint
                 $string
             );
         } else {
-            $negatedString = \str_replace(
+            $negatedString = str_replace(
                 $positives,
                 $negatives,
                 $string
@@ -103,7 +108,7 @@ class LogicalNot extends Constraint
      * @param bool   $returnResult Whether to return a result or throw an exception
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -123,7 +128,7 @@ class LogicalNot extends Constraint
      */
     public function toString(): string
     {
-        switch (\get_class($this->constraint)) {
+        switch (get_class($this->constraint)) {
             case LogicalAnd::class:
             case self::class:
             case LogicalOr::class:
@@ -141,7 +146,7 @@ class LogicalNot extends Constraint
      */
     public function count(): int
     {
-        return \count($this->constraint);
+        return count($this->constraint);
     }
 
     /**
@@ -152,11 +157,11 @@ class LogicalNot extends Constraint
      *
      * @param mixed $other evaluated value or object
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function failureDescription($other): string
     {
-        switch (\get_class($this->constraint)) {
+        switch (get_class($this->constraint)) {
             case LogicalAnd::class:
             case self::class:
             case LogicalOr::class:

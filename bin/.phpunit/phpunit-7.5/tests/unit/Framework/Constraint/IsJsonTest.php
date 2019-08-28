@@ -9,6 +9,9 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+
 class IsJsonTest extends ConstraintTestCase
 {
     public static function evaluateDataprovider(): array
@@ -22,8 +25,8 @@ class IsJsonTest extends ConstraintTestCase
     /**
      * @dataProvider evaluateDataprovider
      *
-     * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testEvaluate($expected, $jsonOther): void
     {

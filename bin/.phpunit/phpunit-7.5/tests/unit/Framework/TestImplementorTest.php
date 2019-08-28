@@ -9,16 +9,20 @@
  */
 namespace PHPUnit\Framework;
 
+use DoubleTestCase;
+use Success;
+use function count;
+
 class TestImplementorTest extends TestCase
 {
     public function testSuccessfulRun(): void
     {
         $result = new TestResult;
 
-        $test = new \DoubleTestCase(new \Success);
+        $test = new DoubleTestCase(new Success);
         $test->run($result);
 
-        $this->assertCount(\count($test), $result);
+        $this->assertCount(count($test), $result);
         $this->assertEquals(0, $result->errorCount());
         $this->assertEquals(0, $result->failureCount());
     }

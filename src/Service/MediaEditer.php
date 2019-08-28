@@ -46,10 +46,10 @@ class MediaEditer extends AbstractController
                             $picture->setPath('/images/uploads/' . $newFilename);
                             $this->em->flush();
                         } else {
-                            return "wrongFormat";
+                            return "Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.";
                         }
                     } else {
-                        return "tooHeavy";
+                        return "Image trop lourde ! (max. 2Mo autorisé)";
                     }
                 }
             } elseif ($picturesToEdit[$i] == "cover") {
@@ -70,10 +70,10 @@ class MediaEditer extends AbstractController
                             $this->em->persist($picture);
 
                         } else {
-                            return "wrongFormat";
+                            return "Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.";
                         }
                     } else {
-                        return "tooHeavy";
+                        return "Image trop lourde ! (max. 2Mo autorisé)";
                     }
                 }
             }

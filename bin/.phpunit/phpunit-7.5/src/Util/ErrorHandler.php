@@ -9,10 +9,23 @@
  */
 namespace PHPUnit\Util;
 
+use Exception;
 use PHPUnit\Framework\Error\Deprecated;
 use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\Error\Warning;
+use function array_shift;
+use function debug_backtrace;
+use function error_reporting;
+use function restore_error_handler;
+use function set_error_handler;
+use const E_DEPRECATED;
+use const E_NOTICE;
+use const E_STRICT;
+use const E_USER_DEPRECATED;
+use const E_USER_NOTICE;
+use const E_USER_WARNING;
+use const E_WARNING;
 
 /**
  * Error handler that converts PHP errors and warnings to exceptions.
@@ -31,14 +44,14 @@ final class ErrorHandler
 
     public static function handleError(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool
     {
-        if (!($errorNumber & \error_reporting())) {
+        if (!($errorNumber & error_reporting())) {
             return false;
         }
 
         self::$errorStack[] = [$errorNumber, $errorString, $errorFile, $errorLine];
 
-        $trace = \debug_backtrace();
-        \array_shift($trace);
+        $trace = debug_backtrace();
+        array_shift($trace);
 
         foreach ($trace as $frame) {
             if ($frame['function'] === '__toString') {
@@ -46,19 +59,19 @@ final class ErrorHandler
             }
         }
 
-        if ($errorNumber === \E_NOTICE || $errorNumber === \E_USER_NOTICE || $errorNumber === \E_STRICT) {
+        if ($errorNumber === E_NOTICE || $errorNumber === E_USER_NOTICE || $errorNumber === E_STRICT) {
             if (Notice::$enabled !== true) {
                 return false;
             }
 
             $exception = Notice::class;
-        } elseif ($errorNumber === \E_WARNING || $errorNumber === \E_USER_WARNING) {
+        } elseif ($errorNumber === E_WARNING || $errorNumber === E_USER_WARNING) {
             if (Warning::$enabled !== true) {
                 return false;
             }
 
             $exception = Warning::class;
-        } elseif ($errorNumber === \E_DEPRECATED || $errorNumber === \E_USER_DEPRECATED) {
+        } elseif ($errorNumber === E_DEPRECATED || $errorNumber === E_USER_DEPRECATED) {
             if (Deprecated::$enabled !== true) {
                 return false;
             }
@@ -77,9 +90,9 @@ final class ErrorHandler
      *
      * @param int $severity PHP predefined error constant
      *
-     * @throws \Exception if event of specified severity is emitted
+     * @throws Exception if event of specified severity is emitted
      */
-    public static function handleErrorOnce($severity = \E_WARNING): callable
+    public static function handleErrorOnce($severity = E_WARNING): callable
     {
         $terminator = function () {
             static $expired = false;
@@ -87,11 +100,11 @@ final class ErrorHandler
             if (!$expired) {
                 $expired = true;
 
-                return \restore_error_handler();
+                return restore_error_handler();
             }
         };
 
-        \set_error_handler(
+        set_error_handler(
             function ($errorNumber, $errorString) use ($severity) {
                 if ($errorNumber === $severity) {
                     return;

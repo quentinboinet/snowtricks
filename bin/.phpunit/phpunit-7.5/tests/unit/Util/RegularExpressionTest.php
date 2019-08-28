@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Util;
 
+use Exception;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 class RegularExpressionTest extends TestCase
@@ -35,8 +37,8 @@ class RegularExpressionTest extends TestCase
     /**
      * @dataProvider validRegexpProvider
      *
-     * @throws \Exception
-     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws Exception
+     * @throws ExpectationFailedException
      */
     public function testValidRegex($pattern, $subject, $return): void
     {
@@ -46,8 +48,8 @@ class RegularExpressionTest extends TestCase
     /**
      * @dataProvider invalidRegexpProvider
      *
-     * @throws \Exception
-     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws Exception
+     * @throws ExpectationFailedException
      */
     public function testInvalidRegex($pattern, $subject): void
     {

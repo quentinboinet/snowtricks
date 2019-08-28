@@ -9,11 +9,15 @@
  */
 namespace PHPUnit\Framework\MockObject\Matcher;
 
+use Exception;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsAnything;
 use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
+use function count;
+use function get_class;
+use function sprintf;
 
 /**
  * Invocation matcher which looks for specific parameters in the invocations.
@@ -71,7 +75,7 @@ class Parameters extends StatelessInvocation
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool
      */
@@ -110,27 +114,27 @@ class Parameters extends StatelessInvocation
             throw new ExpectationFailedException('Mocked method does not exist.');
         }
 
-        if (\count($this->invocation->getParameters()) < \count($this->parameters)) {
+        if (count($this->invocation->getParameters()) < count($this->parameters)) {
             $message = 'Parameter count for invocation %s is too low.';
 
             // The user called `->with($this->anything())`, but may have meant
             // `->withAnyParameters()`.
             //
             // @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/199
-            if (\count($this->parameters) === 1 &&
-                \get_class($this->parameters[0]) === IsAnything::class) {
+            if (count($this->parameters) === 1 &&
+                get_class($this->parameters[0]) === IsAnything::class) {
                 $message .= "\nTo allow 0 or more parameters with any value, omit ->with() or use ->withAnyParameters() instead.";
             }
 
             throw new ExpectationFailedException(
-                \sprintf($message, $this->invocation->toString())
+                sprintf($message, $this->invocation->toString())
             );
         }
 
         foreach ($this->parameters as $i => $parameter) {
             $parameter->evaluate(
                 $this->invocation->getParameters()[$i],
-                \sprintf(
+                sprintf(
                     'Parameter %s for invocation %s does not match expected ' .
                     'value.',
                     $i,
@@ -149,7 +153,7 @@ class Parameters extends StatelessInvocation
      */
     private function guardAgainstDuplicateEvaluationOfParameterConstraints()
     {
-        if ($this->parameterVerificationResult instanceof \Exception) {
+        if ($this->parameterVerificationResult instanceof Exception) {
             throw $this->parameterVerificationResult;
         }
 

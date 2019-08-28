@@ -25,6 +25,57 @@ use ReflectionFunction;
 use ReflectionMethod;
 use SebastianBergmann\Environment\OperatingSystem;
 use Traversable;
+use function addcslashes;
+use function array_flip;
+use function array_keys;
+use function array_merge;
+use function array_pop;
+use function array_slice;
+use function array_unique;
+use function array_unshift;
+use function class_exists;
+use function class_implements;
+use function class_parents;
+use function constant;
+use function count;
+use function defined;
+use function explode;
+use function extension_loaded;
+use function file;
+use function function_exists;
+use function get_class;
+use function implode;
+use function ini_get;
+use function interface_exists;
+use function is_array;
+use function is_int;
+use function is_numeric;
+use function is_string;
+use function json_decode;
+use function json_last_error;
+use function json_last_error_msg;
+use function method_exists;
+use function phpversion;
+use function preg_match;
+use function preg_match_all;
+use function preg_replace;
+use function range;
+use function rtrim;
+use function sprintf;
+use function str_replace;
+use function strlen;
+use function strncmp;
+use function strpos;
+use function strtolower;
+use function substr;
+use function substr_count;
+use function trait_exists;
+use function trim;
+use function version_compare;
+use const JSON_ERROR_NONE;
+use const PHP_OS;
+use const PHP_VERSION;
+use const PREG_OFFSET_CAPTURE;
 
 final class Test
 {
@@ -103,14 +154,14 @@ final class Test
     public static function describe(\PHPUnit\Framework\Test $test): array
     {
         if ($test instanceof TestCase) {
-            return [\get_class($test), $test->getName()];
+            return [get_class($test), $test->getName()];
         }
 
         if ($test instanceof SelfDescribing) {
             return ['', $test->toString()];
         }
 
-        return ['', \get_class($test)];
+        return ['', get_class($test)];
     }
 
     public static function describeAsString(\PHPUnit\Framework\Test $test): string
@@ -119,7 +170,7 @@ final class Test
             return $test->toString();
         }
 
-        return \get_class($test);
+        return get_class($test);
     }
 
     /**
@@ -164,14 +215,14 @@ final class Test
         $docComment .= "\n" . $reflector->getDocComment();
         $requires = [];
 
-        if ($count = \preg_match_all(self::REGEX_REQUIRES_OS, $docComment, $matches)) {
-            foreach (\range(0, $count - 1) as $i) {
+        if ($count = preg_match_all(self::REGEX_REQUIRES_OS, $docComment, $matches)) {
+            foreach (range(0, $count - 1) as $i) {
                 $requires[$matches['name'][$i]] = $matches['value'][$i];
             }
         }
 
-        if ($count = \preg_match_all(self::REGEX_REQUIRES_VERSION, $docComment, $matches)) {
-            foreach (\range(0, $count - 1) as $i) {
+        if ($count = preg_match_all(self::REGEX_REQUIRES_VERSION, $docComment, $matches)) {
+            foreach (range(0, $count - 1) as $i) {
                 $requires[$matches['name'][$i]] = [
                     'version'  => $matches['version'][$i],
                     'operator' => $matches['operator'][$i],
@@ -179,8 +230,8 @@ final class Test
             }
         }
 
-        if ($count = \preg_match_all(self::REGEX_REQUIRES_VERSION_CONSTRAINT, $docComment, $matches)) {
-            foreach (\range(0, $count - 1) as $i) {
+        if ($count = preg_match_all(self::REGEX_REQUIRES_VERSION_CONSTRAINT, $docComment, $matches)) {
+            foreach (range(0, $count - 1) as $i) {
                 if (!empty($requires[$matches['name'][$i]])) {
                     continue;
                 }
@@ -189,7 +240,7 @@ final class Test
                     $versionConstraintParser = new VersionConstraintParser;
 
                     $requires[$matches['name'][$i] . '_constraint'] = [
-                        'constraint' => $versionConstraintParser->parse(\trim($matches['constraint'][$i])),
+                        'constraint' => $versionConstraintParser->parse(trim($matches['constraint'][$i])),
                     ];
                 } catch (\PharIo\Version\Exception $e) {
                     throw new Warning($e->getMessage(), $e->getCode(), $e);
@@ -197,16 +248,16 @@ final class Test
             }
         }
 
-        if ($count = \preg_match_all(self::REGEX_REQUIRES_SETTING, $docComment, $matches)) {
+        if ($count = preg_match_all(self::REGEX_REQUIRES_SETTING, $docComment, $matches)) {
             $requires['setting'] = [];
 
-            foreach (\range(0, $count - 1) as $i) {
+            foreach (range(0, $count - 1) as $i) {
                 $requires['setting'][$matches['setting'][$i]] = $matches['value'][$i];
             }
         }
 
-        if ($count = \preg_match_all(self::REGEX_REQUIRES, $docComment, $matches)) {
-            foreach (\range(0, $count - 1) as $i) {
+        if ($count = preg_match_all(self::REGEX_REQUIRES, $docComment, $matches)) {
+            foreach (range(0, $count - 1) as $i) {
                 $name = $matches['name'][$i] . 's';
 
                 if (!isset($requires[$name])) {
@@ -244,14 +295,14 @@ final class Test
         if (!empty($required['PHP'])) {
             $operator = empty($required['PHP']['operator']) ? '>=' : $required['PHP']['operator'];
 
-            if (!\version_compare(\PHP_VERSION, $required['PHP']['version'], $operator)) {
-                $missing[] = \sprintf('PHP %s %s is required.', $operator, $required['PHP']['version']);
+            if (!version_compare(PHP_VERSION, $required['PHP']['version'], $operator)) {
+                $missing[] = sprintf('PHP %s %s is required.', $operator, $required['PHP']['version']);
             }
         } elseif (!empty($required['PHP_constraint'])) {
-            $version = new \PharIo\Version\Version(self::sanitizeVersionNumber(\PHP_VERSION));
+            $version = new \PharIo\Version\Version(self::sanitizeVersionNumber(PHP_VERSION));
 
             if (!$required['PHP_constraint']['constraint']->complies($version)) {
-                $missing[] = \sprintf(
+                $missing[] = sprintf(
                     'PHP version does not match the required constraint %s.',
                     $required['PHP_constraint']['constraint']->asString()
                 );
@@ -263,14 +314,14 @@ final class Test
 
             $operator = empty($required['PHPUnit']['operator']) ? '>=' : $required['PHPUnit']['operator'];
 
-            if (!\version_compare($phpunitVersion, $required['PHPUnit']['version'], $operator)) {
-                $missing[] = \sprintf('PHPUnit %s %s is required.', $operator, $required['PHPUnit']['version']);
+            if (!version_compare($phpunitVersion, $required['PHPUnit']['version'], $operator)) {
+                $missing[] = sprintf('PHPUnit %s %s is required.', $operator, $required['PHPUnit']['version']);
             }
         } elseif (!empty($required['PHPUnit_constraint'])) {
             $phpunitVersion = new \PharIo\Version\Version(self::sanitizeVersionNumber(Version::id()));
 
             if (!$required['PHPUnit_constraint']['constraint']->complies($phpunitVersion)) {
-                $missing[] = \sprintf(
+                $missing[] = sprintf(
                     'PHPUnit version does not match the required constraint %s.',
                     $required['PHPUnit_constraint']['constraint']->asString()
                 );
@@ -278,37 +329,37 @@ final class Test
         }
 
         if (!empty($required['OSFAMILY']) && $required['OSFAMILY'] !== (new OperatingSystem)->getFamily()) {
-            $missing[] = \sprintf('Operating system %s is required.', $required['OSFAMILY']);
+            $missing[] = sprintf('Operating system %s is required.', $required['OSFAMILY']);
         }
 
         if (!empty($required['OS'])) {
-            $requiredOsPattern = \sprintf('/%s/i', \addcslashes($required['OS'], '/'));
+            $requiredOsPattern = sprintf('/%s/i', addcslashes($required['OS'], '/'));
 
-            if (!\preg_match($requiredOsPattern, \PHP_OS)) {
-                $missing[] = \sprintf('Operating system matching %s is required.', $requiredOsPattern);
+            if (!preg_match($requiredOsPattern, PHP_OS)) {
+                $missing[] = sprintf('Operating system matching %s is required.', $requiredOsPattern);
             }
         }
 
         if (!empty($required['functions'])) {
             foreach ($required['functions'] as $function) {
-                $pieces = \explode('::', $function);
+                $pieces = explode('::', $function);
 
-                if (\count($pieces) === 2 && \method_exists($pieces[0], $pieces[1])) {
+                if (count($pieces) === 2 && method_exists($pieces[0], $pieces[1])) {
                     continue;
                 }
 
-                if (\function_exists($function)) {
+                if (function_exists($function)) {
                     continue;
                 }
 
-                $missing[] = \sprintf('Function %s is required.', $function);
+                $missing[] = sprintf('Function %s is required.', $function);
             }
         }
 
         if (!empty($required['setting'])) {
             foreach ($required['setting'] as $setting => $value) {
-                if (\ini_get($setting) != $value) {
-                    $missing[] = \sprintf('Setting "%s" must be "%s".', $setting, $value);
+                if (ini_get($setting) != $value) {
+                    $missing[] = sprintf('Setting "%s" must be "%s".', $setting, $value);
                 }
             }
         }
@@ -319,20 +370,20 @@ final class Test
                     continue;
                 }
 
-                if (!\extension_loaded($extension)) {
-                    $missing[] = \sprintf('Extension %s is required.', $extension);
+                if (!extension_loaded($extension)) {
+                    $missing[] = sprintf('Extension %s is required.', $extension);
                 }
             }
         }
 
         if (!empty($required['extension_versions'])) {
             foreach ($required['extension_versions'] as $extension => $required) {
-                $actualVersion = \phpversion($extension);
+                $actualVersion = phpversion($extension);
 
                 $operator = empty($required['operator']) ? '>=' : $required['operator'];
 
-                if ($actualVersion === false || !\version_compare($actualVersion, $required['version'], $operator)) {
-                    $missing[] = \sprintf('Extension %s %s %s is required.', $extension, $operator, $required['version']);
+                if ($actualVersion === false || !version_compare($actualVersion, $required['version'], $operator)) {
+                    $missing[] = sprintf('Extension %s %s %s is required.', $extension, $operator, $required['version']);
                 }
             }
         }
@@ -349,9 +400,9 @@ final class Test
     {
         $reflector  = new ReflectionMethod($className, $methodName);
         $docComment = $reflector->getDocComment();
-        $docComment = \substr($docComment, 3, -2);
+        $docComment = substr($docComment, 3, -2);
 
-        if (\preg_match(self::REGEX_EXPECTED_EXCEPTION, $docComment, $matches)) {
+        if (preg_match(self::REGEX_EXPECTED_EXCEPTION, $docComment, $matches)) {
             $annotations = self::parseTestMethodAnnotations(
                 $className,
                 $methodName
@@ -363,7 +414,7 @@ final class Test
             $messageRegExp = '';
 
             if (isset($matches[2])) {
-                $message = \trim($matches[2]);
+                $message = trim($matches[2]);
             } elseif (isset($annotations['method']['expectedExceptionMessage'])) {
                 $message = self::parseAnnotationContent(
                     $annotations['method']['expectedExceptionMessage'][0]
@@ -384,10 +435,10 @@ final class Test
                 );
             }
 
-            if (\is_numeric($code)) {
+            if (is_numeric($code)) {
                 $code = (int) $code;
-            } elseif (\is_string($code) && \defined($code)) {
-                $code = (int) \constant($code);
+            } elseif (is_string($code) && defined($code)) {
+                $code = (int) constant($code);
             }
 
             return [
@@ -420,11 +471,11 @@ final class Test
 
         if ($data !== null) {
             foreach ($data as $key => $value) {
-                if (!\is_array($value)) {
+                if (!is_array($value)) {
                     throw new Exception(
-                        \sprintf(
+                        sprintf(
                             'Data set %s is invalid.',
-                            \is_int($key) ? '#' . $key : '"' . $key . '"'
+                            is_int($key) ? '#' . $key : '"' . $key . '"'
                         )
                     );
                 }
@@ -441,23 +492,23 @@ final class Test
     {
         $docComment = self::cleanUpMultiLineAnnotation($docComment);
 
-        if (\preg_match(self::REGEX_TEST_WITH, $docComment, $matches, \PREG_OFFSET_CAPTURE)) {
-            $offset            = \strlen($matches[0][0]) + $matches[0][1];
-            $annotationContent = \substr($docComment, $offset);
+        if (preg_match(self::REGEX_TEST_WITH, $docComment, $matches, PREG_OFFSET_CAPTURE)) {
+            $offset            = strlen($matches[0][0]) + $matches[0][1];
+            $annotationContent = substr($docComment, $offset);
             $data              = [];
 
-            foreach (\explode("\n", $annotationContent) as $candidateRow) {
-                $candidateRow = \trim($candidateRow);
+            foreach (explode("\n", $annotationContent) as $candidateRow) {
+                $candidateRow = trim($candidateRow);
 
                 if ($candidateRow[0] !== '[') {
                     break;
                 }
 
-                $dataSet = \json_decode($candidateRow, true);
+                $dataSet = json_decode($candidateRow, true);
 
-                if (\json_last_error() !== \JSON_ERROR_NONE) {
+                if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new Exception(
-                        'The data set for the @testWith annotation cannot be parsed: ' . \json_last_error_msg()
+                        'The data set for the @testWith annotation cannot be parsed: ' . json_last_error_msg()
                     );
                 }
 
@@ -482,13 +533,13 @@ final class Test
             $annotations = [];
 
             foreach ($traits as $trait) {
-                $annotations = \array_merge(
+                $annotations = array_merge(
                     $annotations,
                     self::parseAnnotations($trait->getDocComment())
                 );
             }
 
-            self::$annotationCache[$className] = \array_merge(
+            self::$annotationCache[$className] = array_merge(
                 $annotations,
                 self::parseAnnotations($class->getDocComment())
             );
@@ -516,16 +567,16 @@ final class Test
     public static function getInlineAnnotations(string $className, string $methodName): array
     {
         $method      = new ReflectionMethod($className, $methodName);
-        $code        = \file($method->getFileName());
+        $code        = file($method->getFileName());
         $lineNumber  = $method->getStartLine();
         $startLine   = $method->getStartLine() - 1;
         $endLine     = $method->getEndLine() - 1;
-        $methodLines = \array_slice($code, $startLine, $endLine - $startLine + 1);
+        $methodLines = array_slice($code, $startLine, $endLine - $startLine + 1);
         $annotations = [];
 
         foreach ($methodLines as $line) {
-            if (\preg_match('#/\*\*?\s*@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?\*/$#m', $line, $matches)) {
-                $annotations[\strtolower($matches['name'])] = [
+            if (preg_match('#/\*\*?\s*@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?\*/$#m', $line, $matches)) {
+                $annotations[strtolower($matches['name'])] = [
                     'line'  => $lineNumber,
                     'value' => $matches['value'],
                 ];
@@ -541,10 +592,10 @@ final class Test
     {
         $annotations = [];
         // Strip away the docblock header and footer to ease parsing of one line annotations
-        $docBlock = \substr($docBlock, 3, -2);
+        $docBlock = substr($docBlock, 3, -2);
 
-        if (\preg_match_all('/@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?$/m', $docBlock, $matches)) {
-            $numMatches = \count($matches[0]);
+        if (preg_match_all('/@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?$/m', $docBlock, $matches)) {
+            $numMatches = count($matches[0]);
 
             for ($i = 0; $i < $numMatches; ++$i) {
                 $annotations[$matches['name'][$i]][] = (string) $matches['value'][$i];
@@ -584,13 +635,13 @@ final class Test
         }
 
         if (isset($annotations['method']['depends'])) {
-            $dependencies = \array_merge(
+            $dependencies = array_merge(
                 $dependencies,
                 $annotations['method']['depends']
             );
         }
 
-        return \array_unique($dependencies);
+        return array_unique($dependencies);
     }
 
     public static function getErrorHandlerSettings(string $className, ?string $methodName): ?bool
@@ -618,19 +669,19 @@ final class Test
         }
 
         if (isset($annotations['class']['group'])) {
-            $groups = \array_merge($groups, $annotations['class']['group']);
+            $groups = array_merge($groups, $annotations['class']['group']);
         }
 
         if (isset($annotations['method']['group'])) {
-            $groups = \array_merge($groups, $annotations['method']['group']);
+            $groups = array_merge($groups, $annotations['method']['group']);
         }
 
         if (isset($annotations['class']['ticket'])) {
-            $groups = \array_merge($groups, $annotations['class']['ticket']);
+            $groups = array_merge($groups, $annotations['class']['ticket']);
         }
 
         if (isset($annotations['method']['ticket'])) {
-            $groups = \array_merge($groups, $annotations['method']['ticket']);
+            $groups = array_merge($groups, $annotations['method']['ticket']);
         }
 
         foreach (['method', 'class'] as $element) {
@@ -643,12 +694,12 @@ final class Test
             }
         }
 
-        return \array_unique($groups);
+        return array_unique($groups);
     }
 
     public static function getSize(string $className, ?string $methodName): int
     {
-        $groups = \array_flip(self::getGroups($className, $methodName));
+        $groups = array_flip(self::getGroups($className, $methodName));
 
         if (isset($groups['large'])) {
             return self::LARGE;
@@ -696,7 +747,7 @@ final class Test
 
     public static function getHookMethods(string $className): array
     {
-        if (!\class_exists($className, false)) {
+        if (!class_exists($className, false)) {
             return self::emptyHookMethodsArray();
         }
 
@@ -717,26 +768,26 @@ final class Test
 
                     if ($methodComment = $method->getDocComment()) {
                         if ($method->isStatic()) {
-                            if (\strpos($methodComment, '@beforeClass') !== false) {
-                                \array_unshift(
+                            if (strpos($methodComment, '@beforeClass') !== false) {
+                                array_unshift(
                                     self::$hookMethods[$className]['beforeClass'],
                                     $method->getName()
                                 );
                             }
 
-                            if (\strpos($methodComment, '@afterClass') !== false) {
+                            if (strpos($methodComment, '@afterClass') !== false) {
                                 self::$hookMethods[$className]['afterClass'][] = $method->getName();
                             }
                         }
 
-                        if (\preg_match('/@before\b/', $methodComment) > 0) {
-                            \array_unshift(
+                        if (preg_match('/@before\b/', $methodComment) > 0) {
+                            array_unshift(
                                 self::$hookMethods[$className]['before'],
                                 $method->getName()
                             );
                         }
 
-                        if (\preg_match('/@after\b/', $methodComment) > 0) {
+                        if (preg_match('/@after\b/', $methodComment) > 0) {
                             self::$hookMethods[$className]['after'][] = $method->getName();
                         }
                     }
@@ -761,9 +812,9 @@ final class Test
         $classShortcut = null;
 
         if (!empty($annotations['class'][$mode . 'DefaultClass'])) {
-            if (\count($annotations['class'][$mode . 'DefaultClass']) > 1) {
+            if (count($annotations['class'][$mode . 'DefaultClass']) > 1) {
                 throw new CodeCoverageException(
-                    \sprintf(
+                    sprintf(
                         'More than one @%sClass annotation in class or interface "%s".',
                         $mode,
                         $className
@@ -781,30 +832,30 @@ final class Test
         }
 
         if (isset($annotations['method'][$mode])) {
-            $list = \array_merge($list, $annotations['method'][$mode]);
+            $list = array_merge($list, $annotations['method'][$mode]);
         }
 
         $codeList = [];
 
-        foreach (\array_unique($list) as $element) {
-            if ($classShortcut && \strncmp($element, '::', 2) === 0) {
+        foreach (array_unique($list) as $element) {
+            if ($classShortcut && strncmp($element, '::', 2) === 0) {
                 $element = $classShortcut . $element;
             }
 
-            $element = \preg_replace('/[\s()]+$/', '', $element);
-            $element = \explode(' ', $element);
+            $element = preg_replace('/[\s()]+$/', '', $element);
+            $element = explode(' ', $element);
             $element = $element[0];
 
-            if ($mode === 'covers' && \interface_exists($element)) {
+            if ($mode === 'covers' && interface_exists($element)) {
                 throw new InvalidCoversTargetException(
-                    \sprintf(
+                    sprintf(
                         'Trying to @cover interface "%s".',
                         $element
                     )
                 );
             }
 
-            $codeList = \array_merge(
+            $codeList = array_merge(
                 $codeList,
                 self::resolveElementToReflectionObjects($element)
             );
@@ -822,8 +873,8 @@ final class Test
      */
     private static function parseAnnotationContent(string $message): string
     {
-        if (\defined($message) && (\strpos($message, '::') !== false && \substr_count($message, '::') + 1 === 2)) {
-            $message = \constant($message);
+        if (defined($message) && (strpos($message, '::') !== false && substr_count($message, '::') + 1 === 2)) {
+            $message = constant($message);
         }
 
         return $message;
@@ -834,24 +885,24 @@ final class Test
      */
     private static function getDataFromDataProviderAnnotation(string $docComment, string $className, string $methodName): ?iterable
     {
-        if (\preg_match_all(self::REGEX_DATA_PROVIDER, $docComment, $matches)) {
+        if (preg_match_all(self::REGEX_DATA_PROVIDER, $docComment, $matches)) {
             $result = [];
 
             foreach ($matches[1] as $match) {
-                $dataProviderMethodNameNamespace = \explode('\\', $match);
-                $leaf                            = \explode('::', \array_pop($dataProviderMethodNameNamespace));
-                $dataProviderMethodName          = \array_pop($leaf);
+                $dataProviderMethodNameNamespace = explode('\\', $match);
+                $leaf                            = explode('::', array_pop($dataProviderMethodNameNamespace));
+                $dataProviderMethodName          = array_pop($leaf);
 
                 if (empty($dataProviderMethodNameNamespace)) {
                     $dataProviderMethodNameNamespace = '';
                 } else {
-                    $dataProviderMethodNameNamespace = \implode('\\', $dataProviderMethodNameNamespace) . '\\';
+                    $dataProviderMethodNameNamespace = implode('\\', $dataProviderMethodNameNamespace) . '\\';
                 }
 
                 if (empty($leaf)) {
                     $dataProviderClassName = $className;
                 } else {
-                    $dataProviderClassName = $dataProviderMethodNameNamespace . \array_pop($leaf);
+                    $dataProviderClassName = $dataProviderMethodNameNamespace . array_pop($leaf);
                 }
 
                 $dataProviderClass  = new ReflectionClass($dataProviderClassName);
@@ -876,7 +927,7 @@ final class Test
                     $data     = [];
 
                     foreach ($origData as $key => $value) {
-                        if (\is_int($key)) {
+                        if (is_int($key)) {
                             $data[] = $value;
                         } else {
                             $data[$key] = $value;
@@ -884,8 +935,8 @@ final class Test
                     }
                 }
 
-                if (\is_array($data)) {
-                    $result = \array_merge($result, $data);
+                if (is_array($data)) {
+                    $result = array_merge($result, $data);
                 }
             }
 
@@ -898,11 +949,11 @@ final class Test
     private static function cleanUpMultiLineAnnotation(string $docComment): string
     {
         //removing initial '   * ' for docComment
-        $docComment = \str_replace("\r\n", "\n", $docComment);
-        $docComment = \preg_replace('/' . '\n' . '\s*' . '\*' . '\s?' . '/', "\n", $docComment);
-        $docComment = \substr($docComment, 0, -1);
+        $docComment = str_replace("\r\n", "\n", $docComment);
+        $docComment = preg_replace('/' . '\n' . '\s*' . '\*' . '\s?' . '/', "\n", $docComment);
+        $docComment = substr($docComment, 0, -1);
 
-        return \rtrim($docComment, "\n");
+        return rtrim($docComment, "\n");
     }
 
     private static function emptyHookMethodsArray(): array
@@ -952,20 +1003,20 @@ final class Test
     {
         $codeToCoverList = [];
 
-        if (\strpos($element, '\\') !== false && \function_exists($element)) {
+        if (strpos($element, '\\') !== false && function_exists($element)) {
             $codeToCoverList[] = new ReflectionFunction($element);
-        } elseif (\strpos($element, '::') !== false) {
-            [$className, $methodName] = \explode('::', $element);
+        } elseif (strpos($element, '::') !== false) {
+            [$className, $methodName] = explode('::', $element);
 
             if (isset($methodName[0]) && $methodName[0] === '<') {
                 $classes = [$className];
 
                 foreach ($classes as $className) {
-                    if (!\class_exists($className) &&
-                        !\interface_exists($className) &&
-                        !\trait_exists($className)) {
+                    if (!class_exists($className) &&
+                        !interface_exists($className) &&
+                        !trait_exists($className)) {
                         throw new InvalidCoversTargetException(
-                            \sprintf(
+                            sprintf(
                                 'Trying to @cover or @use not existing class or ' .
                                 'interface "%s".',
                                 $className
@@ -978,9 +1029,9 @@ final class Test
                     $inverse    = isset($methodName[1]) && $methodName[1] === '!';
                     $visibility = 'isPublic';
 
-                    if (\strpos($methodName, 'protected')) {
+                    if (strpos($methodName, 'protected')) {
                         $visibility = 'isProtected';
-                    } elseif (\strpos($methodName, 'private')) {
+                    } elseif (strpos($methodName, 'private')) {
                         $visibility = 'isPrivate';
                     }
 
@@ -996,15 +1047,15 @@ final class Test
                 $classes = [$className];
 
                 foreach ($classes as $className) {
-                    if ($className === '' && \function_exists($methodName)) {
+                    if ($className === '' && function_exists($methodName)) {
                         $codeToCoverList[] = new ReflectionFunction(
                             $methodName
                         );
                     } else {
-                        if (!((\class_exists($className) || \interface_exists($className) || \trait_exists($className)) &&
-                            \method_exists($className, $methodName))) {
+                        if (!((class_exists($className) || interface_exists($className) || trait_exists($className)) &&
+                            method_exists($className, $methodName))) {
                             throw new InvalidCoversTargetException(
-                                \sprintf(
+                                sprintf(
                                     'Trying to @cover or @use not existing method "%s::%s".',
                                     $className,
                                     $methodName
@@ -1022,27 +1073,27 @@ final class Test
         } else {
             $extended = false;
 
-            if (\strpos($element, '<extended>') !== false) {
-                $element  = \str_replace('<extended>', '', $element);
+            if (strpos($element, '<extended>') !== false) {
+                $element  = str_replace('<extended>', '', $element);
                 $extended = true;
             }
 
             $classes = [$element];
 
             if ($extended) {
-                $classes = \array_merge(
+                $classes = array_merge(
                     $classes,
-                    \class_implements($element),
-                    \class_parents($element)
+                    class_implements($element),
+                    class_parents($element)
                 );
             }
 
             foreach ($classes as $className) {
-                if (!\class_exists($className) &&
-                    !\interface_exists($className) &&
-                    !\trait_exists($className)) {
+                if (!class_exists($className) &&
+                    !interface_exists($className) &&
+                    !trait_exists($className)) {
                     throw new InvalidCoversTargetException(
-                        \sprintf(
+                        sprintf(
                             'Trying to @cover or @use not existing class or ' .
                             'interface "%s".',
                             $className
@@ -1076,14 +1127,14 @@ final class Test
                 $result[$filename] = [];
             }
 
-            $result[$filename] = \array_merge(
+            $result[$filename] = array_merge(
                 $result[$filename],
-                \range($reflector->getStartLine(), $reflector->getEndLine())
+                range($reflector->getStartLine(), $reflector->getEndLine())
             );
         }
 
         foreach ($result as $filename => $lineNumbers) {
-            $result[$filename] = \array_keys(\array_flip($lineNumbers));
+            $result[$filename] = array_keys(array_flip($lineNumbers));
         }
 
         return $result;
@@ -1095,7 +1146,7 @@ final class Test
      */
     private static function sanitizeVersionNumber(string $version)
     {
-        return \preg_replace(
+        return preg_replace(
             '/^(\d+\.\d+(?:.\d+)?).*$/',
             '$1',
             $version

@@ -10,6 +10,7 @@
 namespace PHPUnit\Framework\Constraint;
 
 use ReflectionClass;
+use function sprintf;
 
 /**
  * Constraint that asserts that the class it is evaluated for has a given
@@ -24,7 +25,7 @@ class ClassHasStaticAttribute extends ClassHasAttribute
      */
     public function toString(): string
     {
-        return \sprintf(
+        return sprintf(
             'has static attribute "%s"',
             $this->attributeName()
         );

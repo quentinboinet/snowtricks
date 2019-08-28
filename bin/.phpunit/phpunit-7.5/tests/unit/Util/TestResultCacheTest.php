@@ -22,8 +22,8 @@ class TestResultCacheTest extends TestCase
         $cache     = new TestResultCache($cacheFile);
         $cache->load();
 
-        $this->assertSame(BaseTestRunner::STATUS_UNKNOWN, $cache->getState(\MultiDependencyTest::class . '::testOne'));
-        $this->assertSame(BaseTestRunner::STATUS_SKIPPED, $cache->getState(\MultiDependencyTest::class . '::testFive'));
+        $this->assertSame(BaseTestRunner::STATUS_UNKNOWN, $cache->getState(MultiDependencyTest::class . '::testOne'));
+        $this->assertSame(BaseTestRunner::STATUS_SKIPPED, $cache->getState(MultiDependencyTest::class . '::testFive'));
     }
 
     public function testDoesClearCacheBeforeLoad(): void
@@ -32,12 +32,12 @@ class TestResultCacheTest extends TestCase
         $cache     = new TestResultCache($cacheFile);
         $cache->setState('someTest', BaseTestRunner::STATUS_FAILURE);
 
-        $this->assertSame(BaseTestRunner::STATUS_UNKNOWN, $cache->getState(\MultiDependencyTest::class . '::testFive'));
+        $this->assertSame(BaseTestRunner::STATUS_UNKNOWN, $cache->getState(MultiDependencyTest::class . '::testFive'));
 
         $cache->load();
 
-        $this->assertSame(BaseTestRunner::STATUS_UNKNOWN, $cache->getState(\MultiDependencyTest::class . '::someTest'));
-        $this->assertSame(BaseTestRunner::STATUS_SKIPPED, $cache->getState(\MultiDependencyTest::class . '::testFive'));
+        $this->assertSame(BaseTestRunner::STATUS_UNKNOWN, $cache->getState(MultiDependencyTest::class . '::someTest'));
+        $this->assertSame(BaseTestRunner::STATUS_SKIPPED, $cache->getState(MultiDependencyTest::class . '::testFive'));
     }
 
     public function testShouldNotSerializePassedTestsAsDefectButTimeIsStored(): void
@@ -46,16 +46,16 @@ class TestResultCacheTest extends TestCase
         $cache->setState('testOne', BaseTestRunner::STATUS_PASSED);
         $cache->setTime('testOne', 123);
 
-        $data = \serialize($cache);
+        $data = serialize($cache);
         $this->assertSame('C:30:"PHPUnit\Runner\TestResultCache":64:{a:2:{s:7:"defects";a:0:{}s:5:"times";a:1:{s:7:"testOne";d:123;}}}', $data);
     }
 
     public function testCanPersistCacheToFile(): void
     {
         // Create a cache with one result and store it
-        $cacheFile = \tempnam(\sys_get_temp_dir(), 'phpunit_');
+        $cacheFile = tempnam(sys_get_temp_dir(), 'phpunit_');
         $cache     = new TestResultCache($cacheFile);
-        $testName  = 'test' . \uniqid();
+        $testName  = 'test' . uniqid();
         $cache->setState($testName, BaseTestRunner::STATUS_SKIPPED);
         $cache->persist();
         unset($cache);
@@ -66,7 +66,7 @@ class TestResultCacheTest extends TestCase
         $this->assertSame(BaseTestRunner::STATUS_SKIPPED, $loadedCache->getState($testName));
 
         // Clean up
-        \unlink($cacheFile);
+        unlink($cacheFile);
     }
 
     public function testShouldReturnEmptyCacheWhenFileDoesNotExist(): void
@@ -74,18 +74,18 @@ class TestResultCacheTest extends TestCase
         $cache = new TestResultCache('/a/wrong/path/file');
         $cache->load();
 
-        $this->assertTrue($this->isSerializedEmptyCache(\serialize($cache)));
+        $this->assertTrue($this->isSerializedEmptyCache(serialize($cache)));
     }
 
     public function testShouldReturnEmptyCacheFromInvalidFile(): void
     {
-        $cacheFile = \tempnam(\sys_get_temp_dir(), 'phpunit_');
-        \file_put_contents($cacheFile, '<certainly not serialized php>');
+        $cacheFile = tempnam(sys_get_temp_dir(), 'phpunit_');
+        file_put_contents($cacheFile, '<certainly not serialized php>');
 
         $cache = new TestResultCache($cacheFile);
         $cache->load();
 
-        $this->assertTrue($this->isSerializedEmptyCache(\serialize($cache)));
+        $this->assertTrue($this->isSerializedEmptyCache(serialize($cache)));
     }
 
     public function isSerializedEmptyCache(string $data): bool

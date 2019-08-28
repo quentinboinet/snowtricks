@@ -9,8 +9,12 @@
  */
 namespace PHPUnit\Framework;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\Error\Error;
 use Throwable;
+use function get_class;
+use function sprintf;
+use function trim;
 
 /**
  * A TestFailure collects a failed test together with the caught exception.
@@ -35,7 +39,7 @@ class TestFailure
     /**
      * Returns a description for an exception.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function exceptionToString(Throwable $e): string
     {
@@ -47,7 +51,7 @@ class TestFailure
             }
 
             if (!empty($buffer)) {
-                $buffer = \trim($buffer) . "\n";
+                $buffer = trim($buffer) . "\n";
             }
 
             return $buffer;
@@ -61,7 +65,7 @@ class TestFailure
             return $e->getClassName() . ': ' . $e->getMessage() . "\n";
         }
 
-        return \get_class($e) . ': ' . $e->getMessage() . "\n";
+        return get_class($e) . ': ' . $e->getMessage() . "\n";
     }
 
     /**
@@ -74,7 +78,7 @@ class TestFailure
         if ($failedTest instanceof SelfDescribing) {
             $this->testName = $failedTest->toString();
         } else {
-            $this->testName = \get_class($failedTest);
+            $this->testName = get_class($failedTest);
         }
 
         if (!$failedTest instanceof TestCase || !$failedTest->isInIsolation()) {
@@ -89,7 +93,7 @@ class TestFailure
      */
     public function toString(): string
     {
-        return \sprintf(
+        return sprintf(
             '%s: %s',
             $this->testName,
             $this->thrownException->getMessage()
@@ -99,7 +103,7 @@ class TestFailure
     /**
      * Returns a description for the thrown exception.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getExceptionAsString(): string
     {

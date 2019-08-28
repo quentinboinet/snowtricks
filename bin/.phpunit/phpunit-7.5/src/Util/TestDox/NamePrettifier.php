@@ -10,7 +10,37 @@
 namespace PHPUnit\Util\TestDox;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\Test;
+use ReflectionException;
+use ReflectionMethod;
+use ReflectionObject;
 use SebastianBergmann\Exporter\Exporter;
+use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function array_values;
+use function get_class;
+use function gettype;
+use function in_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_numeric;
+use function is_object;
+use function is_scalar;
+use function is_string;
+use function ord;
+use function preg_quote;
+use function preg_replace;
+use function sprintf;
+use function str_replace;
+use function strlen;
+use function strpos;
+use function strripos;
+use function strtolower;
+use function strtoupper;
+use function substr;
+use function trim;
 
 /**
  * Prettifies class and method names for use in TestDox documentation.
@@ -28,35 +58,35 @@ final class NamePrettifier
     public function prettifyTestClass(string $className): string
     {
         try {
-            $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className);
+            $annotations = Test::parseTestMethodAnnotations($className);
 
             if (isset($annotations['class']['testdox'][0])) {
                 return $annotations['class']['testdox'][0];
             }
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
         }
 
         $result = $className;
 
-        if (\substr($className, -1 * \strlen('Test')) === 'Test') {
-            $result = \substr($result, 0, \strripos($result, 'Test'));
+        if (substr($className, -1 * strlen('Test')) === 'Test') {
+            $result = substr($result, 0, strripos($result, 'Test'));
         }
 
-        if (\strpos($className, 'Tests') === 0) {
-            $result = \substr($result, \strlen('Tests'));
-        } elseif (\strpos($className, 'Test') === 0) {
-            $result = \substr($result, \strlen('Test'));
+        if (strpos($className, 'Tests') === 0) {
+            $result = substr($result, strlen('Tests'));
+        } elseif (strpos($className, 'Test') === 0) {
+            $result = substr($result, strlen('Test'));
         }
 
         if ($result[0] === '\\') {
-            $result = \substr($result, 1);
+            $result = substr($result, 1);
         }
 
         return $result;
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function prettifyTestCase(TestCase $test): string
     {
@@ -64,18 +94,18 @@ final class NamePrettifier
         $annotationWithPlaceholders = false;
 
         $callback = static function (string $variable): string {
-            return \sprintf('/%s(?=\b)/', \preg_quote($variable, '/'));
+            return sprintf('/%s(?=\b)/', preg_quote($variable, '/'));
         };
 
         if (isset($annotations['method']['testdox'][0])) {
             $result = $annotations['method']['testdox'][0];
 
-            if (\strpos($result, '$') !== false) {
+            if (strpos($result, '$') !== false) {
                 $annotation   = $annotations['method']['testdox'][0];
                 $providedData = $this->mapTestMethodParameterNamesToProvidedDataValues($test);
-                $variables    = \array_map($callback, \array_keys($providedData));
+                $variables    = array_map($callback, array_keys($providedData));
 
-                $result = \trim(\preg_replace($variables, $providedData, $annotation));
+                $result = trim(preg_replace($variables, $providedData, $annotation));
 
                 $annotationWithPlaceholders = true;
             }
@@ -97,42 +127,42 @@ final class NamePrettifier
     {
         $buffer = '';
 
-        if (!\is_string($name) || $name === '') {
+        if (!is_string($name) || $name === '') {
             return $buffer;
         }
 
-        $string = \preg_replace('#\d+$#', '', $name, -1, $count);
+        $string = preg_replace('#\d+$#', '', $name, -1, $count);
 
-        if (\in_array($string, $this->strings)) {
+        if (in_array($string, $this->strings)) {
             $name = $string;
         } elseif ($count === 0) {
             $this->strings[] = $string;
         }
 
-        if (\strpos($name, 'test_') === 0) {
-            $name = \substr($name, 5);
-        } elseif (\strpos($name, 'test') === 0) {
-            $name = \substr($name, 4);
+        if (strpos($name, 'test_') === 0) {
+            $name = substr($name, 5);
+        } elseif (strpos($name, 'test') === 0) {
+            $name = substr($name, 4);
         }
 
         if ($name === '') {
             return $buffer;
         }
 
-        $name[0] = \strtoupper($name[0]);
+        $name[0] = strtoupper($name[0]);
 
-        if (\strpos($name, '_') !== false) {
-            return \trim(\str_replace('_', ' ', $name));
+        if (strpos($name, '_') !== false) {
+            return trim(str_replace('_', ' ', $name));
         }
 
-        $max        = \strlen($name);
+        $max        = strlen($name);
         $wasNumeric = false;
 
         for ($i = 0; $i < $max; $i++) {
-            if ($i > 0 && \ord($name[$i]) >= 65 && \ord($name[$i]) <= 90) {
-                $buffer .= ' ' . \strtolower($name[$i]);
+            if ($i > 0 && ord($name[$i]) >= 65 && ord($name[$i]) <= 90) {
+                $buffer .= ' ' . strtolower($name[$i]);
             } else {
-                $isNumeric = \is_numeric($name[$i]);
+                $isNumeric = is_numeric($name[$i]);
 
                 if (!$wasNumeric && $isNumeric) {
                     $buffer .= ' ';
@@ -151,35 +181,35 @@ final class NamePrettifier
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function mapTestMethodParameterNamesToProvidedDataValues(TestCase $test): array
     {
-        $reflector          = new \ReflectionMethod(\get_class($test), $test->getName(false));
+        $reflector          = new ReflectionMethod(get_class($test), $test->getName(false));
         $providedData       = [];
-        $providedDataValues = \array_values($test->getProvidedData());
+        $providedDataValues = array_values($test->getProvidedData());
         $i                  = 0;
 
         foreach ($reflector->getParameters() as $parameter) {
-            if (!\array_key_exists($i, $providedDataValues) && $parameter->isDefaultValueAvailable()) {
+            if (!array_key_exists($i, $providedDataValues) && $parameter->isDefaultValueAvailable()) {
                 $providedDataValues[$i] = $parameter->getDefaultValue();
             }
 
             $value = $providedDataValues[$i++] ?? null;
 
-            if (\is_object($value)) {
-                $reflector = new \ReflectionObject($value);
+            if (is_object($value)) {
+                $reflector = new ReflectionObject($value);
 
                 if ($reflector->hasMethod('__toString')) {
                     $value = (string) $value;
                 }
             }
 
-            if (!\is_scalar($value)) {
-                $value = \gettype($value);
+            if (!is_scalar($value)) {
+                $value = gettype($value);
             }
 
-            if (\is_bool($value) || \is_int($value) || \is_float($value)) {
+            if (is_bool($value) || is_int($value) || is_float($value)) {
                 $exporter = new Exporter;
 
                 $value = $exporter->export($value);

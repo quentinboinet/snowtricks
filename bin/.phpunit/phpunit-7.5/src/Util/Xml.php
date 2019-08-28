@@ -16,6 +16,23 @@ use DOMNode;
 use DOMText;
 use PHPUnit\Framework\Exception;
 use ReflectionClass;
+use function chdir;
+use function dirname;
+use function error_reporting;
+use function file_get_contents;
+use function getcwd;
+use function gettype;
+use function htmlspecialchars;
+use function is_string;
+use function libxml_get_errors;
+use function libxml_use_internal_errors;
+use function mb_convert_encoding;
+use function ord;
+use function preg_replace;
+use function settype;
+use function sprintf;
+use function strlen;
+use const ENT_QUOTES;
 
 final class Xml
 {
@@ -50,8 +67,8 @@ final class Xml
             return $actual;
         }
 
-        if (!\is_string($actual)) {
-            throw new Exception('Could not load XML from ' . \gettype($actual));
+        if (!is_string($actual)) {
+            throw new Exception('Could not load XML from ' . gettype($actual));
         }
 
         if ($actual === '') {
@@ -60,16 +77,16 @@ final class Xml
 
         // Required for XInclude on Windows.
         if ($xinclude) {
-            $cwd = \getcwd();
-            @\chdir(\dirname($filename));
+            $cwd = getcwd();
+            @chdir(dirname($filename));
         }
 
         $document                     = new DOMDocument;
         $document->preserveWhiteSpace = false;
 
-        $internal  = \libxml_use_internal_errors(true);
+        $internal  = libxml_use_internal_errors(true);
         $message   = '';
-        $reporting = \error_reporting(0);
+        $reporting = error_reporting(0);
 
         if ($filename !== '') {
             // Required for XInclude
@@ -86,21 +103,21 @@ final class Xml
             $document->xinclude();
         }
 
-        foreach (\libxml_get_errors() as $error) {
+        foreach (libxml_get_errors() as $error) {
             $message .= "\n" . $error->message;
         }
 
-        \libxml_use_internal_errors($internal);
-        \error_reporting($reporting);
+        libxml_use_internal_errors($internal);
+        error_reporting($reporting);
 
         if (isset($cwd)) {
-            @\chdir($cwd);
+            @chdir($cwd);
         }
 
         if ($loaded === false || ($strict && $message !== '')) {
             if ($filename !== '') {
                 throw new Exception(
-                    \sprintf(
+                    sprintf(
                         'Could not load "%s".%s',
                         $filename,
                         $message !== '' ? "\n" . $message : ''
@@ -125,14 +142,14 @@ final class Xml
      */
     public static function loadFile(string $filename, bool $isHtml = false, bool $xinclude = false, bool $strict = false): DOMDocument
     {
-        $reporting = \error_reporting(0);
-        $contents  = \file_get_contents($filename);
+        $reporting = error_reporting(0);
+        $contents  = file_get_contents($filename);
 
-        \error_reporting($reporting);
+        error_reporting($reporting);
 
         if ($contents === false) {
             throw new Exception(
-                \sprintf(
+                sprintf(
                     'Could not read "%s".',
                     $filename
                 )
@@ -163,12 +180,12 @@ final class Xml
      */
     public static function prepareString(string $string): string
     {
-        return \preg_replace(
+        return preg_replace(
             '/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]/',
             '',
-            \htmlspecialchars(
+            htmlspecialchars(
                 self::convertToUtf8($string),
-                \ENT_QUOTES
+                ENT_QUOTES
             )
         );
     }
@@ -236,7 +253,7 @@ final class Xml
             case 'string':
                 $variable = $element->textContent;
 
-                \settype($variable, $element->tagName);
+                settype($variable, $element->tagName);
 
                 break;
         }
@@ -247,7 +264,7 @@ final class Xml
     private static function convertToUtf8(string $string): string
     {
         if (!self::isUtf8($string)) {
-            $string = \mb_convert_encoding($string, 'UTF-8');
+            $string = mb_convert_encoding($string, 'UTF-8');
         }
 
         return $string;
@@ -255,23 +272,23 @@ final class Xml
 
     private static function isUtf8(string $string): bool
     {
-        $length = \strlen($string);
+        $length = strlen($string);
 
         for ($i = 0; $i < $length; $i++) {
-            if (\ord($string[$i]) < 0x80) {
+            if (ord($string[$i]) < 0x80) {
                 $n = 0;
-            } elseif ((\ord($string[$i]) & 0xE0) === 0xC0) {
+            } elseif ((ord($string[$i]) & 0xE0) === 0xC0) {
                 $n = 1;
-            } elseif ((\ord($string[$i]) & 0xF0) === 0xE0) {
+            } elseif ((ord($string[$i]) & 0xF0) === 0xE0) {
                 $n = 2;
-            } elseif ((\ord($string[$i]) & 0xF0) === 0xF0) {
+            } elseif ((ord($string[$i]) & 0xF0) === 0xF0) {
                 $n = 3;
             } else {
                 return false;
             }
 
             for ($j = 0; $j < $n; $j++) {
-                if ((++$i === $length) || ((\ord($string[$i]) & 0xC0) !== 0x80)) {
+                if ((++$i === $length) || ((ord($string[$i]) & 0xC0) !== 0x80)) {
                     return false;
                 }
             }

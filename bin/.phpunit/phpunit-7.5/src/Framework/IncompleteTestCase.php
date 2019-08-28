@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Framework;
 
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+
 /**
  * An incomplete test case
  */
@@ -59,7 +61,7 @@ class IncompleteTestCase extends TestCase
     /**
      * Returns a string representation of the test case.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function toString(): string
     {

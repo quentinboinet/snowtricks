@@ -69,14 +69,14 @@ class DataProviderTestDoxTest extends TestCase
             'float'            => [1.0],
             'string'           => ['string'],
             'array'            => [[1, 2, 3]],
-            'object'           => [new \stdClass],
+            'object'           => [new stdClass],
             'stringableObject' => [new class {
                 public function __toString()
                 {
                     return 'string';
                 }
             }],
-            'resource'         => [\fopen(__FILE__, 'rb')],
+            'resource'         => [fopen(__FILE__, 'rb')],
             'null'             => [null],
         ];
     }

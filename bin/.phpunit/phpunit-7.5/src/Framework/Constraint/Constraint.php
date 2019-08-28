@@ -14,6 +14,8 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Exporter\Exporter;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function sprintf;
 
 /**
  * Abstract base class for constraints which can be applied to any value.
@@ -42,7 +44,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param bool   $returnResult Whether to return a result or throw an exception
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -90,11 +92,11 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param ComparisonFailure $comparisonFailure
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
     {
-        $failureDescription = \sprintf(
+        $failureDescription = sprintf(
             'Failed asserting that %s.',
             $this->failureDescription($other)
         );
@@ -139,7 +141,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @param mixed $other evaluated value or object
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function failureDescription($other): string
     {

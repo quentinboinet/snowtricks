@@ -17,7 +17,7 @@ class StackTest extends TestCase
         $this->assertCount(0, $stack);
 
         $stack[] = 'foo';
-        $this->assertEquals('foo', \end($stack));
+        $this->assertEquals('foo', end($stack));
         $this->assertCount(1, $stack);
 
         return $stack;
@@ -28,7 +28,7 @@ class StackTest extends TestCase
      */
     public function testPop(array $stack): void
     {
-        $this->assertEquals('foo', \array_pop($stack));
+        $this->assertEquals('foo', array_pop($stack));
         $this->assertCount(0, $stack);
     }
 }

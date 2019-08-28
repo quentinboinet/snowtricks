@@ -11,8 +11,10 @@ namespace PHPUnit\Framework\MockObject\Matcher;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 use PHPUnit\Util\InvalidArgumentHelper;
+use function is_string;
 
 /**
  * Invocation matcher which looks for a specific method name in the invocations.
@@ -32,12 +34,12 @@ class MethodName extends StatelessInvocation
      * @param  Constraint|string
      *
      * @throws Constraint
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Exception
      */
     public function __construct($constraint)
     {
         if (!$constraint instanceof Constraint) {
-            if (!\is_string($constraint)) {
+            if (!is_string($constraint)) {
                 throw InvalidArgumentHelper::factory(1, 'string');
             }
 

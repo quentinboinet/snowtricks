@@ -13,6 +13,6 @@ class IniTest extends TestCase
 {
     public function testIni(): void
     {
-        $this->assertEquals('application/x-test', \ini_get('default_mimetype'));
+        $this->assertEquals('application/x-test', ini_get('default_mimetype'));
     }
 }

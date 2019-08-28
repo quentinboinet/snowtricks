@@ -9,8 +9,12 @@
  */
 namespace PHPUnit\Util;
 
+use DOMDocument;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
+use function chr;
+use function ord;
+use function sprintf;
 
 class XmlTest extends TestCase
 {
@@ -23,7 +27,7 @@ class XmlTest extends TestCase
 
         $escapedString = Xml::prepareString($char);
         $xml           = "<?xml version='1.0' encoding='UTF-8' ?><tag>$escapedString</tag>";
-        $dom           = new \DOMDocument('1.0', 'UTF-8');
+        $dom           = new DOMDocument('1.0', 'UTF-8');
 
         try {
             $dom->loadXML($xml);
@@ -32,9 +36,9 @@ class XmlTest extends TestCase
 
         $this->assertNull(
             $e,
-            \sprintf(
+            sprintf(
                 '\PHPUnit\Util\Xml::prepareString("\x%02x") should not crash DomDocument',
-                \ord($char)
+                ord($char)
             )
         );
     }
@@ -44,7 +48,7 @@ class XmlTest extends TestCase
         $data = [];
 
         for ($i = 0; $i < 256; $i++) {
-            $data[] = [\chr($i)];
+            $data[] = [chr($i)];
         }
 
         return $data;
@@ -77,7 +81,7 @@ class XmlTest extends TestCase
     public function testNestedXmlToVariable(): void
     {
         $xml = '<array><element key="a"><array><element key="b"><string>foo</string></element></array></element><element key="c"><string>bar</string></element></array>';
-        $dom = new \DOMDocument;
+        $dom = new DOMDocument;
         $dom->loadXML($xml);
 
         $expected = [
@@ -95,7 +99,7 @@ class XmlTest extends TestCase
     public function testXmlToVariableCanHandleMultipleOfTheSameArgumentType(): void
     {
         $xml = '<object class="SampleClass"><arguments><string>a</string><string>b</string><string>c</string></arguments></object>';
-        $dom = new \DOMDocument;
+        $dom = new DOMDocument;
         $dom->loadXML($xml);
 
         $expected = ['a' => 'a', 'b' => 'b', 'c' => 'c'];
@@ -108,7 +112,7 @@ class XmlTest extends TestCase
     public function testXmlToVariableCanConstructObjectsWithConstructorArgumentsRecursively(): void
     {
         $xml = '<object class="Exception"><arguments><string>one</string><integer>0</integer><object class="Exception"><arguments><string>two</string></arguments></object></arguments></object>';
-        $dom = new \DOMDocument;
+        $dom = new DOMDocument;
         $dom->loadXML($xml);
 
         $actual = Xml::xmlToVariable($dom->documentElement);

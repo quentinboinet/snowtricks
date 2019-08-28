@@ -10,6 +10,8 @@
 namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Util\InvalidArgumentHelper;
+use function strlen;
+use function strpos;
 
 /**
  * Constraint that asserts that the string it is evaluated for begins with a
@@ -26,7 +28,7 @@ class StringStartsWith extends Constraint
     {
         parent::__construct();
 
-        if (\strlen($prefix) === 0) {
+        if (strlen($prefix) === 0) {
             throw InvalidArgumentHelper::factory(1, 'non-empty string');
         }
 
@@ -49,6 +51,6 @@ class StringStartsWith extends Constraint
      */
     protected function matches($other): bool
     {
-        return \strpos($other, $this->prefix) === 0;
+        return strpos($other, $this->prefix) === 0;
     }
 }
