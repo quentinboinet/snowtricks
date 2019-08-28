@@ -9,6 +9,11 @@
  */
 namespace PHPUnit\Util\TestDox;
 
+use function array_map;
+use function explode;
+use function implode;
+use function sprintf;
+
 final class TestResult
 {
     /**
@@ -81,7 +86,7 @@ final class TestResult
 
     public function toString(?self $previousTestResult, $verbose = false): string
     {
-        return \sprintf(
+        return sprintf(
             "%s%s %s %s%s\n%s",
             $previousTestResult && $previousTestResult->additionalInformationPrintable($verbose) ? "\n" : '',
             $this->getClassNameHeader($previousTestResult ? $previousTestResult->testClass : null),
@@ -101,7 +106,7 @@ final class TestResult
                 $className = "\n";
             }
 
-            $className .= \sprintf("%s\n", $this->testClass);
+            $className .= sprintf("%s\n", $this->testClass);
         }
 
         return $className;
@@ -110,14 +115,14 @@ final class TestResult
     private function getFormattedRuntime(): string
     {
         if ($this->runtime > 5) {
-            return ($this->colorize)('fg-red', \sprintf('[%.2f ms]', $this->runtime * 1000));
+            return ($this->colorize)('fg-red', sprintf('[%.2f ms]', $this->runtime * 1000));
         }
 
         if ($this->runtime > 1) {
-            return ($this->colorize)('fg-yellow', \sprintf('[%.2f ms]', $this->runtime * 1000));
+            return ($this->colorize)('fg-yellow', sprintf('[%.2f ms]', $this->runtime * 1000));
         }
 
-        return \sprintf('[%.2f ms]', $this->runtime * 1000);
+        return sprintf('[%.2f ms]', $this->runtime * 1000);
     }
 
     private function getFormattedAdditionalInformation($verbose): string
@@ -126,15 +131,15 @@ final class TestResult
             return '';
         }
 
-        return \sprintf(
+        return sprintf(
             "   │\n%s\n",
-            \implode(
+            implode(
                 "\n",
-                \array_map(
+                array_map(
                     function (string $text) {
-                        return \sprintf('   │ %s', $text);
+                        return sprintf('   │ %s', $text);
                     },
-                    \explode("\n", $this->additionalInformation)
+                    explode("\n", $this->additionalInformation)
                 )
             )
         );

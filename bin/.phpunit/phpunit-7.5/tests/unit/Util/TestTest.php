@@ -9,11 +9,27 @@
  */
 namespace PHPUnit\Util;
 
+use CoverageNamespacedFunctionTest;
+use ExceptionTest;
+use MultipleDataProviderTest;
+use My\Space\ExceptionNamespaceTest;
+use ParseTestMethodAnnotationsMock;
 use PharIo\Version\VersionConstraint;
 use PHPUnit\Framework\CodeCoverageException;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
+use RequirementsClassDocBlockTest;
+use RequirementsTest;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use Test3194;
+use VariousIterableDataProviderTest;
+use function array_merge;
+use function get_class;
+use function preg_match;
+use function range;
+use function strpos;
 
 class TestTest extends TestCase
 {
@@ -24,68 +40,68 @@ class TestTest extends TestCase
     {
         $this->assertArraySubset(
             ['class' => 'FooBarBaz', 'code' => null, 'message' => ''],
-            Test::getExpectedException(\ExceptionTest::class, 'testOne')
+            Test::getExpectedException(ExceptionTest::class, 'testOne')
         );
 
         $this->assertArraySubset(
             ['class' => 'Foo_Bar_Baz', 'code' => null, 'message' => ''],
-            Test::getExpectedException(\ExceptionTest::class, 'testTwo')
+            Test::getExpectedException(ExceptionTest::class, 'testTwo')
         );
 
         $this->assertArraySubset(
             ['class' => 'Foo\Bar\Baz', 'code' => null, 'message' => ''],
-            Test::getExpectedException(\ExceptionTest::class, 'testThree')
+            Test::getExpectedException(ExceptionTest::class, 'testThree')
         );
 
         $this->assertArraySubset(
             ['class' => 'ほげ', 'code' => null, 'message' => ''],
-            Test::getExpectedException(\ExceptionTest::class, 'testFour')
+            Test::getExpectedException(ExceptionTest::class, 'testFour')
         );
 
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => 1234, 'message' => 'Message'],
-            Test::getExpectedException(\ExceptionTest::class, 'testFive')
+            Test::getExpectedException(ExceptionTest::class, 'testFive')
         );
 
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => 1234, 'message' => 'Message'],
-            Test::getExpectedException(\ExceptionTest::class, 'testSix')
+            Test::getExpectedException(ExceptionTest::class, 'testSix')
         );
 
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => 'ExceptionCode', 'message' => 'Message'],
-            Test::getExpectedException(\ExceptionTest::class, 'testSeven')
+            Test::getExpectedException(ExceptionTest::class, 'testSeven')
         );
 
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => 0, 'message' => 'Message'],
-            Test::getExpectedException(\ExceptionTest::class, 'testEight')
+            Test::getExpectedException(ExceptionTest::class, 'testEight')
         );
 
         $this->assertArraySubset(
-            ['class' => 'Class', 'code' => \ExceptionTest::ERROR_CODE, 'message' => \ExceptionTest::ERROR_MESSAGE],
-            Test::getExpectedException(\ExceptionTest::class, 'testNine')
+            ['class' => 'Class', 'code' => ExceptionTest::ERROR_CODE, 'message' => ExceptionTest::ERROR_MESSAGE],
+            Test::getExpectedException(ExceptionTest::class, 'testNine')
         );
 
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => null, 'message' => ''],
-            Test::getExpectedException(\ExceptionTest::class, 'testSingleLine')
+            Test::getExpectedException(ExceptionTest::class, 'testSingleLine')
         );
 
         $this->assertArraySubset(
-            ['class' => 'Class', 'code' => \My\Space\ExceptionNamespaceTest::ERROR_CODE, 'message' => \My\Space\ExceptionNamespaceTest::ERROR_MESSAGE],
-            Test::getExpectedException(\My\Space\ExceptionNamespaceTest::class, 'testConstants')
+            ['class' => 'Class', 'code' => ExceptionNamespaceTest::ERROR_CODE, 'message' => ExceptionNamespaceTest::ERROR_MESSAGE],
+            Test::getExpectedException(ExceptionNamespaceTest::class, 'testConstants')
         );
 
         // Ensure the Class::CONST expression is only evaluated when the constant really exists
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => 'ExceptionTest::UNKNOWN_CODE_CONSTANT', 'message' => 'ExceptionTest::UNKNOWN_MESSAGE_CONSTANT'],
-            Test::getExpectedException(\ExceptionTest::class, 'testUnknownConstants')
+            Test::getExpectedException(ExceptionTest::class, 'testUnknownConstants')
         );
 
         $this->assertArraySubset(
             ['class' => 'Class', 'code' => 'My\Space\ExceptionNamespaceTest::UNKNOWN_CODE_CONSTANT', 'message' => 'My\Space\ExceptionNamespaceTest::UNKNOWN_MESSAGE_CONSTANT'],
-            Test::getExpectedException(\My\Space\ExceptionNamespaceTest::class, 'testUnknownConstants')
+            Test::getExpectedException(ExceptionNamespaceTest::class, 'testUnknownConstants')
         );
     }
 
@@ -93,17 +109,17 @@ class TestTest extends TestCase
     {
         $this->assertArraySubset(
             ['message_regex' => '#regex#'],
-            Test::getExpectedException(\ExceptionTest::class, 'testWithRegexMessage')
+            Test::getExpectedException(ExceptionTest::class, 'testWithRegexMessage')
         );
 
         $this->assertArraySubset(
             ['message_regex' => '#regex#'],
-            Test::getExpectedException(\ExceptionTest::class, 'testWithRegexMessageFromClassConstant')
+            Test::getExpectedException(ExceptionTest::class, 'testWithRegexMessageFromClassConstant')
         );
 
         $this->assertArraySubset(
             ['message_regex' => 'ExceptionTest::UNKNOWN_MESSAGE_REGEX_CONSTANT'],
-            Test::getExpectedException(\ExceptionTest::class, 'testWithUnknowRegexMessageFromClassConstant')
+            Test::getExpectedException(ExceptionTest::class, 'testWithUnknowRegexMessageFromClassConstant')
         );
     }
 
@@ -111,14 +127,14 @@ class TestTest extends TestCase
      * @dataProvider requirementsProvider
      *
      * @throws Warning
-     * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testGetRequirements($test, $result): void
     {
         $this->assertEquals(
             $result,
-            Test::getRequirements(\RequirementsTest::class, $test)
+            Test::getRequirements(RequirementsTest::class, $test)
         );
     }
 
@@ -324,12 +340,12 @@ class TestTest extends TestCase
      *
      * @throws Exception
      * @throws Warning
-     * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testGetRequirementsWithVersionConstraints($test, array $result): void
     {
-        $requirements = Test::getRequirements(\RequirementsTest::class, $test);
+        $requirements = Test::getRequirements(RequirementsTest::class, $test);
 
         foreach ($result as $type => $expected_requirement) {
             $this->assertArrayHasKey(
@@ -464,7 +480,7 @@ class TestTest extends TestCase
     public function testGetRequirementsWithInvalidVersionConstraintsThrowsException($test): void
     {
         $this->expectException(Warning::class);
-        Test::getRequirements(\RequirementsTest::class, $test);
+        Test::getRequirements(RequirementsTest::class, $test);
     }
 
     public function requirementsWithInvalidVersionConstraintsThrowsExceptionProvider(): array
@@ -493,7 +509,7 @@ class TestTest extends TestCase
 
         $this->assertEquals(
             $expectedAnnotations,
-            Test::getRequirements(\RequirementsClassDocBlockTest::class, 'testMethod')
+            Test::getRequirements(RequirementsClassDocBlockTest::class, 'testMethod')
         );
     }
 
@@ -501,14 +517,14 @@ class TestTest extends TestCase
      * @dataProvider missingRequirementsProvider
      *
      * @throws Warning
-     * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testGetMissingRequirements($test, $result): void
     {
         $this->assertEquals(
             $result,
-            Test::getMissingRequirements(\RequirementsTest::class, $test)
+            Test::getMissingRequirements(RequirementsTest::class, $test)
         );
     }
 
@@ -569,23 +585,23 @@ class TestTest extends TestCase
      */
     public function testGetProvidedDataRegEx(): void
     {
-        $result = \preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider method', $matches);
+        $result = preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider method', $matches);
         $this->assertEquals(1, $result);
         $this->assertEquals('method', $matches[1]);
 
-        $result = \preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider class::method', $matches);
+        $result = preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider class::method', $matches);
         $this->assertEquals(1, $result);
         $this->assertEquals('class::method', $matches[1]);
 
-        $result = \preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider namespace\class::method', $matches);
+        $result = preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider namespace\class::method', $matches);
         $this->assertEquals(1, $result);
         $this->assertEquals('namespace\class::method', $matches[1]);
 
-        $result = \preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider namespace\namespace\class::method', $matches);
+        $result = preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider namespace\namespace\class::method', $matches);
         $this->assertEquals(1, $result);
         $this->assertEquals('namespace\namespace\class::method', $matches[1]);
 
-        $result = \preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider メソッド', $matches);
+        $result = preg_match(Test::REGEX_DATA_PROVIDER, '@dataProvider メソッド', $matches);
         $this->assertEquals(1, $result);
         $this->assertEquals('メソッド', $matches[1]);
     }
@@ -595,7 +611,7 @@ class TestTest extends TestCase
      */
     public function testMultipleDataProviders(): void
     {
-        $dataSets = Test::getProvidedData(\MultipleDataProviderTest::class, 'testOne');
+        $dataSets = Test::getProvidedData(MultipleDataProviderTest::class, 'testOne');
 
         $this->assertCount(9, $dataSets);
 
@@ -616,7 +632,7 @@ class TestTest extends TestCase
 
     public function testMultipleYieldIteratorDataProviders(): void
     {
-        $dataSets = Test::getProvidedData(\MultipleDataProviderTest::class, 'testTwo');
+        $dataSets = Test::getProvidedData(MultipleDataProviderTest::class, 'testTwo');
 
         $this->assertCount(9, $dataSets);
 
@@ -637,7 +653,7 @@ class TestTest extends TestCase
 
     public function testWithVariousIterableDataProviders(): void
     {
-        $dataSets = Test::getProvidedData(\VariousIterableDataProviderTest::class, 'test');
+        $dataSets = Test::getProvidedData(VariousIterableDataProviderTest::class, 'test');
 
         $this->assertEquals([
             ['A'],
@@ -741,7 +757,7 @@ class TestTest extends TestCase
     {
         $this->assertEquals(
             ['Foo', 'ほげ'],
-            Test::getDependencies(\get_class($this), 'methodForTestParseAnnotation')
+            Test::getDependencies(get_class($this), 'methodForTestParseAnnotation')
         );
     }
 
@@ -759,7 +775,7 @@ class TestTest extends TestCase
     {
         $this->assertEquals(
             ['Bar'],
-            Test::getDependencies(\get_class($this), 'methodForTestParseAnnotationThatIsOnlyOneLine')
+            Test::getDependencies(get_class($this), 'methodForTestParseAnnotationThatIsOnlyOneLine')
         );
     }
 
@@ -773,12 +789,12 @@ class TestTest extends TestCase
      * @dataProvider getLinesToBeCoveredProvider
      *
      * @throws CodeCoverageException
-     * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testGetLinesToBeCovered($test, $lines): void
     {
-        if (\strpos($test, 'Namespace') === 0) {
+        if (strpos($test, 'Namespace') === 0) {
             $expected = [
                 TEST_FILES_PATH . 'NamespaceCoveredClass.php' => $lines,
             ];
@@ -863,7 +879,7 @@ class TestTest extends TestCase
     public function testFunctionParenthesesAreAllowed(): void
     {
         $this->assertSame(
-            [TEST_FILES_PATH . 'CoveredFunction.php' => \range(10, 12)],
+            [TEST_FILES_PATH . 'CoveredFunction.php' => range(10, 12)],
             Test::getLinesToBeCovered(
                 'CoverageFunctionParenthesesTest',
                 'testSomething'
@@ -874,7 +890,7 @@ class TestTest extends TestCase
     public function testFunctionParenthesesAreAllowedWithWhitespace(): void
     {
         $this->assertSame(
-            [TEST_FILES_PATH . 'CoveredFunction.php' => \range(10, 12)],
+            [TEST_FILES_PATH . 'CoveredFunction.php' => range(10, 12)],
             Test::getLinesToBeCovered(
                 'CoverageFunctionParenthesesWhitespaceTest',
                 'testSomething'
@@ -885,7 +901,7 @@ class TestTest extends TestCase
     public function testMethodParenthesesAreAllowed(): void
     {
         $this->assertSame(
-            [TEST_FILES_PATH . 'CoveredClass.php' => \range(29, 33)],
+            [TEST_FILES_PATH . 'CoveredClass.php' => range(29, 33)],
             Test::getLinesToBeCovered(
                 'CoverageMethodParenthesesTest',
                 'testSomething'
@@ -896,7 +912,7 @@ class TestTest extends TestCase
     public function testMethodParenthesesAreAllowedWithWhitespace(): void
     {
         $this->assertSame(
-            [TEST_FILES_PATH . 'CoveredClass.php' => \range(29, 33)],
+            [TEST_FILES_PATH . 'CoveredClass.php' => range(29, 33)],
             Test::getLinesToBeCovered(
                 'CoverageMethodParenthesesWhitespaceTest',
                 'testSomething'
@@ -908,10 +924,10 @@ class TestTest extends TestCase
     {
         $this->assertEquals(
             [
-                TEST_FILES_PATH . 'NamespaceCoveredFunction.php' => \range(12, 15),
+                TEST_FILES_PATH . 'NamespaceCoveredFunction.php' => range(12, 15),
             ],
             Test::getLinesToBeCovered(
-                \CoverageNamespacedFunctionTest::class,
+                CoverageNamespacedFunctionTest::class,
                 'testFunc'
             )
         );
@@ -926,91 +942,91 @@ class TestTest extends TestCase
             ],
             [
                 'CoverageClassExtendedTest',
-                \array_merge(\range(27, 44), \range(10, 25)),
+                array_merge(range(27, 44), range(10, 25)),
             ],
             [
                 'CoverageClassTest',
-                \range(27, 44),
+                range(27, 44),
             ],
             [
                 'CoverageMethodTest',
-                \range(29, 33),
+                range(29, 33),
             ],
             [
                 'CoverageMethodOneLineAnnotationTest',
-                \range(29, 33),
+                range(29, 33),
             ],
             [
                 'CoverageNotPrivateTest',
-                \array_merge(\range(29, 33), \range(35, 39)),
+                array_merge(range(29, 33), range(35, 39)),
             ],
             [
                 'CoverageNotProtectedTest',
-                \array_merge(\range(29, 33), \range(41, 43)),
+                array_merge(range(29, 33), range(41, 43)),
             ],
             [
                 'CoverageNotPublicTest',
-                \array_merge(\range(35, 39), \range(41, 43)),
+                array_merge(range(35, 39), range(41, 43)),
             ],
             [
                 'CoveragePrivateTest',
-                \range(41, 43),
+                range(41, 43),
             ],
             [
                 'CoverageProtectedTest',
-                \range(35, 39),
+                range(35, 39),
             ],
             [
                 'CoveragePublicTest',
-                \range(29, 33),
+                range(29, 33),
             ],
             [
                 'CoverageFunctionTest',
-                \range(10, 12),
+                range(10, 12),
             ],
             [
                 'NamespaceCoverageClassExtendedTest',
-                \array_merge(\range(29, 46), \range(12, 27)),
+                array_merge(range(29, 46), range(12, 27)),
             ],
             [
                 'NamespaceCoverageClassTest',
-                \range(29, 46),
+                range(29, 46),
             ],
             [
                 'NamespaceCoverageMethodTest',
-                \range(31, 35),
+                range(31, 35),
             ],
             [
                 'NamespaceCoverageNotPrivateTest',
-                \array_merge(\range(31, 35), \range(37, 41)),
+                array_merge(range(31, 35), range(37, 41)),
             ],
             [
                 'NamespaceCoverageNotProtectedTest',
-                \array_merge(\range(31, 35), \range(43, 45)),
+                array_merge(range(31, 35), range(43, 45)),
             ],
             [
                 'NamespaceCoverageNotPublicTest',
-                \array_merge(\range(37, 41), \range(43, 45)),
+                array_merge(range(37, 41), range(43, 45)),
             ],
             [
                 'NamespaceCoveragePrivateTest',
-                \range(43, 45),
+                range(43, 45),
             ],
             [
                 'NamespaceCoverageProtectedTest',
-                \range(37, 41),
+                range(37, 41),
             ],
             [
                 'NamespaceCoveragePublicTest',
-                \range(31, 35),
+                range(31, 35),
             ],
             [
                 'NamespaceCoverageCoversClassTest',
-                \array_merge(\range(43, 45), \range(37, 41), \range(31, 35), \range(24, 26), \range(19, 22), \range(14, 17)),
+                array_merge(range(43, 45), range(37, 41), range(31, 35), range(24, 26), range(19, 22), range(14, 17)),
             ],
             [
                 'NamespaceCoverageCoversClassPublicTest',
-                \range(31, 35),
+                range(31, 35),
             ],
             [
                 'CoverageClassNothingTest',
@@ -1022,7 +1038,7 @@ class TestTest extends TestCase
             ],
             [
                 'CoverageCoversOverridesCoversNothingTest',
-                \range(29, 33),
+                range(29, 33),
             ],
             [
                 'CoverageMethodNothingCoversMethod',
@@ -1033,7 +1049,7 @@ class TestTest extends TestCase
 
     public function testParseTestMethodAnnotationsIncorporatesTraits(): void
     {
-        $result = Test::parseTestMethodAnnotations(\ParseTestMethodAnnotationsMock::class);
+        $result = Test::parseTestMethodAnnotations(ParseTestMethodAnnotationsMock::class);
 
         $this->assertArrayHasKey('class', $result);
         $this->assertArrayHasKey('method', $result);
@@ -1045,10 +1061,10 @@ class TestTest extends TestCase
     {
         $this->assertSame(
             [
-                TEST_FILES_PATH . '3194.php' => \array_merge(\range(21, 29), \range(13, 19)),
+                TEST_FILES_PATH . '3194.php' => array_merge(range(21, 29), range(13, 19)),
             ],
             Test::getLinesToBeCovered(
-                \Test3194::class,
+                Test3194::class,
                 'testOne'
             )
         );

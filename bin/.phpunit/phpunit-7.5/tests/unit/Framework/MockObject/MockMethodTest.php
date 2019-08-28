@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace PHPUnit\Framework\MockObject;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class MockMethodTest extends TestCase
 {
@@ -36,7 +37,7 @@ class MockMethodTest extends TestCase
     public function testFailWhenReturnTypeIsParentButThereIsNoParentClass()
     {
         $method = new MockMethod(
-            \stdClass::class,
+            stdClass::class,
             'methodName',
             false,
             '',

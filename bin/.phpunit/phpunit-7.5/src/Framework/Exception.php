@@ -9,7 +9,11 @@
  */
 namespace PHPUnit\Framework;
 
+use InvalidArgumentException;
 use PHPUnit\Util\Filter;
+use RuntimeException;
+use function array_keys;
+use function get_object_vars;
 
 /**
  * Base class for all PHPUnit Framework exceptions.
@@ -31,7 +35,7 @@ use PHPUnit\Util\Filter;
  *
  * @see http://fabien.potencier.org/article/9/php-serialization-stack-traces-and-exceptions
  */
-class Exception extends \RuntimeException implements \PHPUnit\Exception
+class Exception extends RuntimeException implements \PHPUnit\Exception
 {
     /**
      * @var array
@@ -50,7 +54,7 @@ class Exception extends \RuntimeException implements \PHPUnit\Exception
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __toString(): string
     {
@@ -65,7 +69,7 @@ class Exception extends \RuntimeException implements \PHPUnit\Exception
 
     public function __sleep(): array
     {
-        return \array_keys(\get_object_vars($this));
+        return array_keys(get_object_vars($this));
     }
 
     /**

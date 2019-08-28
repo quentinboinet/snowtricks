@@ -10,6 +10,7 @@
 namespace PHPUnit\Framework\MockObject\Matcher;
 
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
+use function count;
 
 /**
  * Records invocations and provides convenience methods for checking them later
@@ -29,7 +30,7 @@ abstract class InvokedRecorder implements Invocation
      */
     public function getInvocationCount()
     {
-        return \count($this->invocations);
+        return count($this->invocations);
     }
 
     /**
@@ -45,7 +46,7 @@ abstract class InvokedRecorder implements Invocation
      */
     public function hasBeenInvoked()
     {
-        return \count($this->invocations) > 0;
+        return count($this->invocations) > 0;
     }
 
     public function invoked(BaseInvocation $invocation): void

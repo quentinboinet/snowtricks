@@ -10,13 +10,13 @@
 class WrapperIteratorAggregate implements IteratorAggregate
 {
     /**
-     * @var array|\Traversable
+     * @var array|Traversable
      */
     private $baseCollection;
 
     public function __construct($baseCollection)
     {
-        \assert(\is_array($baseCollection) || $baseCollection instanceof Traversable);
+        assert(is_array($baseCollection) || $baseCollection instanceof Traversable);
         $this->baseCollection = $baseCollection;
     }
 

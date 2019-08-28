@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Framework;
 
+use Throwable;
+
 /**
  * A Listener for test progress.
  */
@@ -17,7 +19,7 @@ interface TestListener
     /**
      * An error occurred.
      */
-    public function addError(Test $test, \Throwable $t, float $time): void;
+    public function addError(Test $test, Throwable $t, float $time): void;
 
     /**
      * A warning occurred.
@@ -32,17 +34,17 @@ interface TestListener
     /**
      * Incomplete test.
      */
-    public function addIncompleteTest(Test $test, \Throwable $t, float $time): void;
+    public function addIncompleteTest(Test $test, Throwable $t, float $time): void;
 
     /**
      * Risky test.
      */
-    public function addRiskyTest(Test $test, \Throwable $t, float $time): void;
+    public function addRiskyTest(Test $test, Throwable $t, float $time): void;
 
     /**
      * Skipped test.
      */
-    public function addSkippedTest(Test $test, \Throwable $t, float $time): void;
+    public function addSkippedTest(Test $test, Throwable $t, float $time): void;
 
     /**
      * A test suite started.

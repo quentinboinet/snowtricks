@@ -11,15 +11,23 @@ namespace PHPUnit\Util;
 
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\SyntheticError;
+use Throwable;
+use function array_unshift;
+use function defined;
+use function in_array;
+use function is_file;
+use function realpath;
+use function sprintf;
+use function strpos;
 
 final class Filter
 {
-    public static function getFilteredStacktrace(\Throwable $t): string
+    public static function getFilteredStacktrace(Throwable $t): string
     {
         $prefix = false;
-        $script = \realpath($GLOBALS['_SERVER']['SCRIPT_NAME']);
+        $script = realpath($GLOBALS['_SERVER']['SCRIPT_NAME']);
 
-        if (\defined('__PHPUNIT_PHAR_ROOT__')) {
+        if (defined('__PHPUNIT_PHAR_ROOT__')) {
             $prefix = __PHPUNIT_PHAR_ROOT__;
         }
 
@@ -44,7 +52,7 @@ final class Filter
         }
 
         if (!self::frameExists($eTrace, $eFile, $eLine)) {
-            \array_unshift(
+            array_unshift(
                 $eTrace,
                 ['file' => $eFile, 'line' => $eLine]
             );
@@ -53,12 +61,12 @@ final class Filter
         $blacklist = new Blacklist;
 
         foreach ($eTrace as $frame) {
-            if (isset($frame['file']) && \is_file($frame['file']) &&
-                (empty($GLOBALS['__PHPUNIT_ISOLATION_BLACKLIST']) || !\in_array($frame['file'], $GLOBALS['__PHPUNIT_ISOLATION_BLACKLIST'])) &&
+            if (isset($frame['file']) && is_file($frame['file']) &&
+                (empty($GLOBALS['__PHPUNIT_ISOLATION_BLACKLIST']) || !in_array($frame['file'], $GLOBALS['__PHPUNIT_ISOLATION_BLACKLIST'])) &&
                 !$blacklist->isBlacklisted($frame['file']) &&
-                ($prefix === false || \strpos($frame['file'], $prefix) !== 0) &&
+                ($prefix === false || strpos($frame['file'], $prefix) !== 0) &&
                 $frame['file'] !== $script) {
-                $filteredStacktrace .= \sprintf(
+                $filteredStacktrace .= sprintf(
                     "%s:%s\n",
                     $frame['file'],
                     $frame['line'] ?? '?'

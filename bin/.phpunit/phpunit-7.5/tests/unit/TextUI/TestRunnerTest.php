@@ -10,6 +10,8 @@
 namespace PHPUnit\TextUI;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestSuite;
+use Success;
 
 class TestRunnerTest extends TestCase
 {
@@ -17,7 +19,7 @@ class TestRunnerTest extends TestCase
     {
         $runner = new TestRunner;
         $runner->setPrinter($this->getResultPrinterMock());
-        $runner->doRun(new \Success, ['filter' => 'foo'], false);
+        $runner->doRun(new Success, ['filter' => 'foo'], false);
     }
 
     public function testSuiteIsRunnable(): void
@@ -28,19 +30,19 @@ class TestRunnerTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit\TextUI\ResultPrinter
+     * @return ResultPrinter
      */
     private function getResultPrinterMock()
     {
-        return $this->createMock(\PHPUnit\TextUI\ResultPrinter::class);
+        return $this->createMock(ResultPrinter::class);
     }
 
     /**
-     * @return \PHPUnit\Framework\TestSuite
+     * @return TestSuite
      */
     private function getSuiteMock()
     {
-        $suite = $this->createMock(\PHPUnit\Framework\TestSuite::class);
+        $suite = $this->createMock(TestSuite::class);
         $suite->expects($this->once())->method('injectFilter');
         $suite->expects($this->once())->method('run');
 

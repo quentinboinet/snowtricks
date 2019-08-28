@@ -12,6 +12,8 @@ namespace PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\MockObject\Invocation;
 use PHPUnit\Framework\MockObject\Stub;
 use SebastianBergmann\Exporter\Exporter;
+use Throwable;
+use function sprintf;
 
 /**
  * Stubs a method by raising a user-defined exception.
@@ -20,7 +22,7 @@ class Exception implements Stub
 {
     private $exception;
 
-    public function __construct(\Throwable $exception)
+    public function __construct(Throwable $exception)
     {
         $this->exception = $exception;
     }
@@ -34,7 +36,7 @@ class Exception implements Stub
     {
         $exporter = new Exporter;
 
-        return \sprintf(
+        return sprintf(
             'raise user-specified exception %s',
             $exporter->export($this->exception)
         );

@@ -9,8 +9,11 @@
  */
 namespace PHPUnit\Framework;
 
+use InvalidArgumentException;
 use PHPUnit\Util\Filter;
 use Throwable;
+use function get_class;
+use function spl_object_hash;
 
 /**
  * Wraps Exceptions thrown by code under test.
@@ -42,7 +45,7 @@ class ExceptionWrapper extends Exception
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __toString(): string
     {
@@ -74,11 +77,11 @@ class ExceptionWrapper extends Exception
         $this->className = $className;
     }
 
-    public function setOriginalException(\Throwable $t): void
+    public function setOriginalException(Throwable $t): void
     {
         $this->originalException($t);
 
-        $this->className = \get_class($t);
+        $this->className = get_class($t);
         $this->file      = $t->getFile();
         $this->line      = $t->getLine();
 
@@ -107,7 +110,7 @@ class ExceptionWrapper extends Exception
     {
         static $originalExceptions;
 
-        $instanceId = \spl_object_hash($this);
+        $instanceId = spl_object_hash($this);
 
         if ($exceptionToStore) {
             $originalExceptions[$instanceId] = $exceptionToStore;

@@ -15,7 +15,7 @@ class Issue3364SetupTest extends TestCase
 {
     public function setUp(): void
     {
-        throw new \RuntimeException('throw exception in setUp');
+        throw new RuntimeException('throw exception in setUp');
     }
 
     public function testOneWithSetupException(): void

@@ -9,8 +9,15 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use ArrayObject;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use Traversable;
+use function array_replace_recursive;
+use function is_array;
+use function iterator_to_array;
+use function var_export;
 
 /**
  * Constraint that asserts that the array it is evaluated for has a specified subset.
@@ -55,7 +62,7 @@ class ArraySubset extends Constraint
      * @param bool   $returnResult Whether to return a result or throw an exception
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -64,7 +71,7 @@ class ArraySubset extends Constraint
         $other        = $this->toArray($other);
         $this->subset = $this->toArray($this->subset);
 
-        $patched = \array_replace_recursive($other, $this->subset);
+        $patched = array_replace_recursive($other, $this->subset);
 
         if ($this->strict) {
             $result = $other === $patched;
@@ -80,8 +87,8 @@ class ArraySubset extends Constraint
             $f = new ComparisonFailure(
                 $patched,
                 $other,
-                \var_export($patched, true),
-                \var_export($other, true)
+                var_export($patched, true),
+                var_export($other, true)
             );
 
             $this->fail($other, $description, $f);
@@ -91,7 +98,7 @@ class ArraySubset extends Constraint
     /**
      * Returns a string representation of the constraint.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function toString(): string
     {
@@ -106,7 +113,7 @@ class ArraySubset extends Constraint
      *
      * @param mixed $other evaluated value or object
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function failureDescription($other): string
     {
@@ -115,16 +122,16 @@ class ArraySubset extends Constraint
 
     private function toArray(iterable $other): array
     {
-        if (\is_array($other)) {
+        if (is_array($other)) {
             return $other;
         }
 
-        if ($other instanceof \ArrayObject) {
+        if ($other instanceof ArrayObject) {
             return $other->getArrayCopy();
         }
 
-        if ($other instanceof \Traversable) {
-            return \iterator_to_array($other);
+        if ($other instanceof Traversable) {
+            return iterator_to_array($other);
         }
 
         // Keep BC even if we know that array would not be the expected one

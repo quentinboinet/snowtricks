@@ -10,6 +10,7 @@
 namespace PHPUnit\Framework\MockObject;
 
 use PHPUnit\Framework\TestCase;
+use function array_diff;
 
 /**
  * Implementation of the Builder pattern for Mock objects.
@@ -196,7 +197,7 @@ class MockBuilder
         $this->methodsExcept = $methods;
 
         $this->setMethods(
-            \array_diff(
+            array_diff(
                 $this->generator->getClassMethods($this->type),
                 $this->methodsExcept
             )

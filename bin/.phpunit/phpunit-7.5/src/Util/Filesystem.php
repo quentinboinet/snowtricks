@@ -9,6 +9,11 @@
  */
 namespace PHPUnit\Util;
 
+use function is_dir;
+use function mkdir;
+use function str_replace;
+use const DIRECTORY_SEPARATOR;
+
 /**
  * Filesystem helpers.
  */
@@ -21,15 +26,15 @@ final class Filesystem
      */
     public static function classNameToFilename(string $className): string
     {
-        return \str_replace(
+        return str_replace(
             ['_', '\\'],
-            \DIRECTORY_SEPARATOR,
+            DIRECTORY_SEPARATOR,
             $className
         ) . '.php';
     }
 
     public static function createDirectory(string $directory): bool
     {
-        return !(!\is_dir($directory) && !@\mkdir($directory, 0777, true) && !\is_dir($directory));
+        return !(!is_dir($directory) && !@mkdir($directory, 0777, true) && !is_dir($directory));
     }
 }

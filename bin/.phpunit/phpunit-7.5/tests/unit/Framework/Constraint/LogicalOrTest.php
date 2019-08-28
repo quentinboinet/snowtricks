@@ -9,22 +9,31 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use CountConstraint;
+use FalsyConstraint;
+use Generator;
+use NamedConstraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestFailure;
+use stdClass;
+use TruthyConstraint;
+use function array_map;
+use function array_sum;
+use function implode;
 
 final class LogicalOrTest extends ConstraintTestCase
 {
     public function testSetConstraintsDecoratesNonConstraintWithIsEqual(): void
     {
         $constraints = [
-            new \stdClass,
+            new stdClass,
         ];
 
         $constraint = new LogicalOr;
 
         $constraint->setConstraints($constraints);
 
-        $this->assertTrue($constraint->evaluate(new \stdClass, '', true));
+        $this->assertTrue($constraint->evaluate(new stdClass, '', true));
     }
 
     public function testCountReturnsCountOfComposedConstraints(): void
@@ -35,15 +44,15 @@ final class LogicalOrTest extends ConstraintTestCase
             8,
         ];
 
-        $constraints = \array_map(function (int $count) {
-            return \CountConstraint::fromCount($count);
+        $constraints = array_map(function (int $count) {
+            return CountConstraint::fromCount($count);
         }, $counts);
 
         $constraint = new LogicalOr;
 
         $constraint->setConstraints($constraints);
 
-        $expected = \array_sum($counts);
+        $expected = array_sum($counts);
 
         $this->assertSame($expected, $constraint->count());
     }
@@ -56,15 +65,15 @@ final class LogicalOrTest extends ConstraintTestCase
             'is rich in unsaturated fats',
         ];
 
-        $constraints = \array_map(function (string $name) {
-            return \NamedConstraint::fromName($name);
+        $constraints = array_map(function (string $name) {
+            return NamedConstraint::fromName($name);
         }, $names);
 
         $constraint = new LogicalOr;
 
         $constraint->setConstraints($constraints);
 
-        $expected = \implode(' or ', $names);
+        $expected = implode(' or ', $names);
 
         $this->assertSame($expected, $constraint->toString());
     }
@@ -178,18 +187,18 @@ EOF;
         $this->assertNull($constraint->evaluate('whatever'));
     }
 
-    public function providerFailingConstraints(): \Generator
+    public function providerFailingConstraints(): Generator
     {
         $values = [
             'single' => [
-                new \FalsyConstraint,
-                new \FalsyConstraint,
-                new \FalsyConstraint,
+                new FalsyConstraint,
+                new FalsyConstraint,
+                new FalsyConstraint,
             ],
             'multiple' => [
-                new \FalsyConstraint,
-                new \FalsyConstraint,
-                new \FalsyConstraint,
+                new FalsyConstraint,
+                new FalsyConstraint,
+                new FalsyConstraint,
             ],
         ];
 
@@ -200,16 +209,16 @@ EOF;
         }
     }
 
-    public function providerSucceedingConstraints(): \Generator
+    public function providerSucceedingConstraints(): Generator
     {
         $values = [
             'single' => [
-                new \TruthyConstraint,
+                new TruthyConstraint,
             ],
             'multiple' => [
-                new \FalsyConstraint,
-                new \TruthyConstraint,
-                new \FalsyConstraint,
+                new FalsyConstraint,
+                new TruthyConstraint,
+                new FalsyConstraint,
             ],
         ];
 
@@ -222,9 +231,9 @@ EOF;
 
     private function stringify(array $constraints): string
     {
-        return \implode(
+        return implode(
             ' or ',
-            \array_map(function (Constraint $constraint) {
+            array_map(function (Constraint $constraint) {
                 return $constraint->toString();
             }, $constraints)
         );

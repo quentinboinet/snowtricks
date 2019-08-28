@@ -9,8 +9,15 @@
  */
 namespace PHPUnit\Runner;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
+use function file_put_contents;
+use function strtr;
+use function sys_get_temp_dir;
+use function touch;
+use function unlink;
+use const PHP_EOL;
 
 class PhptTestCaseTest extends TestCase
 {
@@ -62,15 +69,15 @@ EOF;
     private $testCase;
 
     /**
-     * @var AbstractPhpProcess|\PHPUnit\Framework\MockObject\MockObject
+     * @var AbstractPhpProcess|MockObject
      */
     private $phpProcess;
 
     protected function setUp(): void
     {
-        $this->dirname  = \sys_get_temp_dir();
+        $this->dirname  = sys_get_temp_dir();
         $this->filename = $this->dirname . '/phpunit.phpt';
-        \touch($this->filename);
+        touch($this->filename);
 
         $this->phpProcess = $this->getMockForAbstractClass(AbstractPhpProcess::class, [], '', false);
         $this->testCase   = new PhptTestCase($this->filename, $this->phpProcess);
@@ -78,7 +85,7 @@ EOF;
 
     protected function tearDown(): void
     {
-        @\unlink($this->filename);
+        @unlink($this->filename);
 
         $this->phpProcess = null;
         $this->testCase   = null;
@@ -98,7 +105,7 @@ EOF;
     {
         $this->setPhpContent($this->ensureCorrectEndOfLine(self::EXPECT_CONTENT));
 
-        $fileSection = '<?php echo "Hello PHPUnit!"; ?>' . \PHP_EOL;
+        $fileSection = '<?php echo "Hello PHPUnit!"; ?>' . PHP_EOL;
 
         $this->phpProcess
              ->expects($this->once())
@@ -122,7 +129,7 @@ Something
 EOF
         ));
 
-        $renderedCode = "<?php echo '" . $this->dirname . "' . '" . $this->filename . "'; ?>" . \PHP_EOL;
+        $renderedCode = "<?php echo '" . $this->dirname . "' . '" . $this->filename . "'; ?>" . PHP_EOL;
 
         $this->phpProcess
              ->expects($this->once())
@@ -135,13 +142,13 @@ EOF
 
     public function testRenderSkipifSection(): void
     {
-        $phptContent = self::EXPECT_CONTENT . \PHP_EOL;
-        $phptContent .= '--SKIPIF--' . \PHP_EOL;
-        $phptContent .= "<?php echo 'skip: ' . __FILE__; ?>" . \PHP_EOL;
+        $phptContent = self::EXPECT_CONTENT . PHP_EOL;
+        $phptContent .= '--SKIPIF--' . PHP_EOL;
+        $phptContent .= "<?php echo 'skip: ' . __FILE__; ?>" . PHP_EOL;
 
         $this->setPhpContent($phptContent);
 
-        $renderedCode = "<?php echo 'skip: ' . '" . $this->filename . "'; ?>" . \PHP_EOL;
+        $renderedCode = "<?php echo 'skip: ' . '" . $this->filename . "'; ?>" . PHP_EOL;
 
         $this->phpProcess
              ->expects($this->at(0))
@@ -154,10 +161,10 @@ EOF
 
     public function testShouldRunSkipifSectionWhenExists(): void
     {
-        $skipifSection = '<?php /** Nothing **/ ?>' . \PHP_EOL;
+        $skipifSection = '<?php /** Nothing **/ ?>' . PHP_EOL;
 
-        $phptContent = self::EXPECT_CONTENT . \PHP_EOL;
-        $phptContent .= '--SKIPIF--' . \PHP_EOL;
+        $phptContent = self::EXPECT_CONTENT . PHP_EOL;
+        $phptContent .= '--SKIPIF--' . PHP_EOL;
         $phptContent .= $skipifSection;
 
         $this->setPhpContent($phptContent);
@@ -173,10 +180,10 @@ EOF
 
     public function testShouldNotRunTestSectionIfSkipifSectionReturnsOutputWithSkipWord(): void
     {
-        $skipifSection = '<?php echo "skip: Reason"; ?>' . \PHP_EOL;
+        $skipifSection = '<?php echo "skip: Reason"; ?>' . PHP_EOL;
 
-        $phptContent = self::EXPECT_CONTENT . \PHP_EOL;
-        $phptContent .= '--SKIPIF--' . \PHP_EOL;
+        $phptContent = self::EXPECT_CONTENT . PHP_EOL;
+        $phptContent .= '--SKIPIF--' . PHP_EOL;
         $phptContent .= $skipifSection;
 
         $this->setPhpContent($phptContent);
@@ -192,10 +199,10 @@ EOF
 
     public function testShouldRunCleanSectionWhenDefined(): void
     {
-        $cleanSection = '<?php unlink("/tmp/something"); ?>' . \PHP_EOL;
+        $cleanSection = '<?php unlink("/tmp/something"); ?>' . PHP_EOL;
 
-        $phptContent = self::EXPECT_CONTENT . \PHP_EOL;
-        $phptContent .= '--CLEAN--' . \PHP_EOL;
+        $phptContent = self::EXPECT_CONTENT . PHP_EOL;
+        $phptContent .= '--CLEAN--' . PHP_EOL;
         $phptContent .= $cleanSection;
 
         $this->setPhpContent($phptContent);
@@ -325,7 +332,7 @@ EOF
      */
     private function setPhpContent($content): void
     {
-        \file_put_contents($this->filename, $content);
+        file_put_contents($this->filename, $content);
     }
 
     /**
@@ -337,12 +344,12 @@ EOF
      */
     private function ensureCorrectEndOfLine($content)
     {
-        return \strtr(
+        return strtr(
             $content,
             [
-                "\r\n" => \PHP_EOL,
-                "\r"   => \PHP_EOL,
-                "\n"   => \PHP_EOL,
+                "\r\n" => PHP_EOL,
+                "\r"   => PHP_EOL,
+                "\n"   => PHP_EOL,
             ]
         );
     }

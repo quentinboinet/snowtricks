@@ -9,15 +9,21 @@
  */
 namespace PHPUnit\Util;
 
+use function array_map;
+use function implode;
+use function is_string;
+use function realpath;
+use function sprintf;
+
 final class XdebugFilterScriptGenerator
 {
     public function generate(array $filterData): string
     {
         $items = $this->getWhitelistItems($filterData);
 
-        $files = \array_map(
+        $files = array_map(
             function ($item) {
-                return \sprintf(
+                return sprintf(
                     "        '%s'",
                     $item
                 );
@@ -25,7 +31,7 @@ final class XdebugFilterScriptGenerator
             $items
         );
 
-        $files = \implode(",\n", $files);
+        $files = implode(",\n", $files);
 
         return <<<EOF
 <?php declare(strict_types=1);
@@ -50,10 +56,10 @@ EOF;
 
         if (isset($filterData['include']['directory'])) {
             foreach ($filterData['include']['directory'] as $directory) {
-                $path = \realpath($directory['path']);
+                $path = realpath($directory['path']);
 
-                if (\is_string($path)) {
-                    $files[] = \sprintf('%s/', $path);
+                if (is_string($path)) {
+                    $files[] = sprintf('%s/', $path);
                 }
             }
         }

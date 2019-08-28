@@ -19,6 +19,13 @@ use PHPUnit\Runner\PhptTestCase;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\TextUI\ResultPrinter;
 use SebastianBergmann\Timer\Timer;
+use Throwable;
+use function array_map;
+use function count;
+use function explode;
+use function get_class;
+use function implode;
+use function sprintf;
 
 /**
  * This printer is for CLI output only. For the classes that output to file, html and xml,
@@ -116,10 +123,10 @@ class CliTestDoxPrinter extends ResultPrinter
         $this->testResultMessage = '';
 
         if ($test instanceof TestCase) {
-            $className  = $this->prettifier->prettifyTestClass(\get_class($test));
+            $className  = $this->prettifier->prettifyTestClass(get_class($test));
             $testMethod = $this->prettifier->prettifyTestCase($test);
         } elseif ($test instanceof PhptTestCase) {
-            $className  = \get_class($test);
+            $className  = get_class($test);
             $testMethod = $test->getName();
         }
 
@@ -165,7 +172,7 @@ class CliTestDoxPrinter extends ResultPrinter
         parent::endTest($test, $time);
     }
 
-    public function addError(Test $test, \Throwable $t, float $time): void
+    public function addError(Test $test, Throwable $t, float $time): void
     {
         $this->lastTestFailed    = true;
         $this->testResultMessage = $this->formatTestResultMessage(
@@ -198,7 +205,7 @@ class CliTestDoxPrinter extends ResultPrinter
         );
     }
 
-    public function addIncompleteTest(Test $test, \Throwable $t, float $time): void
+    public function addIncompleteTest(Test $test, Throwable $t, float $time): void
     {
         $this->lastTestFailed    = true;
         $this->testResultMessage = $this->formatTestResultMessage(
@@ -209,7 +216,7 @@ class CliTestDoxPrinter extends ResultPrinter
         );
     }
 
-    public function addRiskyTest(Test $test, \Throwable $t, float $time): void
+    public function addRiskyTest(Test $test, Throwable $t, float $time): void
     {
         $this->lastTestFailed    = true;
         $this->testResultMessage = $this->formatTestResultMessage(
@@ -220,7 +227,7 @@ class CliTestDoxPrinter extends ResultPrinter
         );
     }
 
-    public function addSkippedTest(Test $test, \Throwable $t, float $time): void
+    public function addSkippedTest(Test $test, Throwable $t, float $time): void
     {
         $this->lastTestFailed    = true;
         $this->testResultMessage = $this->formatTestResultMessage(
@@ -327,7 +334,7 @@ class CliTestDoxPrinter extends ResultPrinter
     private function formatTestSuiteHeader(?string $lastClassName, string $className, string $msg): string
     {
         if ($lastClassName === null || $className !== $lastClassName) {
-            return \sprintf(
+            return sprintf(
                 "%s%s\n%s",
                 ($this->lastClassName !== '') ? "\n" : '',
                 $className,
@@ -345,7 +352,7 @@ class CliTestDoxPrinter extends ResultPrinter
         bool $alwaysVerbose = false
     ): string {
         $additionalInformation = $this->getFormattedAdditionalInformation($resultMessage, $alwaysVerbose);
-        $msg                   = \sprintf(
+        $msg                   = sprintf(
             " %s %s%s\n%s",
             $symbol,
             $this->testMethod,
@@ -361,14 +368,14 @@ class CliTestDoxPrinter extends ResultPrinter
     private function getFormattedRuntime(float $time): string
     {
         if ($time > 5) {
-            return $this->formatWithColor('fg-red', \sprintf('[%.2f ms]', $time * 1000));
+            return $this->formatWithColor('fg-red', sprintf('[%.2f ms]', $time * 1000));
         }
 
         if ($time > 1) {
-            return $this->formatWithColor('fg-yellow', \sprintf('[%.2f ms]', $time * 1000));
+            return $this->formatWithColor('fg-yellow', sprintf('[%.2f ms]', $time * 1000));
         }
 
-        return \sprintf('[%.2f ms]', $time * 1000);
+        return sprintf('[%.2f ms]', $time * 1000);
     }
 
     private function getFormattedAdditionalInformation(string $resultMessage, bool $verbose): string
@@ -381,15 +388,15 @@ class CliTestDoxPrinter extends ResultPrinter
             return '';
         }
 
-        return \sprintf(
+        return sprintf(
             "   │\n%s\n",
-            \implode(
+            implode(
                 "\n",
-                \array_map(
+                array_map(
                     function (string $text) {
-                        return \sprintf('   │ %s', $text);
+                        return sprintf('   │ %s', $text);
                     },
-                    \explode("\n", $resultMessage)
+                    explode("\n", $resultMessage)
                 )
             )
         );
@@ -401,7 +408,7 @@ class CliTestDoxPrinter extends ResultPrinter
             return;
         }
 
-        if ((\count($this->nonSuccessfulTestResults) / $numberOfExecutedTests) >= 0.7) {
+        if ((count($this->nonSuccessfulTestResults) / $numberOfExecutedTests) >= 0.7) {
             return;
         }
 

@@ -11,6 +11,7 @@ namespace PHPUnit\Framework\MockObject\Matcher;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
+use function sprintf;
 
 /**
  * Invocation matcher which checks if a method was invoked at a certain index.
@@ -71,7 +72,7 @@ class InvokedAtIndex implements Invocation
     {
         if ($this->currentIndex < $this->sequenceIndex) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     'The expected invocation at index %s was never reached.',
                     $this->sequenceIndex
                 )

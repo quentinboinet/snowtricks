@@ -27,8 +27,8 @@ class SeparateClassRunMethodInNewProcessTest extends PHPUnit\Framework\TestCase
     {
         parent::setUpBeforeClass();
 
-        if (\file_exists(self::PROCESS_ID_FILE_PATH)) {
-            static::$masterPid = (int) \file_get_contents(self::PROCESS_ID_FILE_PATH);
+        if (file_exists(self::PROCESS_ID_FILE_PATH)) {
+            static::$masterPid = (int) file_get_contents(self::PROCESS_ID_FILE_PATH);
         }
     }
 
@@ -36,14 +36,14 @@ class SeparateClassRunMethodInNewProcessTest extends PHPUnit\Framework\TestCase
     {
         parent::tearDownAfterClass();
 
-        if (\file_exists(self::PROCESS_ID_FILE_PATH)) {
-            \unlink(self::PROCESS_ID_FILE_PATH);
+        if (file_exists(self::PROCESS_ID_FILE_PATH)) {
+            unlink(self::PROCESS_ID_FILE_PATH);
         }
     }
 
     public function testMethodShouldGetDifferentPidThanMaster(): void
     {
-        static::$pid1 = \getmypid();
+        static::$pid1 = getmypid();
 
         $this->assertNotEquals(self::INITIAL_PID1, static::$pid1);
         $this->assertNotEquals(self::INITIAL_MASTER_PID, static::$masterPid);

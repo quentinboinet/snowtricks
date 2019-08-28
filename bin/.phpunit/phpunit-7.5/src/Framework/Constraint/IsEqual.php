@@ -12,6 +12,11 @@ namespace PHPUnit\Framework\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function is_string;
+use function sprintf;
+use function strpos;
+use function trim;
 
 /**
  * Constraint that checks if one value is equal to another.
@@ -106,7 +111,7 @@ class IsEqual extends Constraint
             }
 
             throw new ExpectationFailedException(
-                \trim($description . "\n" . $f->getMessage()),
+                trim($description . "\n" . $f->getMessage()),
                 $f
             );
         }
@@ -117,31 +122,31 @@ class IsEqual extends Constraint
     /**
      * Returns a string representation of the constraint.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function toString(): string
     {
         $delta = '';
 
-        if (\is_string($this->value)) {
-            if (\strpos($this->value, "\n") !== false) {
+        if (is_string($this->value)) {
+            if (strpos($this->value, "\n") !== false) {
                 return 'is equal to <text>';
             }
 
-            return \sprintf(
+            return sprintf(
                 "is equal to '%s'",
                 $this->value
             );
         }
 
         if ($this->delta != 0) {
-            $delta = \sprintf(
+            $delta = sprintf(
                 ' with delta <%F>',
                 $this->delta
             );
         }
 
-        return \sprintf(
+        return sprintf(
             'is equal to %s%s',
             $this->exporter->export($this->value),
             $delta

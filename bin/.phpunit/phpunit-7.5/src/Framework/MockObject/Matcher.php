@@ -17,6 +17,8 @@ use PHPUnit\Framework\MockObject\Matcher\InvokedCount;
 use PHPUnit\Framework\MockObject\Matcher\MethodName;
 use PHPUnit\Framework\MockObject\Matcher\Parameters;
 use PHPUnit\Framework\TestFailure;
+use function implode;
+use function sprintf;
 
 /**
  * Main matcher which defines a full expectation using method, parameter and
@@ -133,7 +135,7 @@ class Matcher implements MatcherInvocation
 
             if (!$builder) {
                 throw new RuntimeException(
-                    \sprintf(
+                    sprintf(
                         'No builder found for match builder identification <%s>',
                         $this->afterMatchBuilderId
                     )
@@ -156,7 +158,7 @@ class Matcher implements MatcherInvocation
             }
         } catch (ExpectationFailedException $e) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     "Expectation failed for %s when %s\n%s",
                     $this->methodNameMatcher->toString(),
                     $this->invocationMatcher->toString(),
@@ -188,7 +190,7 @@ class Matcher implements MatcherInvocation
 
             if (!$builder) {
                 throw new RuntimeException(
-                    \sprintf(
+                    sprintf(
                         'No builder found for match builder identification <%s>',
                         $this->afterMatchBuilderId
                     )
@@ -226,7 +228,7 @@ class Matcher implements MatcherInvocation
             }
         } catch (ExpectationFailedException $e) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     "Expectation failed for %s when %s\n%s",
                     $this->methodNameMatcher->toString(),
                     $this->invocationMatcher->toString(),
@@ -270,7 +272,7 @@ class Matcher implements MatcherInvocation
             }
         } catch (ExpectationFailedException $e) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     "Expectation failed for %s when %s.\n%s",
                     $this->methodNameMatcher->toString(),
                     $this->invocationMatcher->toString(),
@@ -304,6 +306,6 @@ class Matcher implements MatcherInvocation
             $list[] = 'will ' . $this->stub->toString();
         }
 
-        return \implode(' ', $list);
+        return implode(' ', $list);
     }
 }

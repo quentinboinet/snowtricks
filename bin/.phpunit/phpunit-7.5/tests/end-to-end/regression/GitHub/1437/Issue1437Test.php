@@ -13,7 +13,7 @@ class Issue1437Test extends TestCase
 {
     public function testFailure(): void
     {
-        \ob_start();
+        ob_start();
         $this->assertTrue(false);
     }
 }

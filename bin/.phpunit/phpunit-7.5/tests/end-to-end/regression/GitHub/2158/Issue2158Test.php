@@ -28,6 +28,6 @@ class Issue2158Test extends TestCase
      */
     public function testSomethingElse(): void
     {
-        $this->assertTrue(\defined('TEST_CONSTANT'));
+        $this->assertTrue(defined('TEST_CONSTANT'));
     }
 }

@@ -9,6 +9,9 @@
  */
 namespace PHPUnit\Framework;
 
+use BadFunctionCallException;
+use function print_r;
+
 class ExceptionWrapperTest extends TestCase
 {
     /**
@@ -16,10 +19,10 @@ class ExceptionWrapperTest extends TestCase
      */
     public function testGetOriginalException(): void
     {
-        $e       = new \BadFunctionCallException('custom class exception');
+        $e       = new BadFunctionCallException('custom class exception');
         $wrapper = new ExceptionWrapper($e);
 
-        $this->assertInstanceOf(\BadFunctionCallException::class, $wrapper->getOriginalException());
+        $this->assertInstanceOf(BadFunctionCallException::class, $wrapper->getOriginalException());
     }
 
     /**
@@ -27,10 +30,10 @@ class ExceptionWrapperTest extends TestCase
      */
     public function testGetOriginalExceptionWithPrevious(): void
     {
-        $e       = new \BadFunctionCallException('custom class exception', 0, new \Exception('previous'));
+        $e       = new BadFunctionCallException('custom class exception', 0, new \Exception('previous'));
         $wrapper = new ExceptionWrapper($e);
 
-        $this->assertInstanceOf(\BadFunctionCallException::class, $wrapper->getOriginalException());
+        $this->assertInstanceOf(BadFunctionCallException::class, $wrapper->getOriginalException());
     }
 
     /**
@@ -38,13 +41,13 @@ class ExceptionWrapperTest extends TestCase
      */
     public function testNoOriginalExceptionInStacktrace(): void
     {
-        $e       = new \BadFunctionCallException('custom class exception');
+        $e       = new BadFunctionCallException('custom class exception');
         $wrapper = new ExceptionWrapper($e);
 
         // Replace the only mention of "BadFunctionCallException" in wrapper
         $wrapper->setClassName('MyException');
 
-        $data = \print_r($wrapper, 1);
+        $data = print_r($wrapper, 1);
 
         $this->assertNotContains(
             'BadFunctionCallException',

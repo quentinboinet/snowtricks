@@ -10,6 +10,9 @@
 namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function array_values;
+use function count;
 
 /**
  * Logical AND.
@@ -25,7 +28,7 @@ class LogicalAnd extends Constraint
     {
         $constraint = new self;
 
-        $constraint->constraints = \array_values($constraints);
+        $constraint->constraints = array_values($constraints);
 
         return $constraint;
     }
@@ -66,7 +69,7 @@ class LogicalAnd extends Constraint
      * @param bool   $returnResult Whether to return a result or throw an exception
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -115,7 +118,7 @@ class LogicalAnd extends Constraint
         $count = 0;
 
         foreach ($this->constraints as $constraint) {
-            $count += \count($constraint);
+            $count += count($constraint);
         }
 
         return $count;

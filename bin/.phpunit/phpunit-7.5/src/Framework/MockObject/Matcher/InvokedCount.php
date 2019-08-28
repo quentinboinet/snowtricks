@@ -11,6 +11,7 @@ namespace PHPUnit\Framework\MockObject\Matcher;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
+use function sprintf;
 
 /**
  * Invocation matcher which checks if a method has been invoked a certain amount
@@ -72,7 +73,7 @@ class InvokedCount extends InvokedRecorder
                     break;
 
                 default:
-                    $message .= \sprintf(
+                    $message .= sprintf(
                         'was not expected to be called more than %d times.',
                         $this->expectedCount
                     );
@@ -94,7 +95,7 @@ class InvokedCount extends InvokedRecorder
 
         if ($count !== $this->expectedCount) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     'Method was expected to be called %d times, ' .
                     'actually called %d times.',
                     $this->expectedCount,

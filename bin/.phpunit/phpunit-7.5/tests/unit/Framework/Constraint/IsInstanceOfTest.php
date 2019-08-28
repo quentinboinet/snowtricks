@@ -11,19 +11,20 @@ namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestFailure;
+use stdClass;
 
 final class IsInstanceOfTest extends ConstraintTestCase
 {
     public function testConstraintInstanceOf(): void
     {
-        $constraint = new IsInstanceOf(\stdClass::class);
+        $constraint = new IsInstanceOf(stdClass::class);
 
-        self::assertTrue($constraint->evaluate(new \stdClass, '', true));
+        self::assertTrue($constraint->evaluate(new stdClass, '', true));
     }
 
     public function testConstraintFailsOnString(): void
     {
-        $constraint = new IsInstanceOf(\stdClass::class);
+        $constraint = new IsInstanceOf(stdClass::class);
 
         try {
             $constraint->evaluate('stdClass');

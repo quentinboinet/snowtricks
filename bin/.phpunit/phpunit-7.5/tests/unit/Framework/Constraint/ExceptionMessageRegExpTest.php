@@ -10,6 +10,7 @@
 namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\TestCase;
+use function ini_set;
 
 class ExceptionMessageRegExpTest extends TestCase
 {
@@ -35,7 +36,7 @@ class ExceptionMessageRegExpTest extends TestCase
      */
     public function testMessageXdebugScreamCompatibility(): void
     {
-        \ini_set('xdebug.scream', '1');
+        ini_set('xdebug.scream', '1');
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessageRegExp('#Screaming preg_match#');

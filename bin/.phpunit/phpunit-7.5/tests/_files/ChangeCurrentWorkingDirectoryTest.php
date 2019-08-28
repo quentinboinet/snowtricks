@@ -13,7 +13,7 @@ class ChangeCurrentWorkingDirectoryTest extends TestCase
 {
     public function testSomethingThatChangesTheCwd(): void
     {
-        \chdir('../');
+        chdir('../');
         $this->assertTrue(true);
     }
 }

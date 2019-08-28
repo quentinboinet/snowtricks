@@ -7,8 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-if (\extension_loaded('xdebug')) {
-    \xdebug_disable();
+if (extension_loaded('xdebug')) {
+    xdebug_disable();
 }
 
     throw new Exception(

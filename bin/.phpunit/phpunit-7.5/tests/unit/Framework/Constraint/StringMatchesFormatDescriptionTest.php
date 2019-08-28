@@ -10,6 +10,7 @@
 namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\ExpectationFailedException;
+use const DIRECTORY_SEPARATOR;
 
 class StringMatchesFormatDescriptionTest extends ConstraintTestCase
 {
@@ -20,9 +21,9 @@ class StringMatchesFormatDescriptionTest extends ConstraintTestCase
         $this->assertFalse($constraint->evaluate('**', '', true));
         $this->assertFalse($constraint->evaluate('*a*', '', true));
 
-        $this->assertTrue($constraint->evaluate('*' . \DIRECTORY_SEPARATOR . '*', '', true));
+        $this->assertTrue($constraint->evaluate('*' . DIRECTORY_SEPARATOR . '*', '', true));
 
-        $this->assertEquals('matches PCRE pattern "/^\*\\' . \DIRECTORY_SEPARATOR . '\*$/s"', $constraint->toString());
+        $this->assertEquals('matches PCRE pattern "/^\*\\' . DIRECTORY_SEPARATOR . '\*$/s"', $constraint->toString());
         $this->assertCount(1, $constraint);
     }
 
@@ -197,7 +198,7 @@ class StringMatchesFormatDescriptionTest extends ConstraintTestCase
     {
         $constraint = new StringMatchesFormatDescription('%%,%%e,%%s,%%S,%%a,%%A,%%w,%%i,%%d,%%x,%%f,%%c,%%Z,%%%%,%%');
 
-        $this->assertFalse($constraint->evaluate('%%,%' . \DIRECTORY_SEPARATOR . ',%*,%*,%*,%*,% ,%0,%0,%0f0f0f,%1.0,%*,%%Z,%%%%,%%', '', true));
+        $this->assertFalse($constraint->evaluate('%%,%' . DIRECTORY_SEPARATOR . ',%*,%*,%*,%*,% ,%0,%0,%0f0f0f,%1.0,%*,%%Z,%%%%,%%', '', true));
         $this->assertTrue($constraint->evaluate('%,%e,%s,%S,%a,%A,%w,%i,%d,%x,%f,%c,%Z,%%,%', '', true));
         $this->assertEquals('matches PCRE pattern "/^%,%e,%s,%S,%a,%A,%w,%i,%d,%x,%f,%c,%Z,%%,%$/s"', $constraint->toString());
         $this->assertCount(1, $constraint);
@@ -208,8 +209,8 @@ class StringMatchesFormatDescriptionTest extends ConstraintTestCase
         $constraint = new StringMatchesFormatDescription('%%%e,%%%s,%%%S,%%%a,%%%A,%%%w,%%%i,%%%d,%%%x,%%%f,%%%c');
 
         $this->assertFalse($constraint->evaluate('%%e,%%s,%%S,%%a,%%A,%%w,%%i,%%d,%%x,%%f,%%c', '', true));
-        $this->assertTrue($constraint->evaluate('%' . \DIRECTORY_SEPARATOR . ',%*,%*,%*,%*,% ,%0,%0,%0f0f0f,%1.0,%*', '', true));
-        $this->assertEquals('matches PCRE pattern "/^%\\' . \DIRECTORY_SEPARATOR . ',%[^\r\n]+,%[^\r\n]*,%.+,%.*,%\s*,%[+-]?\d+,%\d+,%[0-9a-fA-F]+,%[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?,%.$/s"', $constraint->toString());
+        $this->assertTrue($constraint->evaluate('%' . DIRECTORY_SEPARATOR . ',%*,%*,%*,%*,% ,%0,%0,%0f0f0f,%1.0,%*', '', true));
+        $this->assertEquals('matches PCRE pattern "/^%\\' . DIRECTORY_SEPARATOR . ',%[^\r\n]+,%[^\r\n]*,%.+,%.*,%\s*,%[+-]?\d+,%\d+,%[0-9a-fA-F]+,%[+-]?\.?\d+\.?\d*(?:[Ee][+-]?\d+)?,%.$/s"', $constraint->toString());
         $this->assertCount(1, $constraint);
     }
 

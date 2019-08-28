@@ -9,13 +9,47 @@
  */
 namespace PHPUnit\Util;
 
+use DOMDocument;
 use DOMElement;
+use DOMNodeList;
 use DOMXPath;
+use LibXMLError;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\TextUI\ResultPrinter;
 use SebastianBergmann\FileIterator\Facade as FileIteratorFacade;
+use function constant;
+use function count;
+use function define;
+use function defined;
+use function dirname;
+use function explode;
+use function file_exists;
+use function getenv;
+use function implode;
+use function in_array;
+use function ini_get;
+use function ini_set;
+use function is_numeric;
+use function libxml_clear_errors;
+use function libxml_get_errors;
+use function libxml_use_internal_errors;
+use function preg_match;
+use function putenv;
+use function realpath;
+use function sprintf;
+use function stream_resolve_include_path;
+use function strlen;
+use function strpos;
+use function strtolower;
+use function strtoupper;
+use function substr;
+use function trim;
+use function version_compare;
+use const DIRECTORY_SEPARATOR;
+use const PATH_SEPARATOR;
+use const PHP_VERSION;
 
 /**
  * Wrapper for the PHPUnit XML configuration file.
@@ -164,7 +198,7 @@ final class Configuration
     private static $instances = [];
 
     /**
-     * @var \DOMDocument
+     * @var DOMDocument
      */
     private $document;
 
@@ -179,7 +213,7 @@ final class Configuration
     private $filename;
 
     /**
-     * @var \LibXMLError[]
+     * @var LibXMLError[]
      */
     private $errors = [];
 
@@ -190,11 +224,11 @@ final class Configuration
      */
     public static function getInstance(string $filename): self
     {
-        $realPath = \realpath($filename);
+        $realPath = realpath($filename);
 
         if ($realPath === false) {
             throw new Exception(
-                \sprintf(
+                sprintf(
                     'Could not read "%s".',
                     $filename
                 )
@@ -232,7 +266,7 @@ final class Configuration
 
     public function hasValidationErrors(): bool
     {
-        return \count($this->errors) > 0;
+        return count($this->errors) > 0;
     }
 
     public function getValidationErrors(): array
@@ -243,7 +277,7 @@ final class Configuration
             if (!isset($result[$error->line])) {
                 $result[$error->line] = [];
             }
-            $result[$error->line][] = \trim($error->message);
+            $result[$error->line][] = trim($error->message);
         }
 
         return $result;
@@ -535,29 +569,29 @@ final class Configuration
         $configuration = $this->getPHPConfiguration();
 
         if (!empty($configuration['include_path'])) {
-            \ini_set(
+            ini_set(
                 'include_path',
-                \implode(\PATH_SEPARATOR, $configuration['include_path']) .
-                \PATH_SEPARATOR .
-                \ini_get('include_path')
+                implode(PATH_SEPARATOR, $configuration['include_path']) .
+                PATH_SEPARATOR .
+                ini_get('include_path')
             );
         }
 
         foreach ($configuration['ini'] as $name => $data) {
             $value = $data['value'];
 
-            if (\defined($value)) {
-                $value = (string) \constant($value);
+            if (defined($value)) {
+                $value = (string) constant($value);
             }
 
-            \ini_set($name, $value);
+            ini_set($name, $value);
         }
 
         foreach ($configuration['const'] as $name => $data) {
             $value = $data['value'];
 
-            if (!\defined($name)) {
-                \define($name, $value);
+            if (!defined($name)) {
+                define($name, $value);
             }
         }
 
@@ -577,7 +611,7 @@ final class Configuration
                     break;
 
                 default:
-                    $target = &$GLOBALS['_' . \strtoupper($array)];
+                    $target = &$GLOBALS['_' . strtoupper($array)];
 
                     break;
             }
@@ -591,11 +625,11 @@ final class Configuration
             $value = $data['value'];
             $force = $data['force'] ?? false;
 
-            if ($force || \getenv($name) === false) {
-                \putenv("{$name}={$value}");
+            if ($force || getenv($name) === false) {
+                putenv("{$name}={$value}");
             }
 
-            $value = \getenv($name);
+            $value = getenv($name);
 
             if (!isset($_ENV[$name])) {
                 $_ENV[$name] = $value;
@@ -941,7 +975,7 @@ final class Configuration
         }
 
         if ($root->hasAttribute('executionOrder')) {
-            foreach (\explode(',', $root->getAttribute('executionOrder')) as $order) {
+            foreach (explode(',', $root->getAttribute('executionOrder')) as $order) {
                 switch ($order) {
                     case 'default':
                         $result['executionOrder']        = TestSuiteSorter::ORDER_DEFAULT;
@@ -1024,24 +1058,24 @@ final class Configuration
 
     private function validateConfigurationAgainstSchema(): void
     {
-        $original    = \libxml_use_internal_errors(true);
+        $original    = libxml_use_internal_errors(true);
         $xsdFilename = __DIR__ . '/../../phpunit.xsd';
 
-        if (\defined('__PHPUNIT_PHAR_ROOT__')) {
+        if (defined('__PHPUNIT_PHAR_ROOT__')) {
             $xsdFilename =  __PHPUNIT_PHAR_ROOT__ . '/phpunit.xsd';
         }
 
         $this->document->schemaValidate($xsdFilename);
-        $this->errors = \libxml_get_errors();
-        \libxml_clear_errors();
-        \libxml_use_internal_errors($original);
+        $this->errors = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($original);
     }
 
     /**
      * Collects and returns the configuration arguments from the PHPUnit
      * XML configuration
      */
-    private function getConfigurationArguments(\DOMNodeList $nodes): array
+    private function getConfigurationArguments(DOMNodeList $nodes): array
     {
         $arguments = [];
 
@@ -1075,7 +1109,7 @@ final class Configuration
     }
 
     /**
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Exception
      */
     private function getTestSuite(DOMElement $testSuiteNode, string $testSuiteFilter = ''): TestSuite
     {
@@ -1098,11 +1132,11 @@ final class Configuration
         }
 
         $fileIteratorFacade = new FileIteratorFacade;
-        $testSuiteFilter    = $testSuiteFilter ? \explode(',', $testSuiteFilter) : [];
+        $testSuiteFilter    = $testSuiteFilter ? explode(',', $testSuiteFilter) : [];
 
         foreach ($testSuiteNode->getElementsByTagName('directory') as $directoryNode) {
             /** @var DOMElement $directoryNode */
-            if (!empty($testSuiteFilter) && !\in_array($directoryNode->parentNode->getAttribute('name'), $testSuiteFilter)) {
+            if (!empty($testSuiteFilter) && !in_array($directoryNode->parentNode->getAttribute('name'), $testSuiteFilter)) {
                 continue;
             }
 
@@ -1139,7 +1173,7 @@ final class Configuration
 
         foreach ($testSuiteNode->getElementsByTagName('file') as $fileNode) {
             /** @var DOMElement $fileNode */
-            if (!empty($testSuiteFilter) && !\in_array($fileNode->parentNode->getAttribute('name'), $testSuiteFilter)) {
+            if (!empty($testSuiteFilter) && !in_array($fileNode->parentNode->getAttribute('name'), $testSuiteFilter)) {
                 continue;
             }
 
@@ -1171,7 +1205,7 @@ final class Configuration
 
     private function satisfiesPhpVersion(DOMElement $node): bool
     {
-        $phpVersion         = \PHP_VERSION;
+        $phpVersion         = PHP_VERSION;
         $phpVersionOperator = '>=';
 
         if ($node->hasAttribute('phpVersion')) {
@@ -1182,7 +1216,7 @@ final class Configuration
             $phpVersionOperator = (string) $node->getAttribute('phpVersionOperator');
         }
 
-        return \version_compare(\PHP_VERSION, $phpVersion, $phpVersionOperator);
+        return version_compare(PHP_VERSION, $phpVersion, $phpVersionOperator);
     }
 
     /**
@@ -1196,11 +1230,11 @@ final class Configuration
      */
     private function getBoolean(string $value, $default)
     {
-        if (\strtolower($value) === 'false') {
+        if (strtolower($value) === 'false') {
             return false;
         }
 
-        if (\strtolower($value) === 'true') {
+        if (strtolower($value) === 'true') {
             return true;
         }
 
@@ -1209,7 +1243,7 @@ final class Configuration
 
     private function getInteger(string $value, int $default): int
     {
-        if (\is_numeric($value)) {
+        if (is_numeric($value)) {
             return (int) $value;
         }
 
@@ -1275,7 +1309,7 @@ final class Configuration
 
     private function toAbsolutePath(string $path, bool $useIncludePath = false): string
     {
-        $path = \trim($path);
+        $path = trim($path);
 
         if ($path[0] === '/') {
             return $path;
@@ -1289,19 +1323,19 @@ final class Configuration
         //  - C:\windows
         //  - C:/windows
         //  - c:/windows
-        if (\defined('PHP_WINDOWS_VERSION_BUILD') &&
-            ($path[0] === '\\' || (\strlen($path) >= 3 && \preg_match('#^[A-Z]\:[/\\\]#i', \substr($path, 0, 3))))) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') &&
+            ($path[0] === '\\' || (strlen($path) >= 3 && preg_match('#^[A-Z]\:[/\\\]#i', substr($path, 0, 3))))) {
             return $path;
         }
 
-        if (\strpos($path, '://') !== false) {
+        if (strpos($path, '://') !== false) {
             return $path;
         }
 
-        $file = \dirname($this->filename) . \DIRECTORY_SEPARATOR . $path;
+        $file = dirname($this->filename) . DIRECTORY_SEPARATOR . $path;
 
-        if ($useIncludePath && !\file_exists($file)) {
-            $includePathFile = \stream_resolve_include_path($path);
+        if ($useIncludePath && !file_exists($file)) {
+            $includePathFile = stream_resolve_include_path($path);
 
             if ($includePathFile) {
                 $file = $includePathFile;

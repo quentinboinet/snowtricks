@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestSuite;
 use ReflectionClass;
 use ReflectionException;
 use SebastianBergmann\FileIterator\Facade as FileIteratorFacade;
+use function is_dir;
+use function is_file;
+use function sprintf;
 
 /**
  * Base class for all test runners.
@@ -85,8 +88,8 @@ abstract class BaseTestRunner
      */
     public function getTest(string $suiteClassName, string $suiteClassFile = '', $suffixes = ''): ?Test
     {
-        if (\is_dir($suiteClassName) &&
-            !\is_file($suiteClassName . '.php') && empty($suiteClassFile)) {
+        if (is_dir($suiteClassName) &&
+            !is_file($suiteClassName . '.php') && empty($suiteClassFile)) {
             $facade = new FileIteratorFacade;
             $files  = $facade->getFilesAsArray(
                 $suiteClassName,
@@ -125,7 +128,7 @@ abstract class BaseTestRunner
                 $test = $suiteMethod->invoke(null, $testClass->getName());
             } catch (ReflectionException $e) {
                 $this->runFailed(
-                    \sprintf(
+                    sprintf(
                         "Failed to invoke suite() method.\n%s",
                         $e->getMessage()
                     )

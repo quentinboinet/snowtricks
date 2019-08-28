@@ -18,6 +18,19 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestFailure;
 use PHPUnit\Framework\TestResult;
 use SebastianBergmann\Environment\Runtime;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use function escapeshellarg;
+use function restore_error_handler;
+use function set_error_handler;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function strrpos;
+use function substr;
+use function trim;
+use function unserialize;
+use const DIRECTORY_SEPARATOR;
+use const PHP_SAPI;
 
 /**
  * Utility methods for PHP sub-processes.
@@ -56,7 +69,7 @@ abstract class AbstractPhpProcess
 
     public static function factory(): self
     {
-        if (\DIRECTORY_SEPARATOR === '\\') {
+        if (DIRECTORY_SEPARATOR === '\\') {
             return new WindowsPhpProcess;
         }
 
@@ -155,7 +168,7 @@ abstract class AbstractPhpProcess
     /**
      * Runs a single test in a separate PHP process.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function runTestJob(string $job, Test $test, TestResult $result): void
     {
@@ -179,7 +192,7 @@ abstract class AbstractPhpProcess
         $command = $this->runtime->getBinary();
         $command .= $this->settingsToParameters($settings);
 
-        if (\PHP_SAPI === 'phpdbg') {
+        if (PHP_SAPI === 'phpdbg') {
             $command .= ' -qrr';
 
             if (!$file) {
@@ -188,7 +201,7 @@ abstract class AbstractPhpProcess
         }
 
         if ($file) {
-            $command .= ' ' . \escapeshellarg($file);
+            $command .= ' ' . escapeshellarg($file);
         }
 
         if ($this->args) {
@@ -215,7 +228,7 @@ abstract class AbstractPhpProcess
         $buffer = '';
 
         foreach ($settings as $setting) {
-            $buffer .= ' -d ' . \escapeshellarg($setting);
+            $buffer .= ' -d ' . escapeshellarg($setting);
         }
 
         return $buffer;
@@ -224,7 +237,7 @@ abstract class AbstractPhpProcess
     /**
      * Processes the TestResult object from an isolated process.
      *
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function processChildResult(Test $test, TestResult $result, string $stdout, string $stderr): void
     {
@@ -233,28 +246,28 @@ abstract class AbstractPhpProcess
         if (!empty($stderr)) {
             $result->addError(
                 $test,
-                new Exception(\trim($stderr)),
+                new Exception(trim($stderr)),
                 $time
             );
         } else {
-            \set_error_handler(function ($errno, $errstr, $errfile, $errline): void {
+            set_error_handler(function ($errno, $errstr, $errfile, $errline): void {
                 throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
             });
 
             try {
-                if (\strpos($stdout, "#!/usr/bin/env php\n") === 0) {
-                    $stdout = \substr($stdout, 19);
+                if (strpos($stdout, "#!/usr/bin/env php\n") === 0) {
+                    $stdout = substr($stdout, 19);
                 }
 
-                $childResult = \unserialize(\str_replace("#!/usr/bin/env php\n", '', $stdout));
-                \restore_error_handler();
+                $childResult = unserialize(str_replace("#!/usr/bin/env php\n", '', $stdout));
+                restore_error_handler();
             } catch (ErrorException $e) {
-                \restore_error_handler();
+                restore_error_handler();
                 $childResult = false;
 
                 $result->addError(
                     $test,
-                    new Exception(\trim($stdout), 0, $e),
+                    new Exception(trim($stdout), 0, $e),
                     $time
                 );
             }
@@ -346,12 +359,12 @@ abstract class AbstractPhpProcess
             $exceptionArray = [];
 
             foreach ((array) $exception as $key => $value) {
-                $key                  = \substr($key, \strrpos($key, "\0") + 1);
+                $key                  = substr($key, strrpos($key, "\0") + 1);
                 $exceptionArray[$key] = $value;
             }
 
             $exception = new SyntheticError(
-                \sprintf(
+                sprintf(
                     '%s: %s',
                     $exceptionArray['_PHP_Incomplete_Class_Name'],
                     $exceptionArray['message']

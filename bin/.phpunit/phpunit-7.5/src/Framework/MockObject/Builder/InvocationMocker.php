@@ -15,6 +15,13 @@ use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\RuntimeException;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\MockObject\Stub\MatcherCollection;
+use Throwable;
+use function array_merge;
+use function count;
+use function in_array;
+use function is_string;
+use function sprintf;
+use function strtolower;
 
 /**
  * Builder for mocked or stubbed invocations.
@@ -84,11 +91,11 @@ class InvocationMocker implements MethodNameMatch
      */
     public function willReturn($value, ...$nextValues)
     {
-        if (\count($nextValues) === 0) {
+        if (count($nextValues) === 0) {
             $stub = new Stub\ReturnStub($value);
         } else {
             $stub = new Stub\ConsecutiveCalls(
-                \array_merge([$value], $nextValues)
+                array_merge([$value], $nextValues)
             );
         }
 
@@ -162,7 +169,7 @@ class InvocationMocker implements MethodNameMatch
     /**
      * @return InvocationMocker
      */
-    public function willThrowException(\Throwable $exception)
+    public function willThrowException(Throwable $exception)
     {
         $stub = new Stub\Exception($exception);
 
@@ -240,9 +247,9 @@ class InvocationMocker implements MethodNameMatch
             );
         }
 
-        if (\is_string($constraint) && !\in_array(\strtolower($constraint), $this->configurableMethods, true)) {
+        if (is_string($constraint) && !in_array(strtolower($constraint), $this->configurableMethods, true)) {
             throw new RuntimeException(
-                \sprintf(
+                sprintf(
                     'Trying to configure method "%s" which cannot be configured because it does not exist, has not been specified, is final, or is static',
                     $constraint
                 )

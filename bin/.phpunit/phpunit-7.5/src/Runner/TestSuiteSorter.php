@@ -13,6 +13,20 @@ use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
+use function array_intersect;
+use function array_map;
+use function array_merge;
+use function array_reduce;
+use function array_reverse;
+use function array_splice;
+use function count;
+use function get_class;
+use function in_array;
+use function max;
+use function shuffle;
+use function strpos;
+use function substr;
+use function usort;
 
 final class TestSuiteSorter
 {
@@ -83,8 +97,8 @@ final class TestSuiteSorter
         if ($test instanceof TestCase) {
             $testName = $test->getName(true);
 
-            if (\strpos($testName, '::') === false) {
-                $testName = \get_class($test) . '::' . $testName;
+            if (strpos($testName, '::') === false) {
+                $testName = get_class($test) . '::' . $testName;
             }
 
             return $testName;
@@ -110,7 +124,7 @@ final class TestSuiteSorter
             self::ORDER_DURATION,
         ];
 
-        if (!\in_array($order, $allowedOrders, true)) {
+        if (!in_array($order, $allowedOrders, true)) {
             throw new Exception(
                 '$order must be one of TestSuiteSorter::ORDER_DEFAULT, TestSuiteSorter::ORDER_REVERSED, or TestSuiteSorter::ORDER_RANDOMIZED, or TestSuiteSorter::ORDER_DURATION'
             );
@@ -121,7 +135,7 @@ final class TestSuiteSorter
             self::ORDER_DEFECTS_FIRST,
         ];
 
-        if (!\in_array($orderDefects, $allowedOrderDefects, true)) {
+        if (!in_array($orderDefects, $allowedOrderDefects, true)) {
             throw new Exception(
                 '$orderDefects must be one of TestSuiteSorter::ORDER_DEFAULT, TestSuiteSorter::ORDER_DEFECTS_FIRST'
             );
@@ -190,7 +204,7 @@ final class TestSuiteSorter
 
             if (!isset($this->defectSortOrder[$testname])) {
                 $this->defectSortOrder[$testname]        = self::DEFECT_SORT_WEIGHT[$this->cache->getState($testname)];
-                $max                                     = \max($max, $this->defectSortOrder[$testname]);
+                $max                                     = max($max, $this->defectSortOrder[$testname]);
             }
         }
 
@@ -199,7 +213,7 @@ final class TestSuiteSorter
 
     private function suiteOnlyContainsTests(TestSuite $suite): bool
     {
-        return \array_reduce(
+        return array_reduce(
             $suite->tests(),
             function ($carry, $test) {
                 return $carry && ($test instanceof TestCase || $test instanceof DataProviderTestSuite);
@@ -210,19 +224,19 @@ final class TestSuiteSorter
 
     private function reverse(array $tests): array
     {
-        return \array_reverse($tests);
+        return array_reverse($tests);
     }
 
     private function randomize(array $tests): array
     {
-        \shuffle($tests);
+        shuffle($tests);
 
         return $tests;
     }
 
     private function sortDefectsFirst(array $tests): array
     {
-        \usort(
+        usort(
             $tests,
             function ($left, $right) {
                 return $this->cmpDefectPriorityAndTime($left, $right);
@@ -234,7 +248,7 @@ final class TestSuiteSorter
 
     private function sortByDuration(array $tests): array
     {
-        \usort(
+        usort(
             $tests,
             function ($left, $right) {
                 return $this->cmpDuration($left, $right);
@@ -297,22 +311,22 @@ final class TestSuiteSorter
         $i            = 0;
 
         do {
-            $todoNames = \array_map(
+            $todoNames = array_map(
                 function ($test) {
                     return self::getTestSorterUID($test);
                 },
                 $tests
             );
 
-            if (!$tests[$i]->hasDependencies() || empty(\array_intersect($this->getNormalizedDependencyNames($tests[$i]), $todoNames))) {
-                $newTestOrder = \array_merge($newTestOrder, \array_splice($tests, $i, 1));
+            if (!$tests[$i]->hasDependencies() || empty(array_intersect($this->getNormalizedDependencyNames($tests[$i]), $todoNames))) {
+                $newTestOrder = array_merge($newTestOrder, array_splice($tests, $i, 1));
                 $i            = 0;
             } else {
                 $i++;
             }
-        } while (!empty($tests) && ($i < \count($tests)));
+        } while (!empty($tests) && ($i < count($tests)));
 
-        return \array_merge($newTestOrder, $tests);
+        return array_merge($newTestOrder, $tests);
     }
 
     /**
@@ -323,14 +337,14 @@ final class TestSuiteSorter
     private function getNormalizedDependencyNames($test): array
     {
         if ($test instanceof DataProviderTestSuite) {
-            $testClass = \substr($test->getName(), 0, \strpos($test->getName(), '::'));
+            $testClass = substr($test->getName(), 0, strpos($test->getName(), '::'));
         } else {
-            $testClass = \get_class($test);
+            $testClass = get_class($test);
         }
 
-        $names = \array_map(
+        $names = array_map(
             function ($name) use ($testClass) {
-                return \strpos($name, '::') === false ? $testClass . '::' . $name : $name;
+                return strpos($name, '::') === false ? $testClass . '::' . $name : $name;
             },
             $test->getDependencies()
         );
@@ -347,7 +361,7 @@ final class TestSuiteSorter
                 if (!($test instanceof TestSuite)) {
                     $tests[] = self::getTestSorterUID($test);
                 } else {
-                    $tests = \array_merge($tests, $this->calculateTestExecutionOrder($test));
+                    $tests = array_merge($tests, $this->calculateTestExecutionOrder($test));
                 }
             }
         }

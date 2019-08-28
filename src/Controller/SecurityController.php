@@ -4,26 +4,17 @@ namespace App\Controller;
 
 use App\Entity\RegistrationToken;
 use App\Form\UserRegistrationFormType;
+use App\Service\Mailer;
 use Doctrine\DBAL\DBALException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    private $mailer;
-
-    public function __construct(MailerInterface $mailer)
-    {
-        $this->mailer = $mailer;
-    }
-
     /**
      * @Route("/login", name="app_login")
      */
@@ -59,7 +50,7 @@ class SecurityController extends AbstractController
     /**
      * @Route ("/register", name="app_register")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, Mailer $mailerService)
     {
         $form = $this->createForm(UserRegistrationFormType::class);
         $form->handleRequest($request);
@@ -87,20 +78,7 @@ class SecurityController extends AbstractController
             }
 
             //on envoi l'e-mail de confirmation d'inscription
-            $email = (new TemplatedEmail())
-            ->from('quentinboinet@live.fr')
-                ->to($form['email']->getData())
-                ->subject('SnowTricks - Confirmation d\'inscription')
-                //->html('<h3>SnowTricks</h3><p>Merci pour votre inscription sur le site communautaire SnowTricks ! <br/>Cependant, votre compte est pour le moment inactif. Afin
-                //de l\'activer et de pouvoir vous connecter, merci de cliquer sur le lien suivant : <a href="localhost:8000/api/account/confirm/' . $user->getId() . '/' . $token->getToken() . '">confirmer mon inscription !</a></p>
-                //<p>A très vite !<br /><b>L\'équipe SnowTricks</b></p>');
-                ->htmlTemplate('email/registrationConfirm.html.twig')
-                ->context([
-                    'api_token' => $token->getToken(),
-                    'user_id' => $user->getId(),
-                ]);
-
-            $this->mailer->send($email);
+            $mailerService->sendMail($user, 'SnowTricks - Confirmation d\'inscription', 'email/registrationConfirm.html.twig', $token, null);
 
             $this->addFlash('success', 'Inscription prise en compte ! Un e-mail contenant un lien d\'activation vous a été envoyé.');
             return $this->redirectToRoute('home_page');

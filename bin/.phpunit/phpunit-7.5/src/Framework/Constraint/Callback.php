@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use function call_user_func;
+
 /**
  * Constraint that evaluates against a specified closure.
  */
@@ -42,6 +44,6 @@ class Callback extends Constraint
      */
     protected function matches($other): bool
     {
-        return \call_user_func($this->callback, $other);
+        return call_user_func($this->callback, $other);
     }
 }

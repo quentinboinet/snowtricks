@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Runner;
 
-class Exception extends \RuntimeException implements \PHPUnit\Exception
+use RuntimeException;
+
+class Exception extends RuntimeException implements \PHPUnit\Exception
 {
 }

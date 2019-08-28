@@ -9,6 +9,7 @@
  */
 namespace PHPUnit\TextUI;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\Error\Deprecated;
 use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\Error\Warning;
@@ -46,6 +47,8 @@ use PHPUnit\Util\TestDox\TextResultPrinter;
 use PHPUnit\Util\TestDox\XmlResultPrinter;
 use PHPUnit\Util\XdebugFilterScriptGenerator;
 use ReflectionClass;
+use ReflectionException;
+use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
 use SebastianBergmann\CodeCoverage\Filter as CodeCoverageFilter;
@@ -58,6 +61,25 @@ use SebastianBergmann\CodeCoverage\Report\Xml\Facade as XmlReport;
 use SebastianBergmann\Comparator\Comparator;
 use SebastianBergmann\Environment\Runtime;
 use SebastianBergmann\Invoker\Invoker;
+use function array_diff;
+use function class_exists;
+use function count;
+use function dirname;
+use function extension_loaded;
+use function file_put_contents;
+use function htmlspecialchars;
+use function ini_get;
+use function is_int;
+use function is_string;
+use function mt_srand;
+use function phpversion;
+use function range;
+use function realpath;
+use function sprintf;
+use function strpos;
+use function time;
+use const PHP_EOL;
+use const PHP_SAPI;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -110,10 +132,10 @@ class TestRunner extends BaseTestRunner
      * @param ReflectionClass|Test $test
      * @param bool                 $exit
      *
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      * @throws Exception
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public static function run($test, array $arguments = [], $exit = true): TestResult
     {
@@ -148,9 +170,9 @@ class TestRunner extends BaseTestRunner
     /**
      * @throws \PHPUnit\Runner\Exception
      * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     * @throws \ReflectionException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws ReflectionException
      */
     public function doRun(Test $suite, array $arguments = [], bool $exit = true): TestResult
     {
@@ -160,7 +182,7 @@ class TestRunner extends BaseTestRunner
 
         $this->handleConfiguration($arguments);
 
-        if (\is_int($arguments['columns']) && $arguments['columns'] < 16) {
+        if (is_int($arguments['columns']) && $arguments['columns'] < 16) {
             $arguments['columns']   = 16;
             $tooFewColumnsRequested = true;
         }
@@ -184,7 +206,7 @@ class TestRunner extends BaseTestRunner
         }
 
         if ($arguments['executionOrder'] === TestSuiteSorter::ORDER_RANDOMIZED) {
-            \mt_srand($arguments['randomOrderSeed']);
+            mt_srand($arguments['randomOrderSeed']);
         }
 
         if ($arguments['cacheResult']) {
@@ -197,10 +219,10 @@ class TestRunner extends BaseTestRunner
 
                 $arguments['cacheResultFile'] = null;
 
-                $cacheResultFile = \realpath($cacheLocation);
+                $cacheResultFile = realpath($cacheLocation);
 
                 if ($cacheResultFile !== false) {
-                    $arguments['cacheResultFile'] = \dirname($cacheResultFile);
+                    $arguments['cacheResultFile'] = dirname($cacheResultFile);
                 }
             }
 
@@ -221,10 +243,10 @@ class TestRunner extends BaseTestRunner
             unset($sorter);
         }
 
-        if (\is_int($arguments['repeat']) && $arguments['repeat'] > 0) {
+        if (is_int($arguments['repeat']) && $arguments['repeat'] > 0) {
             $_suite = new TestSuite;
 
-            foreach (\range(1, $arguments['repeat']) as $step) {
+            foreach (range(1, $arguments['repeat']) as $step) {
                 $_suite->addTest($suite);
             }
 
@@ -307,7 +329,7 @@ class TestRunner extends BaseTestRunner
             } else {
                 $printerClass = ResultPrinter::class;
 
-                if (isset($arguments['printer']) && \is_string($arguments['printer']) && \class_exists($arguments['printer'], false)) {
+                if (isset($arguments['printer']) && is_string($arguments['printer']) && class_exists($arguments['printer'], false)) {
                     $class = new ReflectionClass($arguments['printer']);
 
                     if ($class->isSubclassOf(ResultPrinter::class)) {
@@ -341,9 +363,9 @@ class TestRunner extends BaseTestRunner
             $runtime = $this->runtime->getNameWithVersion();
 
             if ($this->runtime->hasXdebug()) {
-                $runtime .= \sprintf(
+                $runtime .= sprintf(
                     ' with Xdebug %s',
-                    \phpversion('xdebug')
+                    phpversion('xdebug')
                 );
             }
 
@@ -392,10 +414,10 @@ class TestRunner extends BaseTestRunner
             );
 
             foreach ($arguments['configuration']->getValidationErrors() as $line => $errors) {
-                $this->write(\sprintf("\n  Line %d:\n", $line));
+                $this->write(sprintf("\n  Line %d:\n", $line));
 
                 foreach ($errors as $msg) {
-                    $this->write(\sprintf("  - %s\n", $msg));
+                    $this->write(sprintf("  - %s\n", $msg));
                 }
             }
             $this->write("\n  Test results may not be as expected.\n\n");
@@ -595,15 +617,15 @@ class TestRunner extends BaseTestRunner
 
             $script = (new XdebugFilterScriptGenerator)->generate($filterConfiguration['whitelist']);
 
-            if ($arguments['xdebugFilterFile'] !== 'php://stdout' && $arguments['xdebugFilterFile'] !== 'php://stderr' && !Filesystem::createDirectory(\dirname($arguments['xdebugFilterFile']))) {
-                $this->write(\sprintf('Cannot write Xdebug filter script to %s ' . \PHP_EOL, $arguments['xdebugFilterFile']));
+            if ($arguments['xdebugFilterFile'] !== 'php://stdout' && $arguments['xdebugFilterFile'] !== 'php://stderr' && !Filesystem::createDirectory(dirname($arguments['xdebugFilterFile']))) {
+                $this->write(sprintf('Cannot write Xdebug filter script to %s ' . PHP_EOL, $arguments['xdebugFilterFile']));
 
                 exit(self::EXCEPTION_EXIT);
             }
 
-            \file_put_contents($arguments['xdebugFilterFile'], $script);
+            file_put_contents($arguments['xdebugFilterFile'], $script);
 
-            $this->write(\sprintf('Wrote Xdebug filter script to %s ' . \PHP_EOL, $arguments['xdebugFilterFile']));
+            $this->write(sprintf('Wrote Xdebug filter script to %s ' . PHP_EOL, $arguments['xdebugFilterFile']));
 
             exit(self::SUCCESS_EXIT);
         }
@@ -624,11 +646,11 @@ class TestRunner extends BaseTestRunner
         $result->beStrictAboutResourceUsageDuringSmallTests($arguments['beStrictAboutResourceUsageDuringSmallTests']);
 
         if ($arguments['enforceTimeLimit'] === true) {
-            if (!\class_exists(Invoker::class)) {
+            if (!class_exists(Invoker::class)) {
                 $this->writeMessage('Error', 'Package phpunit/php-invoker is required for enforcing time limits');
             }
 
-            if (!\extension_loaded('pcntl') || \strpos(\ini_get('disable_functions'), 'pcntl') !== false) {
+            if (!extension_loaded('pcntl') || strpos(ini_get('disable_functions'), 'pcntl') !== false) {
                 $this->writeMessage('Error', 'PHP extension pcntl is required for enforcing time limits');
             }
         }
@@ -709,7 +731,7 @@ class TestRunner extends BaseTestRunner
                     $writer = new HtmlReport(
                         $arguments['reportLowUpperBound'],
                         $arguments['reportHighLowerBound'],
-                        \sprintf(
+                        sprintf(
                             ' and <a href="https://phpunit.de/">PHPUnit %s</a>',
                             Version::id()
                         )
@@ -837,15 +859,15 @@ class TestRunner extends BaseTestRunner
      */
     protected function runFailed(string $message): void
     {
-        $this->write($message . \PHP_EOL);
+        $this->write($message . PHP_EOL);
 
         exit(self::FAILURE_EXIT);
     }
 
     protected function write(string $buffer): void
     {
-        if (\PHP_SAPI != 'cli' && \PHP_SAPI != 'phpdbg') {
-            $buffer = \htmlspecialchars($buffer);
+        if (PHP_SAPI != 'cli' && PHP_SAPI != 'phpdbg') {
+            $buffer = htmlspecialchars($buffer);
         }
 
         if ($this->printer !== null) {
@@ -1057,17 +1079,17 @@ class TestRunner extends BaseTestRunner
             }
 
             if (!empty($groupConfiguration['exclude']) && !isset($arguments['excludeGroups'])) {
-                $arguments['excludeGroups'] = \array_diff($groupConfiguration['exclude'], $groupCliArgs);
+                $arguments['excludeGroups'] = array_diff($groupConfiguration['exclude'], $groupCliArgs);
             }
 
             foreach ($arguments['configuration']->getExtensionConfiguration() as $extension) {
-                if (!\class_exists($extension['class'], false) && $extension['file'] !== '') {
+                if (!class_exists($extension['class'], false) && $extension['file'] !== '') {
                     require_once $extension['file'];
                 }
 
-                if (!\class_exists($extension['class'])) {
+                if (!class_exists($extension['class'])) {
                     throw new Exception(
-                        \sprintf(
+                        sprintf(
                             'Class "%s" does not exist',
                             $extension['class']
                         )
@@ -1078,14 +1100,14 @@ class TestRunner extends BaseTestRunner
 
                 if (!$extensionClass->implementsInterface(Hook::class)) {
                     throw new Exception(
-                        \sprintf(
+                        sprintf(
                             'Class "%s" does not implement a PHPUnit\Runner\Hook interface',
                             $extension['class']
                         )
                     );
                 }
 
-                if (\count($extension['arguments']) == 0) {
+                if (count($extension['arguments']) == 0) {
                     $this->extensions[] = $extensionClass->newInstance();
                 } else {
                     $this->extensions[] = $extensionClass->newInstanceArgs(
@@ -1095,14 +1117,14 @@ class TestRunner extends BaseTestRunner
             }
 
             foreach ($arguments['configuration']->getListenerConfiguration() as $listener) {
-                if (!\class_exists($listener['class'], false) &&
+                if (!class_exists($listener['class'], false) &&
                     $listener['file'] !== '') {
                     require_once $listener['file'];
                 }
 
-                if (!\class_exists($listener['class'])) {
+                if (!class_exists($listener['class'])) {
                     throw new Exception(
-                        \sprintf(
+                        sprintf(
                             'Class "%s" does not exist',
                             $listener['class']
                         )
@@ -1113,14 +1135,14 @@ class TestRunner extends BaseTestRunner
 
                 if (!$listenerClass->implementsInterface(TestListener::class)) {
                     throw new Exception(
-                        \sprintf(
+                        sprintf(
                             'Class "%s" does not implement the PHPUnit\Framework\TestListener interface',
                             $listener['class']
                         )
                     );
                 }
 
-                if (\count($listener['arguments']) == 0) {
+                if (count($listener['arguments']) == 0) {
                     $listener = new $listener['class'];
                 } else {
                     $listener = $listenerClass->newInstanceArgs(
@@ -1246,7 +1268,7 @@ class TestRunner extends BaseTestRunner
         $arguments['groups']                                          = $arguments['groups'] ?? [];
         $arguments['processIsolation']                                = $arguments['processIsolation'] ?? false;
         $arguments['processUncoveredFilesFromWhitelist']              = $arguments['processUncoveredFilesFromWhitelist'] ?? false;
-        $arguments['randomOrderSeed']                                 = $arguments['randomOrderSeed'] ?? \time();
+        $arguments['randomOrderSeed']                                 = $arguments['randomOrderSeed'] ?? time();
         $arguments['registerMockObjectsFromTestArgumentsRecursively'] = $arguments['registerMockObjectsFromTestArgumentsRecursively'] ?? false;
         $arguments['repeat']                                          = $arguments['repeat'] ?? false;
         $arguments['reportHighLowerBound']                            = $arguments['reportHighLowerBound'] ?? 90;
@@ -1272,8 +1294,8 @@ class TestRunner extends BaseTestRunner
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \InvalidArgumentException
+     * @throws ReflectionException
+     * @throws InvalidArgumentException
      */
     private function processSuiteFilters(TestSuite $suite, array $arguments): void
     {
@@ -1316,7 +1338,7 @@ class TestRunner extends BaseTestRunner
         }
 
         $this->write(
-            \sprintf(
+            sprintf(
                 "%-15s%s\n",
                 $type . ':',
                 $message

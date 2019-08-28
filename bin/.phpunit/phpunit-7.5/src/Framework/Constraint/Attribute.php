@@ -11,6 +11,7 @@ namespace PHPUnit\Framework\Constraint;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 class Attribute extends Composite
 {
@@ -42,7 +43,7 @@ class Attribute extends Composite
      *
      * @throws ExpectationFailedException
      * @throws \PHPUnit\Framework\Exception
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
