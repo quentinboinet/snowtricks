@@ -240,12 +240,6 @@ class AccountController extends AbstractController
                     $this->addFlash('success', 'Image de profil correctement mise à jour !');
                     return $this->redirectToRoute('profile_view');
                     break;
-                case 'wrongFormat' :
-                    $form->get('picture')->addError(new FormError('Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.'));
-                    return $this->render('profile/profileEditPicture.html.twig', ['form' => $form->createView()]);
-                case 'tooHeavy' :
-                    $form->get('picture')->addError(new FormError('Image trop lourde ! (max. 2Mo autorisé)'));
-                    return $this->render('profile/profileEditPicture.html.twig', ['form' => $form->createView()]);
                 case 'null' :
                     $this->addFlash('success', 'Image de profil non modifiée !');
                     return $this->redirectToRoute('profile_view');

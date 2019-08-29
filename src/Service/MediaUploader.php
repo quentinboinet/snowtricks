@@ -74,9 +74,6 @@ class MediaUploader extends AbstractController
         $uploadedFile = $form['picture']->getData();
         if ($uploadedFile) {
             if ($uploadedFile->isValid()) {
-                $extensionsAccepted = array('jpg', 'jpeg', 'png', 'gif');
-                if (in_array($uploadedFile->guessExtension(), $extensionsAccepted)) {
-
                     //on upload la nouvelle image
                     $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
                     $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
@@ -103,9 +100,6 @@ class MediaUploader extends AbstractController
                     }
                     $this->em->flush();
                     return "OK";
-                } else {
-                    return "wrongFormat";
-                }
             }
         }
         else {
