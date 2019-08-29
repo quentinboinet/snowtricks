@@ -8,15 +8,21 @@ use App\Entity\PasswordToken;
 use App\Entity\Picture;
 use App\Entity\RegistrationToken;
 use App\Entity\User;
+use App\Form\ProfileInfosFormType;
+use App\Form\ProfilePasswordFormType;
+use App\Form\ProfilePictureFormType;
 use App\Service\Mailer;
+use App\Service\MediaUploader;
 use App\Service\TokenChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -163,112 +169,93 @@ class AccountController extends AbstractController
     }
 
     /**
-     * @Route("/profile/edit", name="profile_edit")
+     * @Route("/profile/edit/infos", name="profile_edit_infos")
      * @IsGranted("ROLE_USER")
      */
-    public function editProfile(EntityManagerInterface $em, Request $request, Security $security, UserPasswordEncoderInterface $passwordEncoder)
+    public function editProfile(EntityManagerInterface $em, Request $request)
     {
-        if ($request->isMethod('POST')) {
-             $user = $security->getUser();
-             $user->setFirstName($request->request->get('firstName'));
-             $user->setLastName($request->request->get('lastName'));
-
-            if (!empty($request->files->get('profilePicture'))) {
-
-                //on upload et ajoute la nouvelle image à l'user
-                /** @var UploadedFile $uploadedFile */
-                $uploadedFile = $request->files->get('profilePicture');
-                if ($uploadedFile->isValid() AND $uploadedFile->getSize() <= 2097152) {
-                    $extensionsAccepted = array('jpg', 'jpeg', 'png', 'gif');
-                    if (in_array($uploadedFile->guessExtension(), $extensionsAccepted)) {
-
-                        $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
-                        $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
-                        $uploadedFile->move($destination, $newFilename);
-
-                        if ($request->request->get('picturesToEdit') == "cover-") {
-
-                            $picture = new Picture();
-                            $picture->setPath('/images/uploads/' . $newFilename);
-                            $em->persist($picture);
-                            $user->setProfilePicture($picture);
-                        }
-                        else {
-                            $pictureIds = explode("-", $request->request->get('picturesToEdit'));
-                            $pictureId = $pictureIds[0];
-                            $picture = $em->getRepository(Picture::class)->find($pictureId);
-                            $picturePath = $picture->getPath();
-
-                            //on supprime l'ancienne image du serveur
-                            $fileSystem = new Filesystem();
-                            $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picturePath;
-                            $fileSystem->remove($fileName);
-
-                            $picture->setPath('/images/uploads/' . $newFilename);
-                            $em->persist($picture);
-                        }
-
-
-                    } else {
-                        return $this->render('profile/profileEdit.html.twig', ['error' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']);
-                    }
-                } else {
-                    return $this->render('profile/profileEdit.html.twig', ['error' => 'Image trop lourde ! (max. 2Mo autorisé)']);
-                }
-
-            }
-
-            //puis on supprime l'image de profil si le champ picturesToDelete est rempli
-            if ($request->request->get('picturesToDelete') != "") {
-
-                $pictureIds = explode("-", $request->request->get('picturesToDelete'));
-                $pictureIdToDelete = $pictureIds[0];
-
-                $picture = $em->getRepository(Picture::class)->find($pictureIdToDelete);
-                $em->remove($picture);
-
-                //on la supprime du serveur
-                $fileSystem = new Filesystem();
-                $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picture->getPath();
-                $fileSystem->remove($fileName);
-
-                $user->setProfilePicture(null);
-            }
-
-            if($request->request->get('newPassword1') != "") { //si l'utilisateur souhaite modifier son mot de passe
-
-                $oldPassword = $request->request->get('oldPassword');
-                $newPassword1 = $request->request->get('newPassword1');
-                $newPassword2 = $request->request->get('newPassword2');
-
-                if ($oldPassword != "") {
-                    if ($newPassword1 == $newPassword2) {
-                        if ($passwordEncoder->isPasswordValid($user, $oldPassword)) { //si le mot de passe entré correspond bien à celui enregistré en bdd
-
-                            $user->setPassword($passwordEncoder->encodePassword($user, $newPassword1));
-
-                        }
-                        else {
-                            return $this->render('profile/profileEdit.html.twig', ['error' => 'Le mot de passe actuel entré est incorrect !']);
-                        }
-                    }
-                    else {
-                        return $this->render('profile/profileEdit.html.twig', ['error' => 'Le mot de passe entré dans la confirmation n\'est pas identique au premier.']);
-                    }
-                }
-                else {
-                    return $this->render('profile/profileEdit.html.twig', ['error' => 'Veuillez renseigner votre ancien mot de passe pour pouvoir le modifier.']);
-                }
-            }
-
-            $em->persist($user);
+        $form = $this->createForm(ProfileInfosFormType::class, $this->getUser());
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $user = $this->getUser();
+            $user->setLastName($form['lastName']->getData());
+            $user->setFirstName($form['firstName']->getData());
             $em->flush();
 
-            $this->addFlash('success', 'Votre profil a bien été modifié !');
+            $this->addFlash('success', 'Profil correctement mis à jour !');
             return $this->redirectToRoute('profile_view');
         }
         else {
-            return $this->render('profile/profileEdit.html.twig', ['error' => '']);
+            return $this->render('profile/profileEditInfos.html.twig', [
+                'form' => $form->createView()
+            ]);
+        }
+    }
+
+    /**
+     * @Route("/profile/edit/password", name="profile_edit_password")
+     * @IsGranted("ROLE_USER")
+     */
+    public function editPassword(EntityManagerInterface $em, Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $form = $this->createForm(ProfilePasswordFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            if ($passwordEncoder->isPasswordValid($user, $form['old_password']->getData())) { //si le mot de passe entré correspond bien à celui enregistré en bdd
+                $user->setPassword($passwordEncoder->encodePassword(
+                    $user,
+                    $form['password']->getData()
+                ));
+                $em->flush();
+            }
+            else {
+                $form->get('old_password')->addError(new FormError('Le mot de passe actuel est incorrect !'));
+                return $this->render('profile/profileEditPassword.html.twig', ['form' => $form->createView()]);
+            }
+
+            $this->addFlash('success', 'Mot de passe correctement modifié !');
+            return $this->redirectToRoute('profile_view');
+        }
+        else {
+            return $this->render('profile/profileEditPassword.html.twig', [
+                'form' => $form->createView()
+            ]);
+        }
+    }
+
+    /**
+     * @Route("/profile/edit/picture", name="profile_edit_picture")
+     * @IsGranted("ROLE_USER")
+     */
+    public function editPicture(EntityManagerInterface $em, Request $request, MediaUploader $mediaUploader)
+    {
+        $form = $this->createForm(ProfilePictureFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $result = $mediaUploader->profilePictureUpload($form);
+            switch($result) {
+                case 'OK' :
+                    $this->addFlash('success', 'Image de profil correctement mise à jour !');
+                    return $this->redirectToRoute('profile_view');
+                    break;
+                case 'wrongFormat' :
+                    $form->get('picture')->addError(new FormError('Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.'));
+                    return $this->render('profile/profileEditPicture.html.twig', ['form' => $form->createView()]);
+                case 'tooHeavy' :
+                    $form->get('picture')->addError(new FormError('Image trop lourde ! (max. 2Mo autorisé)'));
+                    return $this->render('profile/profileEditPicture.html.twig', ['form' => $form->createView()]);
+                case 'null' :
+                    $this->addFlash('success', 'Image de profil non modifiée !');
+                    return $this->redirectToRoute('profile_view');
+                    break;
+            }
+        }
+        else {
+            return $this->render('profile/profileEditPicture.html.twig', [
+                'form' => $form->createView()
+            ]);
         }
     }
 }

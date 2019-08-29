@@ -5,7 +5,11 @@ namespace App\Service;
 use App\Entity\Picture;
 use App\Entity\Trick;
 use App\Entity\Video;
+use App\Form\ProfilePictureFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Doctrine\ORM\EntityManagerInterface;
@@ -61,6 +65,51 @@ class MediaUploader extends AbstractController
 
                 $trick->addVideo($video);
             }
+        }
+    }
+
+    public function profilePictureUpload($form) : string
+    {
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $form['picture']->getData();
+        if ($uploadedFile) {
+            if ($uploadedFile->isValid()) {
+                $extensionsAccepted = array('jpg', 'jpeg', 'png', 'gif');
+                if (in_array($uploadedFile->guessExtension(), $extensionsAccepted)) {
+
+                    //on upload la nouvelle image
+                    $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
+                    $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
+                    $uploadedFile->move($destination, $newFilename);
+
+                    //on supprime l'ancienne image du serveur
+                    if ($this->getUser()->getProfilePicture() == null)
+                    {
+                        $picture = new Picture();
+                        $picture->setPath('/images/uploads/' . $newFilename);
+                        $this->getUser()->setProfilePicture($picture);
+                        $this->em->persist($picture);
+                    }
+                    else {
+                        $pictureId = $this->getUser()->getProfilePicture()->getId();
+                        $picture = $this->em->getRepository(Picture::class)->find($pictureId);
+                        $picturePath = $picture->getPath();
+                        $fileSystem = new Filesystem();
+                        $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picturePath;
+                        $fileSystem->remove($fileName);
+
+                        $picture->setPath('/images/uploads/' . $newFilename);
+                        $this->em->persist($picture);
+                    }
+                    $this->em->flush();
+                    return "OK";
+                } else {
+                    return "wrongFormat";
+                }
+            }
+        }
+        else {
+            return "null";
         }
     }
 }

@@ -4,3 +4,5 @@ twig:
     strict_variables: '%kernel.debug%'
     paths:
         '%kernel.project_dir%/public/images': images
+    form_themes:
+        - bootstrap_4_layout.html.twig
