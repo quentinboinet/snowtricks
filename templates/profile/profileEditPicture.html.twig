@@ -1,33 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% form_theme form _self %}
-
-{% block form_row %}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-    {%- endif -%}
-
-    <div class="form-group row">
-        {{- form_label(form, null, {label_attr: { class: 'col-sm-4 col-form-label' }}) -}}
-        <div class="col-sm-8">
-            {{- form_widget(form, {'attr': {'class': 'form-control'}}) -}}
-        </div>
-        {{- form_help(form) -}}
-    </div>
-    {{- form_errors(form) }}
-{% endblock %}
-
-{% block form_errors %}
-    {% spaceless %}
-        {% if errors|length > 0 %}
-            {% for error in errors %}
-                <span class="formErrorMessage"> {{  error.messageTemplate|trans(error.messageParameters, 'validators') }}</span><br/><br />
-            {% endfor %}
-        {% endif %}
-    {% endspaceless %}
-{% endblock form_errors %}
-
 {% block title %}Modifier mon profil{% endblock %}
 
 {% block body %}
@@ -47,18 +19,24 @@
                             </div>
 
                             <hr />
+                            <div class="form-group row justify-content-center offset-md-2 col-md-8">
+                                <label class="col-md-2 col-form-label text-center" for="{{ form.picture.vars.id }}">{{ form.picture.vars.label }}</label>
+                                <div class="col-md-6">
+                                    <div class="custom-file">
+                                        <input type="{{ form.picture.vars.type }}" id="{{ form.picture.vars.id }}" name="{{ form.picture.vars.full_name }}" class="form-control custom-file-input">
+                                        <label for="{{ form.picture.vars.id }}" class="custom-file-label"></label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group row justify-content-center">
-                                {{ form_row(form.picture, {
-                                    attr: {
-                                        'placeholder': 'sélectionnez une image'
-                                    }
-                                }) }}
-                                {{ form_errors(form) }}
+                                <span class="formErrorMessage">{{ form_errors(form.picture) }}</span><br />
+                                <span class="formErrorMessage">{{ form_errors(form) }}</span>
                             </div>
                             <div class="form-group row justify-content-center">
                                 <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
                             </div>
-                        {{ form_end(form) }}
+                        {{ form_widget(form._token) }}
+                        {{ form_end(form, {'render_rest': false}) }}
                     </div>
 
                 </div>

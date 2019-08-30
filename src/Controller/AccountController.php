@@ -177,7 +177,6 @@ class AccountController extends AbstractController
         $form = $this->createForm(ProfileInfosFormType::class, $this->getUser());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
             $user = $this->getUser();
             $user->setLastName($form['lastName']->getData());
             $user->setFirstName($form['firstName']->getData());

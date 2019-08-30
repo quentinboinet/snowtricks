@@ -1,33 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% form_theme form _self %}
-
-{% block form_row %}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-    {%- endif -%}
-
-    <div class="form-group row">
-        {{- form_label(form, null, {label_attr: { class: 'col-sm-4 col-form-label' }}) -}}
-        <div class="col-sm-8">
-            {{- form_widget(form, {'attr': {'class': 'form-control'}}) -}}
-        </div>
-        {{- form_help(form) -}}
-    </div>
-    {{- form_errors(form) }}
-{% endblock %}
-
-{% block form_errors %}
-    {% spaceless %}
-        {% if errors|length > 0 %}
-            {% for error in errors %}
-                <span class="formErrorMessage"> {{  error.messageTemplate|trans(error.messageParameters, 'validators') }}</span><br/><br />
-            {% endfor %}
-        {% endif %}
-    {% endspaceless %}
-{% endblock form_errors %}
-
 {% block title %}Modifier mon profil{% endblock %}
 
 {% block body %}
@@ -47,17 +19,38 @@
                                     <h3><b>{{ app.user.username }}</b></h3><br />
 
                                     {{ form_start(form) }}
-                                    {{ form_widget(form) }}
+
+                                    <div class="form-group row justify-content-center offset-md-2 col-md-8">
+                                        <label class="col-md-4 col-form-label text-center" for="{{ form.lastName.vars.id }}">{{ form.lastName.vars.label }}</label>
+                                        <div class="col-md-8">
+                                            <input type="text" id="{{ form.lastName.vars.id }}" name="{{ form.lastName.vars.full_name }}" class="form-control" required="{{ form.lastName.vars.required }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row justify-content-center offset-md-2 col-md-8">
+                                        <label class="col-md-4 col-form-label text-center" for="{{ form.firstName.vars.id }}">{{ form.firstName.vars.label }}</label>
+                                        <div class="col-md-8">
+                                            <input type="text" id="{{ form.firstName.vars.id }}" name="{{ form.firstName.vars.full_name }}" class="form-control" required="{{ form.firstName.vars.required }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row justify-content-center">
+                                        <span class="formErrorMessage">{{ form_errors(form.lastName) }}</span><br />
+                                        <span class="formErrorMessage">{{ form_errors(form.firstName) }}</span><br />
+                                        <span class="formErrorMessage">{{ form_errors(form) }}</span>
+                                    </div>
 
                                     <p><i class="fas fa-envelope"></i> {{ app.user.email }}</p>
+
                                 </div>
                             </div>
-                            {{ form_errors(form) }}
                             <hr />
                             <div class="form-group row justify-content-center">
                                 <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
                             </div>
-                        {{ form_end(form) }}
+
+                        {{ form_widget(form._token) }}
+                        {{ form_end(form, {'render_rest': false}) }}
                     </div>
 
                 </div>

@@ -72,8 +72,7 @@ class MediaUploader extends AbstractController
     {
         /** @var UploadedFile $uploadedFile */
         $uploadedFile = $form['picture']->getData();
-        if ($uploadedFile) {
-            if ($uploadedFile->isValid()) {
+        if ($uploadedFile && $uploadedFile->isValid()) {
                     //on upload la nouvelle image
                     $destination = $this->getParameter('kernel.project_dir') . '/public/images/uploads';
                     $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
@@ -100,7 +99,6 @@ class MediaUploader extends AbstractController
                     }
                     $this->em->flush();
                     return "OK";
-            }
         }
         else {
             return "null";
