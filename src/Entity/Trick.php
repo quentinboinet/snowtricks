@@ -48,7 +48,7 @@ class Trick
     private $updatedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Picture", inversedBy="tricks")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Picture", inversedBy="tricks", cascade={"persist"})
      */
     private $pictures;
 

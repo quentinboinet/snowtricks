@@ -9,13 +9,17 @@ use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Entity\Trick;
 use App\Entity\Video;
+use App\Form\ProfilePasswordFormType;
+use App\Form\TrickAddFormType;
 use App\Repository\TrickRepository;
+use App\Service\FileUploader;
 use App\Service\MediaEditer;
 use App\Service\MediaRemover;
 use App\Service\MediaUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -120,50 +124,41 @@ class TrickController extends AbstractController
      * @Route("/tricks/add", name="trick_add")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_add(EntityManagerInterface $em, Request $request, Security $security, MediaUploader $uploader)
+    public function trick_add(EntityManagerInterface $em, Request $request, FileUploader $fileUploader)
     {
-        $categoryRepo = $em->getRepository(Category::class);
-        $category = $categoryRepo->findAll();
+        $trick = new Trick();
+        $form = $this->createForm(TrickAddFormType::class, $trick);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
-
-            //on vérifie qu'il n'y a pas de figure avec ce nom enregistré
-            $trickRepo = $em->getRepository(Trick::class);
-            $trick = $trickRepo->findOneBy(array('name' => $request->request->get('name')));
-
-            if (is_null($trick)) {
-                $trick = new Trick();
-                $trick->setName($request->request->get('name'));
-                $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->request->get('name')), '-')));
-                $trick->setDescription($request->request->get('description'));
-                $trick->setPublishedAt(new \DateTime());
-                $trick->setUpdatedAt(new \DateTime());
-                $trick->setAuthorName($security->getUser());
-
-                //on appelle le service uploader pour uploader toutes les images
-                $nbImages = $request->request->get('pictureNb');
-                $error = $uploader->picturesUpload('add', $nbImages, $request, $trick, $category);
-                if ($error != null) { return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]);}
-
-                //on appelle le service uploader pour uploader toutes les vidéos
-                $nbVideos = $request->request->get('videoNb');
-                $uploader->videosUpload('add', $nbVideos, $request, $trick);
-
-                $trickCategory = $em->getRepository(Category::class)->find($request->request->get('category'));
-                $trick->setCategory($trickCategory);
-
-                $em->persist($trick);
-                $em->flush();
-
-                $this->addFlash('success', 'La figure a bien été publiée ! Vous pouvez la retrouver ci-dessous.');
-                return $this->redirectToRoute('home_page');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $pictures = $trick->getPictures();
+                foreach ($pictures as $picture) {
+                    if ($picture->getFile() != null) {
+                        $fileName = $fileUploader->upload($picture->getFile());
+                        $picture->setPath('/images/uploads/' . $fileName);
+                        $trick->addPicture($picture);
+                        $em->persist($picture);
+                    }
+                    else {
+                        $trick->removePicture($picture);
+                    }
             }
-            else {
-                return $this->render('tricks/trickAdd.html.twig', ['categories' => $category, 'error' => 'Une figure possède déjà ce nom ! Veuillez en choisir un autre.']);
-            }
+
+            $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $trick->getName()), '-')));
+            $trick->setPublishedAt(new \DateTime());
+            $trick->setUpdatedAt(new \DateTime());
+            $trick->setAuthorName($this->getUser());
+
+            $em->persist($trick);
+            $em->flush();
+
+            $this->addFlash('success', 'La figure a bien été publiée ! Vous pouvez la retrouver ci-dessous.');
+            return $this->redirectToRoute('home_page');
         }
         else {
-            return $this->render('tricks/trickAdd.html.twig', ['categories' => $category, 'error' => '']);
+            return $this->render('tricks/trickAdd.html.twig', [
+                'form' => $form->createView()
+            ]);
         }
     }
 

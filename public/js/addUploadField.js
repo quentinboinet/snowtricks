@@ -1,72 +1,64 @@
+var $collectionHolder;
+var $newLinkLi = $('#trickPictures');
+
 $(document).ready(function() {
-    $("#pictureNb").val(3);
-    $("#videoNb").val(3);
+    // Get the ul that holds the collection of tags
+    $collectionHolder = $('#trickPictures');
 
-    var regexYoutube = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+");
-    var regexDailymotion = new RegExp("^.+dailymotion.com\\/((video|hub)\\/([^_]+))?[^#]*(#video=([^_&]+))?/");
-    var regexVimeo = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?player.vimeo.com/video\\/.+");
+    // count the current form inputs we have (e.g. 2), use that as the new
+    // index when inserting a new item (e.g. 2)
+    $collectionHolder.data('index', $collectionHolder.find(':input').length);
 
-    $('#addPictureUpload').click(function () {
-        var nbPictureFields = $('#pictureNb').val();
-        var newNbPictureFields = parseInt(nbPictureFields) + 1;
-        var html = "<input type=\"file\" name=\"picture" + newNbPictureFields + "\" class=\"form-control-file\">";
-        $("#pictureUploads").append(html);
-        $("#pictureNb").val(newNbPictureFields);
+    $addTagButton = $('#addPictureUpload');
+    $addTagButton.on('click', function(e) {
+        // add a new tag form (see next code block)
+        addTagForm($collectionHolder, $newLinkLi);
     });
 
-    $('#addVideoUpload').click(function () {
-        var nbVideoFields = $('#videoNb').val();
-        var newNbVideoFields = parseInt(nbVideoFields) + 1;
-        var html = "<input type=\"text\" id=\"video" + newNbVideoFields + "\" name=\"video" + newNbVideoFields + "\" class=\"form-control\" placeholder=\"Lien vers la vidéo " + newNbVideoFields + "\">";
-        $("#videoUploads").append(html);
-        $("#videoNb").val(newNbVideoFields);
+    if($('#trickPictures div').length == 0)
+    {
+        addTagForm($collectionHolder, $newLinkLi);
+    }
 
-        $('#video' + newNbVideoFields).change(function () {
-            var nbVideoFields = $('#videoNb').val();
-            var i = 1;
-            var nbNonValide = 0
-            for(i=1;i<=nbVideoFields;i++) {
-                var url = $("#video" + i).val();
-                if (url != "") {
-                    var valideYoutube = regexYoutube.test(url);
-                    var valideDailymotion = regexDailymotion.test(url);
-                    var valideVimeo = regexVimeo.test(url);
-                    if (!valideYoutube && !valideDailymotion && !valideVimeo) {
-                        nbNonValide = nbNonValide + 1;
-                    }
-                }
-            }
-            if (nbNonValide > 0) {
-                $("#videoErrorMessage").text("Une URL de vidéo entrée n'est pas valide ! Nous acceptons les vidéos provenant de Youtube, Dailymotion et Viméo.");
-                $("#sumbitButtonAddTrick").attr('disabled', true);
-            } else {
-                $("#videoErrorMessage").text("");
-                $("#sumbitButtonAddTrick").attr('disabled', false);
-            }
+    function addTagForm($collectionHolder, $newLinkLi) {
+        // Get the data-prototype explained earlier
+        var prototype = $collectionHolder.data('prototype');
+
+        // get the new index
+        var index = $collectionHolder.data('index');
+
+        var newForm = prototype;
+        // You need this only if you didn't set 'label' => false in your tags field in TaskType
+        // Replace '__name__label__' in the prototype's HTML to
+        // instead be a number based on how many items we have
+        // newForm = newForm.replace(/__name__label__/g, index);
+
+        // Replace '__name__' in the prototype's HTML to
+        // instead be a number based on how many items we have
+        newForm = newForm.replace(/__name__/g, index);
+
+        // increase the index with one for the next item
+        $collectionHolder.data('index', index + 1);
+
+        // Display the form in the page in an li, before the "Add a tag" link li
+        var $newFormLi = $('<div></div>').append(newForm);
+        $newLinkLi.append($newFormLi);
+        //addTagFormDeleteLink($newFormLi);
+    }
+
+    function addTagFormDeleteLink($tagFormLi) {
+        var $removeFormButton = $('<a href="" title="Supprimer l\'image"><i class="fas fa-trash-alt"></i></a>');
+        $tagFormLi.append($removeFormButton);
+
+        $removeFormButton.on('click', function(e) {
+            // remove the li for the tag form
+            $tagFormLi.remove();
         });
+    }
+
+    $(document).on('click', '.deletePicture', function(e) {
+        // remove the li for the tag form
+        $(this).parent().remove();
     });
 
-    $('#videoUploads input').change(function () {
-        var nbVideoFields = $('#videoNb').val();
-        var i = 1;
-        var nbNonValide = 0
-        for(i=1;i<=nbVideoFields;i++) {
-            var url = $("#video" + i).val();
-            if (url != "") {
-                var valideYoutube = regexYoutube.test(url);
-                var valideDailymotion = regexDailymotion.test(url);
-                var valideVimeo = regexVimeo.test(url);
-                if (!valideYoutube && !valideDailymotion && !valideVimeo) {
-                    nbNonValide = nbNonValide + 1;
-                }
-            }
-        }
-        if (nbNonValide > 0) {
-            $("#videoErrorMessage").text("Une URL de vidéo entrée n'est pas valide ! Nous acceptons les vidéos provenant de Youtube, Dailymotion et Viméo.");
-            $("#sumbitButtonAddTrick").attr('disabled', true);
-        } else {
-            $("#videoErrorMessage").text("");
-            $("#sumbitButtonAddTrick").attr('disabled', false);
-        }
-    });
 });

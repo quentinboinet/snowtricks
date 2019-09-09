@@ -7,70 +7,72 @@
         <div class="row justify-content-center align-items-center">
             <div class="col col-md-8 text-center">
                 <div class="card loginCard">
-                    <div class="card-header"><h2>Ajouter une figure</h2></div>
-                    <div class="card-body">
+                                     <div class="card-body">
+                                         <div class="card-header"><h2>Ajouter une figure</h2></div>
                         <p class="card-text">
-                        <form method="post" enctype="multipart/form-data">
-                            <div class="form-group row">
-                                <label for="name" class="col-sm-4 col-form-label">Nom de la figure :</label>
+                        {{ form_start(form) }}
+
+                         <div class="form-group row">
+                                <label for="{{ form.name.vars.id }}" class="col-sm-4 col-form-label required">{{ form.name.vars.label }}</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Nom de figure" required minlength="2" maxlength="50">
+                                    <input type="text" id="{{ form.name.vars.id }}" name="{{ form.name.vars.full_name }}" required="{{ form.name.vars.required }}" class="form-control">
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="description" class="col-sm-4 col-form-label">Description :</label>
+                         </div>
+
+                         <div class="form-group row">
+                                <label for="{{ form.description.vars.id }}" class="col-sm-4 col-form-label">{{ form.description.vars.label }}</label>
                                 <div class="col-sm-8">
-                                    <textarea class="form-control" id="description" name="description" required></textarea>
+                                    <textarea class="form-control" id="{{ form.description.vars.id }}" name="{{ form.description.vars.full_name }}" required="{{ form.description.vars.required }}"></textarea>
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="category" class="col-sm-4 col-form-label">Catégorie :</label>
-                                <div class="col-sm-8">
-                                    <select class="form-control" id="category" name="category">
-                                        {% for category in categories %}
-                                            <option value="{{ category.id }}">{{ category.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="picture1" class="col-sm-4 col-form-label">Images :<br />
-                                    <span class="btn btn-info" id="addPictureUpload" title="Ajouter une image"><i class="fas fa-camera-retro"></i></span>
-                                </label>
-                                <div class="col-sm-8" id="pictureUploads">
-                                    <input type="file" class="form-control-file" name="picture1">
-                                    <input type="file" class="form-control-file" name="picture2">
-                                    <input type="file" class="form-control-file" name="picture3">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="video1" class="col-sm-4 col-form-label">Vidéos :<br />
-                                    <span class="btn btn-info" id="addVideoUpload" title="Ajouter une vidéo"><i class="fas fa-video"></i></span>
-                                </label>
-                                <div class="col-sm-8" id="videoUploads">
-                                    <input type="text" class="form-control" id="video1" name="video1" placeholder="Lien vers la vidéo 1">
-                                    <input type="text" class="form-control" id="video2" name="video2" placeholder="Lien vers la vidéo 2">
-                                    <input type="text" class="form-control" id="video3" name="video3" placeholder="Lien vers la vidéo 3">
-                                </div>
-                                <div id="videoErrorMessage" class="col-sm-8 offset-sm-4 formErrorMessage"></div>
                             </div>
 
-                            {% if error %}
-                                <div class="formErrorMessage">{{ error }}</div>
-                            {% endif %}
+                         <div class="form-group row">
+                                <label for="{{ form.category.vars.id }}" class="col-sm-4 col-form-label">{{ form.category.vars.label }}</label>
+                                <div class="col-sm-8">
+                                    {{ form_widget(form.category) }}
+                                </div>
+                                <br />
+                            </div>
+
+                        {{ form_row(form.category) }}
+
+                        <hr />
+
+                        <div class="form-group row">
+                        <br />
+                                <label for="picture1" class="col-sm-4 col-form-label">Images :<br />
+                                    <span class="btn btn-info add_picture_link" id="addPictureUpload" title="Ajouter une image"><i class="fas fa-camera-retro"></i></span>
+                                </label>
+                                <div class="col-sm-8" id="trickPictures" data-prototype="<div class='row align-items-center'><div class='col-sm-10'>{{ form_widget(form.pictures.vars.prototype)|e('html_attr') }}</div><div class='col-sm-2 form-group deletePicture'><span><i class='fas fa-trash-alt'></i></span></div></div>">
+                                    {{ form_widget(form.pictures.vars.prototype|e('html_attr')) }}
+
+                                    {% for picture in form.pictures %}
+                                        <div class='row align-items-center'>
+                                        {{ form_errors(picture) }}
+                                        <div class='col-sm-10'>{{ form_widget(picture) }}</div>
+                                        <div class='col-sm-2 form-group deletePicture'><span><i class='fas fa-trash-alt'></i></span></div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                        </div>
+
+                         <div class="form-group row justify-content-center">
+                                <span class="formErrorMessage">{{ form_errors(form.pictures) }}</span>
+                                <span class="formErrorMessage">{{ form_errors(form) }}</span>
+                         </div>
 
                             <div class="form-group row justify-content-center">
                                 <div class="col-sm-10 ">
                                     <button id="sumbitButtonAddTrick" type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
                                 </div>
                             </div>
+                            {{ form_widget(form._token) }}
 
-                            <input type="text" id="pictureNb" name="pictureNb" value="3" style="display: none;"/>
-                            <input type="text" id="videoNb" name="videoNb" value="3" style="display: none;"/>
-                        </form>
-                        </p>
-                    </div>
+                            {% do form.pictures.setRendered %}
+                            {% do form.name.setRendered %}
+                            {% do form.description.setRendered %}
 
+                        {{ form_end(form) }}
                 </div>
             </div>
         </div>

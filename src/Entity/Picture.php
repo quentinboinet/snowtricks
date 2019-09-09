@@ -33,6 +33,8 @@ class Picture
      */
     private $users;
 
+    private $file;
+
     public function __construct()
     {
         $this->tricks = new ArrayCollection();
@@ -114,4 +116,22 @@ class Picture
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param mixed $file
+     */
+    public function setFile($file): void
+    {
+        $this->file = $file;
+    }
+
+
 }
