@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Category;
 use App\Entity\Picture;
 use App\Entity\Trick;
+use App\Entity\Video;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -33,7 +34,15 @@ class TrickAddFormType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'prototype' => true,
-                'prototype_data' => new Picture()
+                'prototype_data' => new Picture(),
+                'attr' => ['class' => 'form-inline']
+            ])
+            ->add('videos', CollectionType::class, [
+                'entry_type' => VideoAddFormType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'prototype' => true,
+                'prototype_data' => new Video()
             ])
 
         ;

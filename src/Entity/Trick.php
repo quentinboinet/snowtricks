@@ -7,9 +7,14 @@ use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TrickRepository")
+ * @UniqueEntity(
+ *     fields={"name"},
+ *     message="Une figure avec ce nom existe déjà !"
+ * )
  */
 class Trick
 {
@@ -53,7 +58,7 @@ class Trick
     private $pictures;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Video", inversedBy="tricks")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Video", inversedBy="tricks", cascade={"persist"})
      */
     private $videos;
 

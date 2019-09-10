@@ -35,6 +35,11 @@ class Picture
 
     private $file;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $alt;
+
     public function __construct()
     {
         $this->tricks = new ArrayCollection();
@@ -131,6 +136,18 @@ class Picture
     public function setFile($file): void
     {
         $this->file = $file;
+    }
+
+    public function getAlt(): ?string
+    {
+        return $this->alt;
+    }
+
+    public function setAlt(?string $alt): self
+    {
+        $this->alt = $alt;
+
+        return $this;
     }
 
 

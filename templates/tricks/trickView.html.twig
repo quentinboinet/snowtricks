@@ -80,7 +80,7 @@
                                         {%  for picture in trick.pictures %}
                                          <div class="col-lg-2 card rounded" id="trickMedias">
                                         <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                                             <a href="{{ asset(picture.path) }}" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ trick.name }}"></a>
+                                             <a href="{{ asset(picture.path) }}" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ picture.alt }}"></a>
                                          </div>
                                         {% endfor %}
                                     {% endif %}
@@ -103,7 +103,7 @@
                                         {%  for picture in trick.pictures %}
                                             <div class="card h-100 rounded" id="trickMediasMobile">
                                                 <!-- si on a aucune image associée à la figure alors on affiche l'image par défault, sinon on affiche la première image enregistrée en bdd pour ce trick -->
-                                                <a data-media="{{ asset(picture.path) }}" data-toggle="modal" data-target="#exampleModal" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ trick.name }}"></a>
+                                                <a data-media="{{ asset(picture.path) }}" data-toggle="modal" data-target="#exampleModal" title="Agrandir l'image"><img src="{{ asset(picture.path) }}" class="card-img-top" alt="{{ picture.alt }}"></a>
                                             </div>
                                         {% endfor %}
                                     {% endif %}

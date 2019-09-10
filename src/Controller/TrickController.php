@@ -132,17 +132,22 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $pictures = $trick->getPictures();
+            $videos = $trick->getVideos();
+
                 foreach ($pictures as $picture) {
                     if ($picture->getFile() != null) {
                         $fileName = $fileUploader->upload($picture->getFile());
                         $picture->setPath('/images/uploads/' . $fileName);
-                        $trick->addPicture($picture);
-                        $em->persist($picture);
                     }
                     else {
                         $trick->removePicture($picture);
                     }
             }
+                foreach ($videos as $video) {
+                    if ($video->getUrl() == null) {
+                        $trick->removeVideo($video);
+                    }
+                }
 
             $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $trick->getName()), '-')));
             $trick->setPublishedAt(new \DateTime());
