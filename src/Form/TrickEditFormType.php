@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class TrickAddFormType extends AbstractType
+class TrickEditFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -43,7 +43,6 @@ class TrickAddFormType extends AbstractType
                 'prototype' => true,
                 'prototype_data' => new Video(),
             ])
-
         ;
     }
 

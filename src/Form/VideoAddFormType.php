@@ -19,8 +19,8 @@ class VideoAddFormType extends AbstractType
                 'attr' => ['class' => 'videoAddInput', 'placeholder' => 'Lien vers la vidéo'],
                 'required' => false,
                 'constraints' => [
-                    new Regex(array( 'pattern' => "^((http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+)|(/http:\/\/www\.dailymotion\.com\/video\/+/)|((http(s)?:\/\/)?((w){3}.)?player.vimeo.com/video\/.+)^", 'message' => 'L\'URL de la vidéo entrée n\'est pas valide ! Nous acceptons les vidéos provenant de Youtube, Dailymotion et Viméo.')),
-                ]
+                    new Regex(['pattern' => "^((http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+)|(/http:\/\/www\.dailymotion\.com\/video\/+/)|((http(s)?:\/\/)?((w){3}.)?player.vimeo.com/video\/.+)|(#TO_DELETE#)^", 'message' => 'L\'URL de la vidéo entrée n\'est pas valide ! Nous acceptons les vidéos provenant de Youtube, Dailymotion et Viméo.']),
+                ],
             ])
         ;
     }

@@ -2,6 +2,16 @@ $('div.alert.alert-info').delay(5000).slideUp(300);
 $('div.alert.alert-danger').delay(20000).slideUp(300);
 $('div.alert.alert-warning').delay(5000).slideUp(300);
 
+function addTagFormDeleteLink($tagFormLi) {
+    var $removeFormButton = $('<a href="" title="Supprimer"><i class="fas fa-trash-alt"></i></a>');
+    $tagFormLi.append($removeFormButton);
+
+    $removeFormButton.on('click', function(e) {
+        // remove the li for the tag form
+        $tagFormLi.remove();
+    });
+}
+
 $(document).on('change', '.custom-file-input', function(event) {
     var inputFile = event.currentTarget;
     $(inputFile).parent()

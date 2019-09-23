@@ -9,10 +9,8 @@ var regexVimeo = new RegExp("^(http(s)?:\\/\\/)?((w){3}.)?player.vimeo.com/video
 $(document).ready(function() {
     // Get the ul that holds the collection of tags
     $collectionHolder = $('#trickPictures');
-    $collectionHolder.data('index', $collectionHolder.find(':input').length);
 
     $collectionHolderVideo = $('#trickVideos');
-    $collectionHolderVideo.data('index', $collectionHolderVideo.find(':input').length);
 
     $addTagButton = $('#addPictureUpload');
     $addTagButtonVideo = $('#addVideoUpload');
@@ -27,17 +25,29 @@ $(document).ready(function() {
         addTagForm($collectionHolderVideo, $newLinkLiVideo);
     });
 
-    if($('#trickPictures div').length == 0)
+    if (document.title != 'SnowTricks - Publier une figure') {
+        var initialPicturesIndex = $('#trickMediaEditBlock').data('nbpictures');
+        var initialVideosIndex = $('#trickMediaEditBlock').data('nbvideos');
+    }
+    else {
+        var initialPicturesIndex = 0;
+        var initialVideosIndex = 0;
+    }
+
+    if($('#trickPictures div').length == 0 && document.title == 'SnowTricks - Publier une figure')
     {
         addTagForm($collectionHolder, $newLinkLi);
     }
 
-    if($('#trickVideos div').length == 0)
+    if($('#trickVideos div').length == 0 && document.title == 'SnowTricks - Publier une figure')
     {
         addTagForm($collectionHolderVideo, $newLinkLiVideo);
     }
 
     function addTagForm($collectionHolder, $newLinkLi) {
+
+        $('#trickPictures').data('index', initialPicturesIndex + $('#trickPictures').find(':input').length + $('#editDeleteLinks').find(':input').length);
+        $('#trickVideos').data('index', initialVideosIndex + $('#trickVideos').find(':input').length);
         // Get the data-prototype explained earlier
         var prototype = $collectionHolder.data('prototype');
         // get the new index
@@ -57,16 +67,6 @@ $(document).ready(function() {
         //addTagFormDeleteLink($newFormLi);
     }
 
-    function addTagFormDeleteLink($tagFormLi) {
-        var $removeFormButton = $('<a href="" title="Supprimer"><i class="fas fa-trash-alt"></i></a>');
-        $tagFormLi.append($removeFormButton);
-
-        $removeFormButton.on('click', function(e) {
-            // remove the li for the tag form
-            $tagFormLi.remove();
-        });
-    }
-
     $(document).on('click', '.deletePicture', function(e) {
         $(this).parent().parent().remove();
     });
@@ -76,11 +76,13 @@ $(document).ready(function() {
     });
 
     $(document).on('change', '.videoAddInput', function () {
-        var nbVideoFields = $('#trickVideos div input').length - 1;
+        var nbVideoFields = $('#trickVideos div input').length - 1 + initialVideosIndex;
         var nbNonValide = 0;
+
         for(i=0;i<=nbVideoFields;i++) {
             var url = $("#trick_add_form_videos_" + i + "_url").val();
-            if (url != "") {
+            if (typeof url == "undefined") { url = $("#trick_edit_form_videos_" + i + "_url").val(); }
+            if (url != "" && typeof url != "undefined") {
                 var valideYoutube = regexYoutube.test(url);
                 var valideDailymotion = regexDailymotion.test(url);
                 var valideVimeo = regexVimeo.test(url);
