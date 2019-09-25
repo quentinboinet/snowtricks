@@ -121,11 +121,9 @@ class AccountController extends AbstractController
                 $em->flush();
 
                 $this->addFlash('success', 'Votre mot de passe est désormais changé ! Vous pouvez vous connecter.');
-
                 return $this->redirectToRoute('home_page');
             } else {
                 $error = 'L\'adresse e-mail entrée ne correspond pas à celle définie avec votre compte !';
-
                 return $this->render('security/resetPassword.html.twig', ['error' => $error, 'username' => $user->getUsername()]);
             }
         } else {
@@ -141,12 +139,10 @@ class AccountController extends AbstractController
                     return $this->render('security/resetPassword.html.twig', ['error' => '', 'username' => $user->getUsername()]);
                 } elseif ('expired' == $result) {
                     $this->addFlash('fail', 'Le lien que vous avez utiilisé semble avoir expiré ! Veuillez contacter l\'administrateur.');
-
                     return $this->redirectToRoute('home_page');
                 }
             } else {
                 $this->addFlash('fail', 'Lien invalide ! Veuillez contacter l\'administrateur.');
-
                 return $this->redirectToRoute('home_page');
             }
         }

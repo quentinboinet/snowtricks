@@ -19,7 +19,7 @@ class MediaAdder
     public function addMedias(ArrayCollection $pictures, ArrayCollection $videos, Trick $trick)
     {
         foreach ($pictures as $picture) {
-            if (null != $picture->getFile()) {
+            if (null !== $picture->getFile()) {
                 $fileName = $this->fileUploader->upload($picture->getFile());
                 $picture->setPath('/images/uploads/'.$fileName);
             } else {
@@ -27,7 +27,7 @@ class MediaAdder
             }
         }
         foreach ($videos as $video) {
-            if (null == $video->getUrl()) {
+            if (null === $video->getUrl()) {
                 $trick->removeVideo($video);
             }
         }
