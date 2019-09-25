@@ -93,6 +93,7 @@ class TrickController extends AbstractController
                 $em->flush();
 
                 $this->addFlash('success', 'Votre commentaire a bien été ajouté !');
+
                 return $this->render('tricks/trickView.html.twig', ['trick' => $trick, 'commentForm' => $this->createForm(CommentFormType::class, new Comment())->createView()]);
             } else {
                 return $this->render('tricks/trickView.html.twig', ['trick' => $trick, 'commentForm' => $form->createView()]);
@@ -183,6 +184,11 @@ class TrickController extends AbstractController
 
             foreach ($pictures as $picture) {
                 if (null != $picture->getFile()) {
+                    if (null !== $picture->getPath()) { //si c'est une modification d'image, alors d'abord on supprime l'ancienne du serveur
+                        $fileSystem = new Filesystem();
+                        $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
+                        $fileSystem->remove($fileName);
+                    }
                     $fileName = $fileUploader->upload($picture->getFile());
                     $picture->setPath('/images/uploads/'.$fileName);
                 } elseif (null === $picture->getFile() && false !== strpos($picture->getAlt(), '#TO_DELETE#')) { //c'est que c'est une image à supprimer
