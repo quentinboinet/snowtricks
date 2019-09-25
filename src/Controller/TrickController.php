@@ -10,6 +10,7 @@ use App\Form\TrickAddFormType;
 use App\Form\TrickEditFormType;
 use App\Repository\TrickRepository;
 use App\Service\FileUploader;
+use App\Service\MediaAdder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -108,7 +109,7 @@ class TrickController extends AbstractController
      * @Route("/tricks/add", name="trick_add")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_add(EntityManagerInterface $em, Request $request, FileUploader $fileUploader)
+    public function trick_add(EntityManagerInterface $em, Request $request, MediaAdder $mediaAdder)
     {
         $trick = new Trick();
         $form = $this->createForm(TrickAddFormType::class, $trick);
@@ -118,19 +119,7 @@ class TrickController extends AbstractController
             $pictures = $trick->getPictures();
             $videos = $trick->getVideos();
 
-            foreach ($pictures as $picture) {
-                if (null != $picture->getFile()) {
-                    $fileName = $fileUploader->upload($picture->getFile());
-                    $picture->setPath('/images/uploads/'.$fileName);
-                } else {
-                    $trick->removePicture($picture);
-                }
-            }
-            foreach ($videos as $video) {
-                if (null == $video->getUrl()) {
-                    $trick->removeVideo($video);
-                }
-            }
+            $mediaAdder->addMedias($pictures, $videos, $trick);
 
             $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $trick->getName()), '-')));
             $trick->setPublishedAt(new \DateTime());
@@ -168,7 +157,7 @@ class TrickController extends AbstractController
             $originalPictures->add($picture);
         }
         $originalVideos = new ArrayCollection();
-        // Create an ArrayCollection of the current pictures objects in the database
+        // Create an ArrayCollection of the current videos objects in the database
         foreach ($trick->getVideos() as $video) {
             $originalVideos->add($video);
         }
