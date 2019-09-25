@@ -67,11 +67,7 @@ $(document).ready(function() {
         //addTagFormDeleteLink($newFormLi);
     }
 
-    $(document).on('click', '.deletePicture', function(e) {
-        $(this).parent().parent().remove();
-    });
-
-    $(document).on('click', '.deleteVideo', function(e) {
+    $(document).on('click', '.deletePicture, .deleteVideo', function(e) {
         $(this).parent().parent().remove();
     });
 
