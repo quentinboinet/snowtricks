@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use App\Entity\PasswordToken;
 use App\Entity\Picture;
@@ -11,45 +9,42 @@ use App\Entity\User;
 use App\Form\ProfileInfosFormType;
 use App\Form\ProfilePasswordFormType;
 use App\Form\ProfilePictureFormType;
+use App\Service\FileUploader;
 use App\Service\Mailer;
-use App\Service\MediaUploader;
 use App\Service\TokenChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Security;
 
 class AccountController extends AbstractController
 {
-
     /**
      * @Route ("/api/account/confirm/{userId}/{token}", name="api_account_confirm")
      */
     public function registrationConfirm($userId, $token, EntityManagerInterface $em, TokenChecker $tokenChecker)
     {
-         //on regarde si un token avec cet id d'user existe bien dans la table RegistrationToken, et on vérifie aussi qu'il n'a pas expiré
+        //on regarde si un token avec cet id d'user existe bien dans la table RegistrationToken, et on vérifie aussi qu'il n'a pas expiré
         $tokenRepo = $em->getRepository(RegistrationToken::class);
         $token = $tokenRepo->findOneBy(['user' => $userId, 'token' => $token]);
         if (!empty($token)) {
             $result = $tokenChecker->registrationToken('accountConfirm', $token, null, $userId);
-            if ($result == "OK") {
+            if ('OK' == $result) {
                 $this->addFlash('success', 'Votre compte est désormais activé ! Vous pouvez vous connecter.');
+
                 return $this->redirectToRoute('home_page');
-            }
-            elseif ($result == "expired") {
+            } elseif ('expired' == $result) {
                 $this->addFlash('fail', 'Le lien que vous avez utiilisé semble avoir expiré ! Veuillez contacter l\'administrateur.');
+
                 return $this->redirectToRoute('home_page');
             }
-        }
-        else {
+        } else {
             $this->addFlash('fail', 'Lien invalide ! Veuillez contacter l\'administrateur.');
+
             return $this->redirectToRoute('home_page');
         }
     }
@@ -71,6 +66,7 @@ class AccountController extends AbstractController
         $mailerService->sendMail($user, 'SnowTricks - Validation d\'inscription', 'email/registrationConfirm.html.twig', $token);
 
         $this->addFlash('success', 'Merci ! Un e-mail contenant un lien d\'activation vous a été envoyé.');
+
         return $this->redirectToRoute('home_page');
     }
 
@@ -84,7 +80,6 @@ class AccountController extends AbstractController
             $userRepo = $em->getRepository(User::class);
             $user = $userRepo->findOneBy(['username' => $username]);
             if (!empty($user)) { //si un utilisateur est bien enregistré avec cet username
-
                 //on crée le token qui servira à changer son mot de passe
                 $token = new PasswordToken($user);
                 $em->persist($token);
@@ -94,14 +89,15 @@ class AccountController extends AbstractController
                 $mailerService->sendMail($user, 'SnowTricks - Mot de passe oublié', 'email/forgetPassword.html.twig', null, $token);
 
                 $this->addFlash('success', 'Merci ! Un e-mail contenant un lien permettant de remettre à zéro votre mot de passe vous a été envoyé.');
+
                 return $this->redirectToRoute('home_page');
-            }
-            else {
+            } else {
                 $error = 'Aucun utilisateur connu sous ce nom !';
+
                 return $this->render('security/forgotPassword.html.twig', ['error' => $error]);
             }
-
         }
+
         return $this->render('security/forgotPassword.html.twig', ['error' => '']);
     }
 
@@ -110,16 +106,13 @@ class AccountController extends AbstractController
      */
     public function resetPassword($userId, $token, EntityManagerInterface $em, Request $request, UserPasswordEncoderInterface $passwordEncoder, TokenChecker $tokenChecker)
     {
-
         if ($request->isMethod('POST')) {
-
             $userRepo = $em->getRepository(User::class);
             $user = $userRepo->find($userId);
             $userEmail = $user->getEmail();
             $userEmailForm = $request->request->get('email');
 
             if ($userEmail === $userEmailForm) { //si l'email entré correspond bien à celui en BDD
-
                 $user->setPassword($passwordEncoder->encodePassword(
                     $user,
                     $request->request->get('password')
@@ -128,32 +121,32 @@ class AccountController extends AbstractController
                 $em->flush();
 
                 $this->addFlash('success', 'Votre mot de passe est désormais changé ! Vous pouvez vous connecter.');
-                return $this->redirectToRoute('home_page');
 
-            }
-            else {
+                return $this->redirectToRoute('home_page');
+            } else {
                 $error = 'L\'adresse e-mail entrée ne correspond pas à celle définie avec votre compte !';
+
                 return $this->render('security/resetPassword.html.twig', ['error' => $error, 'username' => $user->getUsername()]);
             }
-        }
-        else {
+        } else {
             //on regarde si un token avec cet id d'user existe bien dans la table RegistrationToken, et on vérifie aussi qu'il n'a pas expiré
             $tokenRepo = $em->getRepository(PasswordToken::class);
             $token = $tokenRepo->findOneBy(['user' => $userId, 'token' => $token]);
             if (!empty($token)) {
                 $result = $tokenChecker->registrationToken('resetPassword', null, $token, $userId);
-                if ($result == "OK") {
+                if ('OK' == $result) {
                     $userRepo = $em->getRepository(User::class);
                     $user = $userRepo->find($userId);
+
                     return $this->render('security/resetPassword.html.twig', ['error' => '', 'username' => $user->getUsername()]);
-                }
-                elseif ($result == "expired") {
+                } elseif ('expired' == $result) {
                     $this->addFlash('fail', 'Le lien que vous avez utiilisé semble avoir expiré ! Veuillez contacter l\'administrateur.');
+
                     return $this->redirectToRoute('home_page');
                 }
-            }
-            else {
+            } else {
                 $this->addFlash('fail', 'Lien invalide ! Veuillez contacter l\'administrateur.');
+
                 return $this->redirectToRoute('home_page');
             }
         }
@@ -183,11 +176,11 @@ class AccountController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Profil correctement mis à jour !');
+
             return $this->redirectToRoute('profile_view');
-        }
-        else {
+        } else {
             return $this->render('profile/profileEditInfos.html.twig', [
-                'form' => $form->createView()
+                'form' => $form->createView(),
             ]);
         }
     }
@@ -208,18 +201,18 @@ class AccountController extends AbstractController
                     $form['password']->getData()
                 ));
                 $em->flush();
-            }
-            else {
+            } else {
                 $form->get('old_password')->addError(new FormError('Le mot de passe actuel est incorrect !'));
+
                 return $this->render('profile/profileEditPassword.html.twig', ['form' => $form->createView()]);
             }
 
             $this->addFlash('success', 'Mot de passe correctement modifié !');
+
             return $this->redirectToRoute('profile_view');
-        }
-        else {
+        } else {
             return $this->render('profile/profileEditPassword.html.twig', [
-                'form' => $form->createView()
+                'form' => $form->createView(),
             ]);
         }
     }
@@ -228,26 +221,34 @@ class AccountController extends AbstractController
      * @Route("/profile/edit/picture", name="profile_edit_picture")
      * @IsGranted("ROLE_USER")
      */
-    public function editPicture(EntityManagerInterface $em, Request $request, MediaUploader $mediaUploader)
+    public function editPicture(EntityManagerInterface $em, Request $request, FileUploader $fileUploader)
     {
         $form = $this->createForm(ProfilePictureFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $result = $mediaUploader->profilePictureUpload($form);
-            switch($result) {
-                case 'OK' :
-                    $this->addFlash('success', 'Image de profil correctement mise à jour !');
-                    return $this->redirectToRoute('profile_view');
-                    break;
-                case 'null' :
-                    $this->addFlash('success', 'Image de profil non modifiée !');
-                    return $this->redirectToRoute('profile_view');
-                    break;
+            $fileName = $fileUploader->upload($form['picture']->getData());
+            if (null === $this->getUser()->getProfilePicture()) {
+                $picture = new Picture();
+                $picture->setPath('/images/uploads/'.$fileName);
+                $this->getUser()->setProfilePicture($picture);
+            } else {
+                $pictureId = $this->getUser()->getProfilePicture()->getId();
+                $picture = $em->getRepository(Picture::class)->find($pictureId);
+                $picturePath = $picture->getPath();
+                $fileSystem = new Filesystem();
+                $oldfileName = $this->getParameter('kernel.project_dir').'/public'.$picturePath;
+                $fileSystem->remove($oldfileName);
+                $picture->setPath('/images/uploads/'.$fileName);
             }
-        }
-        else {
+            $em->persist($picture);
+            $em->flush();
+
+            $picture->setPath('/images/uploads/'.$fileName);
+            $this->addFlash('success', 'Image de profil correctement mise à jour !');
+            return $this->redirectToRoute('profile_view');
+        } else {
             return $this->render('profile/profileEditPicture.html.twig', [
-                'form' => $form->createView()
+                'form' => $form->createView(),
             ]);
         }
     }

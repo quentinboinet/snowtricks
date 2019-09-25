@@ -15,8 +15,8 @@ class ProfilePictureFormType extends AbstractType
         $builder
             ->add('picture', FileType::class, ['label' => 'Fichier : ', 'mapped' => 'false', 'required' => false,
                 'constraints' => [
-                new Image(['maxSize' => '2M', 'maxSizeMessage' => 'Image trop lourde ! (max. 2Mo autorisé)', 'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'], 'mimeTypesMessage' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.'])
-            ]])
+                new Image(['maxSize' => '2M', 'maxSizeMessage' => 'Image trop lourde ! (max. 2Mo autorisé)', 'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'], 'mimeTypesMessage' => 'Seules les images au format .jpg, .jpeg, .png et .gif sont autorisées.']),
+            ], ])
         ;
     }
 
