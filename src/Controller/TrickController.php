@@ -50,13 +50,8 @@ class TrickController extends AbstractController
             foreach ($tricks as $trick) {
                 $pictures = $trick->getPictures();
                 if (0 != count($pictures)) {
-                    $i = 0;
-                    foreach ($pictures as $picture) {
-                        if (0 == $i) {
-                            $picturePath = $picture->getPath();
-                        } //on récupère la première image associée à ce trick (image de couverture)
-                        ++$i;
-                    }
+                    //on récupère la première image associée à ce trick (image de couverture)
+                    $picturePath = $pictures->first()->getPath();
                 } else {
                     $picturePath = '';
                 }
