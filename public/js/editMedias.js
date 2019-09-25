@@ -34,14 +34,6 @@ $(document).ready(function() {
                 "                            </div>";
 
             testMobileOrNot($(this).parent().parent().attr('id'), champURLS);
-            //if ($(this).parent().parent().attr('id') == "trickMediasMobile") //si le clic provient du site en affichage mobile
-            //{
-            //    $('.trickMediaEditBlockMobile').append(champURLS);
-            //}
-            //else {
-             //   $('.trickMediaEditBlock').append(champURLS);
-           // }
-
         }
 
         var nbPicturesToAdd = $('#pictureAddNb').val();

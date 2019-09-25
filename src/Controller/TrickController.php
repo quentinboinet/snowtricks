@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Entity\Comment;
 use App\Entity\Trick;
+use App\Form\CommentFormType;
 use App\Form\TrickAddFormType;
 use App\Form\TrickEditFormType;
 use App\Repository\TrickRepository;
@@ -77,35 +78,24 @@ class TrickController extends AbstractController
     {
         $trickRepo = $em->getRepository(Trick::class);
         $trick = $trickRepo->find($trickId);
+
         if (!empty($trick)) {
-            if ($request->isMethod('POST')) {//si on ajoute un commentaie
-                //on vérifie que user connecté pour avoir le droit d'ajouter un commentaire
-                if (null !== $security->getUser()) {
-                    if (null !== $request->request->get('comment')) {
-                        $comment = new Comment();
-                        $comment->setPublishedAt(new \DateTime());
-                        $comment->setContent($request->request->get('comment'));
-                        $comment->setTrick($trick);
-                        $comment->setUser($security->getUser());
+            $comment = new Comment();
+            $form = $this->createForm(CommentFormType::class, $comment);
+            $form->handleRequest($request);
 
-                        $em->persist($comment);
-                        $em->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $comment->setPublishedAt(new \DateTime());
+                $comment->setUser($this->getUser());
+                $comment->setTrick($trick);
 
-                        $this->addFlash('success', 'Votre commentaire a bien été ajouté !');
+                $em->persist($comment);
+                $em->flush();
 
-                        return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                    } else {
-                        $this->addFlash('fail', 'Vous ne pouvez pas ajouter un commentaire vide !');
-
-                        return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                    }
-                } else {
-                    $this->addFlash('fail', 'Vous devez être connecté pour ajouter un commentaire sur les figures.');
-
-                    return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                }
+                $this->addFlash('success', 'Votre commentaire a bien été ajouté !');
+                return $this->render('tricks/trickView.html.twig', ['trick' => $trick, 'commentForm' => $this->createForm(CommentFormType::class, new Comment())->createView()]);
             } else {
-                return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
+                return $this->render('tricks/trickView.html.twig', ['trick' => $trick, 'commentForm' => $form->createView()]);
             }
         } else {
             //renvoyer un message d'erreur pour dire que la figure n'existe pas
@@ -176,7 +166,6 @@ class TrickController extends AbstractController
         foreach ($trick->getPictures() as $picture) {
             $originalPictures->add($picture);
         }
-
         $originalVideos = new ArrayCollection();
         // Create an ArrayCollection of the current pictures objects in the database
         foreach ($trick->getVideos() as $video) {
@@ -192,12 +181,11 @@ class TrickController extends AbstractController
             $pictures = $trick->getPictures();
             $videos = $trick->getVideos();
 
-            //dd($pictures);
             foreach ($pictures as $picture) {
                 if (null != $picture->getFile()) {
                     $fileName = $fileUploader->upload($picture->getFile());
                     $picture->setPath('/images/uploads/'.$fileName);
-                } elseif ($picture->getFile() === null && strpos($picture->getAlt(), '#TO_DELETE#') !== false) { //c'est que c'est une image à supprimer
+                } elseif (null === $picture->getFile() && false !== strpos($picture->getAlt(), '#TO_DELETE#')) { //c'est que c'est une image à supprimer
                     //on la supprime du serveur
                     $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
                     $fileSystem->remove($fileName);
@@ -212,7 +200,7 @@ class TrickController extends AbstractController
             }
 
             foreach ($videos as $video) {
-                if (null == $video->getUrl() || strpos($video->getUrl(), '#TO_DELETE#') !== false) {
+                if (null == $video->getUrl() || false !== strpos($video->getUrl(), '#TO_DELETE#')) {
                     $em->remove($video);
                 }
             }
@@ -250,30 +238,13 @@ class TrickController extends AbstractController
         $trick = $trickRepo->find($trickId);
 
         if (!empty($trick)) {
-            $commentsRepo = $em->getRepository(Comment::class);
-
-            //on supprime les commentaires associés
-            $commentsAssociated = $commentsRepo->findBy(['trick' => $trickId]);
-            foreach ($commentsAssociated as $comment) {
-                $em->remove($comment);
-            }
-
-            //on supprime les images (en bdd + du serveur)
+            //on supprime les images (du serveur)
             $picturesAssociated = $trick->getPictures();
             $fileSystem = new Filesystem();
             foreach ($picturesAssociated as $picture) {
                 //on la supprime du serveur
                 $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
                 $fileSystem->remove($fileName);
-
-                //et de la bdd
-                $em->remove($picture);
-            }
-
-            //on supprime les vidéos (bdd)
-            $videosAssociated = $trick->getVideos();
-            foreach ($videosAssociated as $video) {
-                $em->remove($video);
             }
 
             $em->remove($trick);

@@ -25,13 +25,21 @@ $(document).ready(function() {
     $('#showMediasLink').click(function () {
         $("#showMediasLink").css('display', 'none');
         $("#hideMediasLink").css('display', 'flex');
-        $("#trickMediasMobileBlock").css('display', 'flex');
+        if ($(this).data("from") === "edit") {
+            $("#trickMediaEditBlock").css('display', 'block');
+        } else {
+            $("#trickMediasMobileBlock").css('display', 'flex');
+        }
     });
 
     $('#hideMediasLink').click(function () {
         $("#showMediasLink").css('display', 'flex');
         $("#hideMediasLink").css('display', 'none');
-        $("#trickMediasMobileBlock").css('display', 'none');
+        if ($(this).data("from") === "edit") {
+            $("#trickMediaEditBlock").css('display', 'none');
+        } else {
+            $("#trickMediasMobileBlock").css('display', 'none');
+        }
     });
 
     $('#exampleModal').on('show.bs.modal', function (event) {
