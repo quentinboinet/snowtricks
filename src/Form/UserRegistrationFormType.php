@@ -21,12 +21,12 @@ class UserRegistrationFormType extends AbstractType
             ->add('email', EmailType::class, ['label' => 'Adresse e-mail :'])
             ->add('plainPassword', PasswordType::class, ['label' => 'Mot de passe :', 'mapped' => false, 'constraints' => [
                 new NotBlank([
-                    'message' => 'Veuillez entrer un mot de passe !'
+                    'message' => 'Veuillez entrer un mot de passe !',
                 ]),
                 new Length([
                     'min' => 5,
-                    'minMessage' => 'Votre mot de passe doit contenir au moins 5 caractères.'
-                ])
+                    'minMessage' => 'Votre mot de passe doit contenir au moins 5 caractères.',
+                ]),
             ]])
         ;
     }

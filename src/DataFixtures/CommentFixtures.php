@@ -11,7 +11,7 @@ class CommentFixtures extends BaseFixture implements DependentFixtureInterface
 {
     public function loadData(ObjectManager $manager)
     {
-        $this->createMany(100, Comment::class, function($i) use ($manager){
+        $this->createMany(10, Comment::class, function($i) use ($manager){
             $comment = new Comment();
             $comment->setUser($this->getRandomReference('main_users'));
             $comment->setTrick($this->getRandomReference(Trick::class));

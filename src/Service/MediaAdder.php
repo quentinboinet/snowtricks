@@ -1,10 +1,13 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Picture;
 use App\Entity\Trick;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 
-class MediaAdder
+class MediaAdder extends AbstractController
 {
     /**
      * @var FileUploader
@@ -31,5 +34,12 @@ class MediaAdder
                 $trick->removeVideo($video);
             }
         }
+    }
+
+    public function removePicture(Picture $picture)
+    {
+        $fileSystem = new Filesystem();
+        $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
+        $fileSystem->remove($fileName);
     }
 }

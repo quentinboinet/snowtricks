@@ -138,13 +138,10 @@ class TrickController extends AbstractController
      * @Route("/tricks/{trickId}/edit", name="trick_edit")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_edit($trickId, EntityManagerInterface $em, Request $request, FileUploader $fileUploader)
+    public function trick_edit($trickId, EntityManagerInterface $em, Request $request, FileUploader $fileUploader, MediaAdder $mediaAdder)
     {
-        $trickRepo = $em->getRepository(Trick::class);
-        $trick = $trickRepo->find($trickId);
-
-        $categoryRepo = $em->getRepository(Category::class);
-        $category = $categoryRepo->findAll();
+        $trick = $em->getRepository(Trick::class)->find($trickId);
+        $category = $em->getRepository(Category::class)->findAll();
 
         $originalPictures = new ArrayCollection();
         // Create an ArrayCollection of the current pictures objects in the database
@@ -160,8 +157,6 @@ class TrickController extends AbstractController
         $form = $this->createForm(TrickEditFormType::class, $trick, ['method' => 'PATCH']);
         $form->handleRequest($request);
 
-        $fileSystem = new Filesystem();
-
         if ($form->isSubmitted() && $form->isValid()) {
             $pictures = $trick->getPictures();
             $videos = $trick->getVideos();
@@ -169,17 +164,12 @@ class TrickController extends AbstractController
             foreach ($pictures as $picture) {
                 if (null != $picture->getFile()) {
                     if (null !== $picture->getPath()) { //si c'est une modification d'image, alors d'abord on supprime l'ancienne du serveur
-                        $fileSystem = new Filesystem();
-                        $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
-                        $fileSystem->remove($fileName);
+                        $mediaAdder->removePicture($picture);
                     }
                     $fileName = $fileUploader->upload($picture->getFile());
                     $picture->setPath('/images/uploads/'.$fileName);
                 } elseif (null === $picture->getFile() && false !== strpos($picture->getAlt(), '#TO_DELETE#')) { //c'est que c'est une image à supprimer
-                    //on la supprime du serveur
-                    $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
-                    $fileSystem->remove($fileName);
-                    //et de la bdd
+                    $mediaAdder->removePicture($picture);
                     $em->remove($picture);
                 }
             }
@@ -222,7 +212,7 @@ class TrickController extends AbstractController
      * @Route("/tricks/{trickId}/delete", name="trick_delete")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_delete($trickId, EntityManagerInterface $em)
+    public function trick_delete($trickId, EntityManagerInterface $em, MediaAdder $mediaAdder)
     {
         $trickRepo = $em->getRepository(Trick::class);
         $trick = $trickRepo->find($trickId);
@@ -230,11 +220,9 @@ class TrickController extends AbstractController
         if (!empty($trick)) {
             //on supprime les images (du serveur)
             $picturesAssociated = $trick->getPictures();
-            $fileSystem = new Filesystem();
             foreach ($picturesAssociated as $picture) {
                 //on la supprime du serveur
-                $fileName = $this->getParameter('kernel.project_dir').'/public'.$picture->getPath();
-                $fileSystem->remove($fileName);
+                $mediaAdder->removePicture($picture);
             }
 
             $em->remove($trick);
