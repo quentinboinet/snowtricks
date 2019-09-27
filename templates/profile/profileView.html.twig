@@ -9,18 +9,25 @@
                 <div class="card profileCard">
                     <div class="card-header text-center">
                         <h2 class="card-title d-inline align-middle">Mon profil</h2>
-                        <span class="badge badge-default float-right m-2"><a href="{{ path('profile_edit') }}" title="Modifier mes informations"><i class="btn btn-info fas fa-pen-fancy"></i></a></span>
                     </div>
                     <div class="card-body">
                         <div class="row align-items-center text-center">
                             <div class="col-md-6">
-                                <img class="img-fluid rounded" src="{% if app.user.profilePicture == "" %}{{ asset('images/default_cover.jpg') }}{% else %}{{ app.user.profilePicture.path }}{% endif %}" title="Votre photo de profil" />
+                                <div class="card-img-overlay" id="editDeleteLinks" data-pictureid="{% if (app.user.profilePicture == "") %}cover{% else %}{{ app.user.profilePicture.id }}{% endif %}">
+                                    <a href="{{ path('profile_edit_picture') }}" id="profilePictureEdit" title="Modifier mon image de profil"><i class="btn btn-info fas fa-pen-fancy"></i></a>
+                                </div>
+                                <img class="img-fluid rounded profilePictureClass" src="{% if app.user.profilePicture == "" %}{{ asset('images/default_cover.jpg') }}{% else %}{{ app.user.profilePicture.path }}{% endif %}" title="Votre photo de profil" alt="Votre photo de profil"/>
                             </div>
                             <div class="col-md-6">
                                 <h3><b>{{ app.user.username }}</b></h3><br />
                                 <p><b>Nom :</b> {% if app.user.lastName != "" %}{{ app.user.lastName }}{% else %}<i>non renseigné</i>{% endif %}</p>
                                 <p><b>Prénom :</b> {% if app.user.firstName != "" %}{{ app.user.firstName }}{% else %}<i>non renseigné</i>{% endif %}</p>
                                 <p><i class="fas fa-envelope"></i> {{ app.user.email }}</p>
+
+                                <hr>
+
+                                <p><a href="{{ path('profile_edit_infos') }}" title="Modifier mes informations">Modifier mes informations</a><br />
+                                <a href="{{ path('profile_edit_password') }}" title="Modifier mon mot de passe">Modifier mon mot de passe</a></p>
                             </div>
                         </div>
                     </div>

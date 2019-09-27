@@ -9,9 +9,10 @@ class CategoryFixtures extends BaseFixture
 {
     public function loadData(ObjectManager $manager)
     {
-        $this->createMany(10, Category::class, function($i) use ($manager){
+        $categoryNames = ['Grab', 'Rotation', 'Flip', 'Slide', 'Old school'];
+        $this->createMany(5, Category::class, function($i) use ($categoryNames, $manager){
             $category = new Category();
-            $category->setName($this->faker->jobTitle);
+            $category->setName($categoryNames[$i]);
 
             return $category;
         });

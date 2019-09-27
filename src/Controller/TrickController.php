@@ -1,22 +1,20 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use App\Entity\Category;
 use App\Entity\Comment;
-use App\Entity\Picture;
 use App\Entity\Trick;
-use App\Entity\Video;
+use App\Form\CommentFormType;
+use App\Form\TrickAddFormType;
+use App\Form\TrickEditFormType;
 use App\Repository\TrickRepository;
-use App\Service\MediaEditer;
-use App\Service\MediaRemover;
-use App\Service\MediaUploader;
+use App\Service\FileUploader;
+use App\Service\MediaAdder;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,8 +32,9 @@ class TrickController extends AbstractController
         $tricks = $repository->findBy([], ['updatedAt' => 'DESC'], 15); //On récupère les 15 derniers tricks
 
         if (!$tricks) {
-            $tricks = "";
+            $tricks = '';
         }
+
         return $this->render('home.html.twig', ['tricks' => $tricks]);
     }
 
@@ -44,27 +43,26 @@ class TrickController extends AbstractController
      */
     public function getMoreTricks(Request $request, TrickRepository $trickRepository)
     {
-        if ($request->isXmlHttpRequest())
-        {
+        if ($request->isXmlHttpRequest()) {
             $tricks = $trickRepository->showMoreTricks($request->request->get('offset'));
 
-            $arrayCollection = array();
-            foreach($tricks as $trick) {
+            $arrayCollection = [];
+            foreach ($tricks as $trick) {
                 $pictures = $trick->getPictures();
-                if (count($pictures) != 0) {
-                    $i=0;
-                    foreach ($pictures as $picture) {
-                        if ($i==0) { $picturePath = $picture->getPath(); } //on récupère la première image associée à ce trick (image de couverture)
-                        $i++;
-                    }
-                } else {$picturePath = ""; }
+                if (0 != count($pictures)) {
+                    //on récupère la première image associée à ce trick (image de couverture)
+                    $picturePath = $pictures->first()->getPath();
+                } else {
+                    $picturePath = '';
+                }
 
-                $arrayCollection[] = array(
+                $arrayCollection[] = [
                     'id' => $trick->getId(),
                     'name' => $trick->getName(),
                     'pictures' => $picturePath,
-                );
+                ];
             }
+
             return new JsonResponse($arrayCollection);
         }
     }
@@ -76,41 +74,27 @@ class TrickController extends AbstractController
     {
         $trickRepo = $em->getRepository(Trick::class);
         $trick = $trickRepo->find($trickId);
-        if (!empty($trick))
-        {
-            if ($request->isMethod('POST'))//si on ajoute un commentaie
-            {
-                //on vérifie que user connecté pour avoir le droit d'ajouter un commentaire
-                if ($security->getUser() !== null) {
-                    if ($request->request->get('comment') !== null) {
-                        $comment = new Comment();
-                        $comment->setPublishedAt(new \DateTime());
-                        $comment->setContent($request->request->get('comment'));
-                        $comment->setTrick($trick);
-                        $comment->setUser($security->getUser());
 
-                        $em->persist($comment);
-                        $em->flush();
+        if (!empty($trick)) {
+            $comment = new Comment();
+            $form = $this->createForm(CommentFormType::class, $comment);
+            $form->handleRequest($request);
 
-                        $this->addFlash('success', 'Votre commentaire a bien été ajouté !');
-                        return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                    }
-                    else {
-                        $this->addFlash('fail', 'Vous ne pouvez pas ajouter un commentaire vide !');
-                        return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                    }
-                }
-                else {
-                    $this->addFlash('fail', 'Vous devez être connecté pour ajouter un commentaire sur les figures.');
-                    return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                }
+            if ($form->isSubmitted() && $form->isValid()) {
+                $comment->setPublishedAt(new \DateTime());
+                $comment->setUser($this->getUser());
+                $comment->setTrick($trick);
+
+                $em->persist($comment);
+                $em->flush();
+
+                $this->addFlash('success', 'Votre commentaire a bien été ajouté !');
+
+                return $this->render('tricks/trickView.html.twig', ['trick' => $trick, 'commentForm' => $this->createForm(CommentFormType::class, new Comment())->createView()]);
+            } else {
+                return $this->render('tricks/trickView.html.twig', ['trick' => $trick, 'commentForm' => $form->createView()]);
             }
-            else {
-                    return $this->render('tricks/trickView.html.twig', ['trick' => $trick]);
-                }
-
-        }
-        else {
+        } else {
             //renvoyer un message d'erreur pour dire que la figure n'existe pas
             return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
         }
@@ -120,50 +104,33 @@ class TrickController extends AbstractController
      * @Route("/tricks/add", name="trick_add")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_add(EntityManagerInterface $em, Request $request, Security $security, MediaUploader $uploader)
+    public function trick_add(EntityManagerInterface $em, Request $request, MediaAdder $mediaAdder)
     {
-        $categoryRepo = $em->getRepository(Category::class);
-        $category = $categoryRepo->findAll();
+        $trick = new Trick();
+        $form = $this->createForm(TrickAddFormType::class, $trick);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
+        if ($form->isSubmitted() && $form->isValid()) {
+            $pictures = $trick->getPictures();
+            $videos = $trick->getVideos();
 
-            //on vérifie qu'il n'y a pas de figure avec ce nom enregistré
-            $trickRepo = $em->getRepository(Trick::class);
-            $trick = $trickRepo->findOneBy(array('name' => $request->request->get('name')));
+            $mediaAdder->addMedias($pictures, $videos, $trick);
 
-            if (is_null($trick)) {
-                $trick = new Trick();
-                $trick->setName($request->request->get('name'));
-                $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->request->get('name')), '-')));
-                $trick->setDescription($request->request->get('description'));
-                $trick->setPublishedAt(new \DateTime());
-                $trick->setUpdatedAt(new \DateTime());
-                $trick->setAuthorName($security->getUser());
+            $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $trick->getName()), '-')));
+            $trick->setPublishedAt(new \DateTime());
+            $trick->setUpdatedAt(new \DateTime());
+            $trick->setAuthorName($this->getUser());
 
-                //on appelle le service uploader pour uploader toutes les images
-                $nbImages = $request->request->get('pictureNb');
-                $error = $uploader->picturesUpload('add', $nbImages, $request, $trick, $category);
-                if ($error != null) { return $this->render('tricks/trickAdd.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]);}
+            $em->persist($trick);
+            $em->flush();
 
-                //on appelle le service uploader pour uploader toutes les vidéos
-                $nbVideos = $request->request->get('videoNb');
-                $uploader->videosUpload('add', $nbVideos, $request, $trick);
+            $this->addFlash('success', 'La figure a bien été publiée ! Vous pouvez la retrouver ci-dessous.');
 
-                $trickCategory = $em->getRepository(Category::class)->find($request->request->get('category'));
-                $trick->setCategory($trickCategory);
-
-                $em->persist($trick);
-                $em->flush();
-
-                $this->addFlash('success', 'La figure a bien été publiée ! Vous pouvez la retrouver ci-dessous.');
-                return $this->redirectToRoute('home_page');
-            }
-            else {
-                return $this->render('tricks/trickAdd.html.twig', ['categories' => $category, 'error' => 'Une figure possède déjà ce nom ! Veuillez en choisir un autre.']);
-            }
-        }
-        else {
-            return $this->render('tricks/trickAdd.html.twig', ['categories' => $category, 'error' => '']);
+            return $this->redirectToRoute('home_page');
+        } else {
+            return $this->render('tricks/trickAdd.html.twig', [
+                'form' => $form->createView(),
+            ]);
         }
     }
 
@@ -171,75 +138,69 @@ class TrickController extends AbstractController
      * @Route("/tricks/{trickId}/edit", name="trick_edit")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_edit($trickId, EntityManagerInterface $em, Request $request, Security $security, MediaUploader $uploader, MediaRemover $mediaRemover, MediaEditer $mediaEditer)
+    public function trick_edit($trickId, EntityManagerInterface $em, Request $request, FileUploader $fileUploader, MediaAdder $mediaAdder)
     {
-        $trickRepo = $em->getRepository(Trick::class);
-        $trick = $trickRepo->find($trickId);
+        $trick = $em->getRepository(Trick::class)->find($trickId);
+        $category = $em->getRepository(Category::class)->findAll();
 
-        $categoryRepo = $em->getRepository(Category::class);
-        $category = $categoryRepo->findAll();
-
-        if ($request->isMethod('POST')) {
-
-            $tricks = $trickRepo->findOneBy(['name' => $request->request->get('name')]);
-            if ($tricks == "" OR $tricks->getId() == $trickId)//si il y a une figure avec le même nom (celle-ci) ou aucune
-            {
-                //on commence par supprimer les images
-                $picturesToDelete = explode("-", $request->request->get('picturesToDelete'));
-                $nbrePicturesToDelete = count($picturesToDelete);
-                $pictureRepo = $em->getRepository(Picture::class);
-                $mediaRemover->picturesRemove($nbrePicturesToDelete, $picturesToDelete, $pictureRepo, $trick);
-
-                // puis on supprime les vidéos
-                $videosToDelete = explode("-", $request->request->get('videosToDelete'));
-                $nbreVideosToDelete = count($videosToDelete);
-                $videoRepo = $em->getRepository(Video::class);
-                $mediaRemover->videosRemove($nbreVideosToDelete, $videosToDelete, $videoRepo, $trick);
-
-                $picturesToEdit = explode("-", $request->request->get('picturesToEdit'));
-                $nbrePicturesToEdit = count($picturesToEdit);
-
-                //puis on édite les images (upload des nouvelles, maj de bdd et suppression des anciennes sur le serveur
-                $error = $mediaEditer->picturesEdit($nbrePicturesToEdit, $picturesToEdit, $request, $pictureRepo, $trick, $category);
-                if ($error != null) { return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]); }
-
-                //puis on édite les vidéos (maj de BDD)
-                $videosToEdit = explode("-", $request->request->get('videosToEdit'));
-                $nbreVideosToEdit = count($videosToEdit);
-                $mediaEditer->videosEdit($nbreVideosToEdit, $videosToEdit, $request, $videoRepo, $trick);
-
-                //on upload les nouvelles images
-                //on appelle le service uploader pour uploader toutes les images
-                $nbNouvellesImages = $request->request->get('pictureAddNb');
-                $error = $uploader->picturesUpload('edit', $nbNouvellesImages, $request, $trick, $category);
-                if ($error != null) { return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => $error]); }
-
-                //on ajoute les nouvelles vidéos, en passant par le service uploader
-                $nbVideos = $request->request->get('videoAddNb');
-                $uploader->videosUpload('edit', $nbVideos, $request, $trick);
-
-                $trick->setName($request->request->get('name'));
-                $trick->setSlug(strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->request->get('name')), '-')));
-                $trick->setDescription($request->request->get('description'));
-                $trick->setUpdatedAt(new \DateTime());
-                $trick->setAuthorName($security->getUser());
-
-                $trickCategory = $em->getRepository(Category::class)->find($request->request->get('category'));
-                $trick->setCategory($trickCategory);
-
-                $em->persist($trick);
-                $em->flush();
-
-                $this->addFlash('success', 'La figure a bien été mise à jour ! Vous pouvez la retrouver ci-dessous.');
-                return $this->redirectToRoute('trick_view', array('trickId' => $trickId));
-            }
-            else {
-                return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => 'Une figure avec ce nom existe déjà ! Veuillez en choisir un autre.']);
-            }
+        $originalPictures = new ArrayCollection();
+        // Create an ArrayCollection of the current pictures objects in the database
+        foreach ($trick->getPictures() as $picture) {
+            $originalPictures->add($picture);
         }
-        else {
+        $originalVideos = new ArrayCollection();
+        // Create an ArrayCollection of the current videos objects in the database
+        foreach ($trick->getVideos() as $video) {
+            $originalVideos->add($video);
+        }
+
+        $form = $this->createForm(TrickEditFormType::class, $trick, ['method' => 'PATCH']);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $pictures = $trick->getPictures();
+            $videos = $trick->getVideos();
+
+            foreach ($pictures as $picture) {
+                if (null != $picture->getFile()) {
+                    if (null !== $picture->getPath()) { //si c'est une modification d'image, alors d'abord on supprime l'ancienne du serveur
+                        $mediaAdder->removePicture($picture);
+                    }
+                    $fileName = $fileUploader->upload($picture->getFile());
+                    $picture->setPath('/images/uploads/'.$fileName);
+                } elseif (null === $picture->getFile() && false !== strpos($picture->getAlt(), '#TO_DELETE#')) { //c'est que c'est une image à supprimer
+                    $mediaAdder->removePicture($picture);
+                    $em->remove($picture);
+                }
+            }
+            foreach ($originalPictures as $picture) {
+                if (false === $pictures->contains($picture)) {
+                    $trick->addPicture($picture);
+                }
+            }
+
+            foreach ($videos as $video) {
+                if (null == $video->getUrl() || false !== strpos($video->getUrl(), '#TO_DELETE#')) {
+                    $em->remove($video);
+                }
+            }
+            foreach ($originalVideos as $video) {
+                if (false === $videos->contains($video)) {
+                    $trick->addVideo($video);
+                }
+            }
+
+            $trick->setUpdatedAt(new \DateTime());
+            $trick->setAuthorName($this->getUser());
+
+            $em->flush();
+
+            $this->addFlash('success', 'La figure a bien été modifiée ! Vous pouvez la retrouver ci-dessous.');
+
+            return $this->redirectToRoute('trick_view', ['trickId' => $trick->getId()]);
+        } else {
             if (!empty($trick)) {
-                return $this->render('tricks/trickEdit.html.twig', ['trick' => $trick, 'categories' => $category, 'error' => '']);
+                return $this->render('tricks/trickEdit.html.twig', ['form' => $form->createView(), 'trick' => $trick, 'categories' => $category, 'error' => '']);
             } else {
                 //renvoyer un message d'erreur pour dire que la figure n'existe pas
                 return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
@@ -247,44 +208,21 @@ class TrickController extends AbstractController
         }
     }
 
-
     /**
      * @Route("/tricks/{trickId}/delete", name="trick_delete")
      * @IsGranted("ROLE_USER")
      */
-    public function trick_delete($trickId, EntityManagerInterface $em) {
-
+    public function trick_delete($trickId, EntityManagerInterface $em, MediaAdder $mediaAdder)
+    {
         $trickRepo = $em->getRepository(Trick::class);
         $trick = $trickRepo->find($trickId);
 
         if (!empty($trick)) {
-            $commentsRepo = $em->getRepository(Comment::class);
-
-            //on supprime les commentaires associés
-            $commentsAssociated = $commentsRepo->findBy(['trick' => $trickId]);
-            foreach ($commentsAssociated as $comment)
-            {
-                $em->remove($comment);
-            }
-
-            //on supprime les images (en bdd + du serveur)
+            //on supprime les images (du serveur)
             $picturesAssociated = $trick->getPictures();
-            $fileSystem = new Filesystem();
-            foreach ($picturesAssociated as $picture)
-            {
+            foreach ($picturesAssociated as $picture) {
                 //on la supprime du serveur
-                $fileName = $this->getParameter('kernel.project_dir') . '/public' . $picture->getPath();
-                $fileSystem->remove($fileName);
-
-                //et de la bdd
-                $em->remove($picture);
-            }
-
-            //on supprime les vidéos (bdd)
-            $videosAssociated = $trick->getVideos();
-            foreach ($videosAssociated as $video)
-            {
-                $em->remove($video);
+                $mediaAdder->removePicture($picture);
             }
 
             $em->remove($trick);
@@ -292,8 +230,8 @@ class TrickController extends AbstractController
 
             $tricks = $trickRepo->findBy([], ['updatedAt' => 'DESC'], 15); //On récupère les 15 derniers tricks
             $this->addFlash('warning', 'La figure a bien été supprimée !');
-            return $this->redirectToRoute('home_page', array('tricks' => $tricks));
 
+            return $this->redirectToRoute('home_page', ['tricks' => $tricks]);
         } else {
             //renvoyer un message d'erreur pour dire que la figure n'existe pas
             return $this->render('bundles/TwigBundle/Exception/error404.html.twig');

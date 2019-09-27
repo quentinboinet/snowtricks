@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center">
+            <div class="col col-md-8">
+                <div class="card profileCard">
+                    <div class="card-header text-center">
+                        <h2 class="card-title d-inline align-middle">Modifier mes informations</h2>
+                    </div>
+                    <div class="card-body">
+                            <div class="row align-items-center text-center" id="profileSection" data-defaultpicture="{{ asset('images/default_cover.jpg') }}">
+                                <div class="col-md-6">
+                                    <img class="img-fluid rounded profilePictureClass" src="{% if app.user.profilePicture == "" %}{{ asset('images/default_cover.jpg') }}{% else %}{{ app.user.profilePicture.path }}{% endif %}" title="Votre photo de profil" />
+                                </div>
+                                <div class="col-md-6" id="userInfos">
+                                    <h3><b>{{ app.user.username }}</b></h3><br />
+
+                                    {{ form_start(form) }}
+
+                                    <div class="form-group row justify-content-center offset-md-2 col-md-8">
+                                        <label class="col-md-4 col-form-label text-center" for="{{ form.lastName.vars.id }}">{{ form.lastName.vars.label }}</label>
+                                        <div class="col-md-8">
+                                            <input type="text" id="{{ form.lastName.vars.id }}" name="{{ form.lastName.vars.full_name }}" class="form-control" required="{{ form.lastName.vars.required }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row justify-content-center offset-md-2 col-md-8">
+                                        <label class="col-md-4 col-form-label text-center" for="{{ form.firstName.vars.id }}">{{ form.firstName.vars.label }}</label>
+                                        <div class="col-md-8">
+                                            <input type="text" id="{{ form.firstName.vars.id }}" name="{{ form.firstName.vars.full_name }}" class="form-control" required="{{ form.firstName.vars.required }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row justify-content-center">
+                                        <span class="formErrorMessage">{{ form_errors(form.lastName) }}</span><br />
+                                        <span class="formErrorMessage">{{ form_errors(form.firstName) }}</span><br />
+                                        <span class="formErrorMessage">{{ form_errors(form) }}</span>
+                                    </div>
+
+                                    <p><i class="fas fa-envelope"></i> {{ app.user.email }}</p>
+
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="form-group row justify-content-center">
+                                <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
+                            </div>
+
+                        {{ form_widget(form._token) }}
+                        {{ form_end(form, {'render_rest': false}) }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script src="{{ asset('js/editProfile.js') }}"></script>
+
+{% endblock %}

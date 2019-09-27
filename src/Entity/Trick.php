@@ -3,13 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
-use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TrickRepository")
+ * @UniqueEntity(
+ *     fields={"name"},
+ *     message="Une figure avec ce nom existe déjà !"
+ * )
  */
 class Trick
 {
@@ -19,7 +23,6 @@ class Trick
      * @ORM\Column(type="integer")
      */
     private $id;
-
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -36,7 +39,6 @@ class Trick
      */
     private $description;
 
-
     /**
      * @ORM\Column(type="datetime")
      */
@@ -48,12 +50,12 @@ class Trick
     private $updatedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Picture", inversedBy="tricks")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Picture", inversedBy="tricks", cascade={"remove", "persist"})
      */
     private $pictures;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Video", inversedBy="tricks")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Video", inversedBy="tricks", cascade={"remove", "persist"})
      */
     private $videos;
 
@@ -69,7 +71,7 @@ class Trick
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="trick")
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="trick", cascade={"remove"})
      * @ORM\OrderBy({"publishedAt" = "DESC"})
      */
     private $comments;
@@ -236,6 +238,7 @@ class Trick
     public function getLimitedComments(): Collection
     {
         $criteria = CommentRepository::createLimitedCommentsCriteria();
+
         return $this->comments->matching($criteria);
     }
 
