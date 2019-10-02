@@ -1,33 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% form_theme registrationForm _self %}
-
-{% block form_row %}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-    {%- endif -%}
-
-    <div class="form-group row">
-    {{- form_label(form, null, {label_attr: { class: 'col-sm-4 col-form-label' }}) -}}
-        <div class="col-sm-8">
-            {{- form_widget(form, {'attr': {'class': 'form-control'}}) -}}
-        </div>
-    {{- form_help(form) -}}
-    </div>
-    {{- form_errors(form) -}}
-{% endblock %}
-
-{% block form_errors %}
-    {% spaceless %}
-        {% if errors|length > 0 %}
-            {% for error in errors %}
-                <span class="formErrorMessage"> {{  error.messageTemplate|trans(error.messageParameters, 'validators') }}</span><br/><br />
-            {% endfor %}
-        {% endif %}
-    {% endspaceless %}
-{% endblock form_errors %}
-
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
@@ -40,8 +12,46 @@
                         <p class="card-text">
 
                             {{ form_start(registrationForm) }}
-                            {{ form_widget(registrationForm) }}
-                            <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
+
+                        <div class="form-group row text-center">
+                            <label for="{{ registrationForm.username.vars.id }}" class="col-sm-4 col-form-label required">{{ registrationForm.username.vars.label }}</label>
+                            <div class="col-sm-8">
+                                {{ form_errors(registrationForm.username) }}
+                                <input type="text" id="{{ registrationForm.username.vars.id }}" name="{{ registrationForm.username.vars.full_name }}" value="{{ registrationForm.username.vars.value }}" required="{{ registrationForm.username.vars.required }}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row text-center">
+                            <label for="{{ registrationForm.email.vars.id }}" class="col-sm-4 col-form-label required">{{ registrationForm.email.vars.label }}</label>
+                            <div class="col-sm-8">
+                                {{ form_errors(registrationForm.email) }}
+                                <input type="text" id="{{ registrationForm.email.vars.id }}" name="{{ registrationForm.email.vars.full_name }}" value="{{ registrationForm.email.vars.value }}" required="{{ registrationForm.email.vars.required }}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row text-center">
+                            <label for="{{ registrationForm.plainPassword.vars.id }}" class="col-sm-4 col-form-label required">{{ registrationForm.plainPassword.vars.label }}</label>
+                            <div class="col-sm-8">
+                                {{ form_errors(registrationForm.plainPassword) }}
+                                <input type="text" id="{{ registrationForm.plainPassword.vars.id }}" name="{{ registrationForm.plainPassword.vars.full_name }}" value="{{ registrationForm.plainPassword.vars.value }}" required="{{ registrationForm.plainPassword.vars.required }}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row justify-content-center formErrorMessage">
+                            <span>{{ form_errors(registrationForm) }}</span>
+                        </div>
+
+                        <div class="form-group row justify-content-center">
+                            <div class="col-sm-10 ">
+                                <button type="submit" class="btn btn-info btn-circle"><i class="fas fa-check fa-2x"></i></button>
+                            </div>
+                        </div>
+                        {{ form_widget(registrationForm._token) }}
+
+                        {% do registrationForm.username.setRendered %}
+                        {% do registrationForm.email.setRendered %}
+                        {% do registrationForm.plainPassword.setRendered %}
+
                             {{ form_end(registrationForm) }}
                         </p>
                     </div>
